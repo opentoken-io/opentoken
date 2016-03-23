@@ -22,3 +22,4 @@ nbproject/
 
 # Generated
 /node_modules/
+npm-debug.log
