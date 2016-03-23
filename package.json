@@ -31,5 +31,7 @@
     },
     "homepage": "https://github.com/opentoken-io/opentoken#readme",
     "devDependencies": {},
-    "dependencies": {}
+    "dependencies": {
+        "dizzy": "^1.0.0"
+    }
 }
