@@ -1,0 +1,8 @@
+{
+    "server": {
+        "port": 8443
+    },
+    "healthCheck": {
+        "port": 8080
+    }
+}
