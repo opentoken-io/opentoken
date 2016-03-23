@@ -1,0 +1,35 @@
+{
+    "name": "opentoken",
+    "version": "1.0.0",
+    "description": "Public and free software API to tokenize or encrypt data.",
+    "main": "lib/opentoken.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/opentoken-io/opentoken.git"
+    },
+    "keywords": [
+        "tokenize"
+    ],
+    "author": "OpenToken Team",
+    "contributors": [
+        {
+            "name": "Tyler Akins",
+            "email": "fidian@rumkin.com",
+            "url": "https://github.com/fidian"
+        },
+        {
+            "name": "Christopher Tetreault",
+            "url": "https://github.com/AbsentSemicolon"
+        }
+    ],
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/opentoken-io/opentoken/issues"
+    },
+    "homepage": "https://github.com/opentoken-io/opentoken#readme",
+    "devDependencies": {},
+    "dependencies": {}
+}
