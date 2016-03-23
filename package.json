@@ -32,6 +32,7 @@
     "homepage": "https://github.com/opentoken-io/opentoken#readme",
     "devDependencies": {},
     "dependencies": {
-        "dizzy": "^1.0.0"
+        "dizzy": "^1.0.0",
+        "express": "^4.13.4"
     }
 }
