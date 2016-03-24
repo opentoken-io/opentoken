@@ -34,6 +34,7 @@
     "devDependencies": {},
     "dependencies": {
         "dizzy": "^1.0.1",
-        "express": "^4.13.4"
+        "express": "^4.13.4",
+        "findhit-proxywrap": "^0.3.11"
     }
 }
