@@ -14,4 +14,9 @@ if (process.env.PORT) {
     config.server.port = process.env.PORT;
 }
 
+if (process.env.DEBUG) {
+    logger.info("Environment variable DEBUG was set. DEBUG is on!");
+    config.debug = true;
+}
+
 container.resolve("apiServer");
