@@ -1,5 +1,6 @@
 {
     "server": {
+        "https": false,
         "port": 8443,
         "proxyProtocol": false
     }
