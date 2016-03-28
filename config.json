@@ -1,6 +1,7 @@
 {
     "server": {
         "port": 8443,
-        "proxyProtocol": false
+        "proxyProtocol": false,
+        "https": false
     }
 }

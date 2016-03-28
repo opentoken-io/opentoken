@@ -3,6 +3,12 @@
 .Trash*
 $*
 
+# Keys and Certs
+*.pem
+*.crt
+*.csr
+*.key
+
 # Backup files
 *.sw[g-p]
 *.bak
