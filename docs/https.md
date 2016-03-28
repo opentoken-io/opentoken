@@ -1,5 +1,5 @@
 HTTPS
-=========
+=====
 
 HTTPS for Open Token can be enabled by adding/updating a configuration option in config.json.
 
@@ -17,7 +17,7 @@ If the server is going to need/want HTTPS then there are a few things to do.
 
 First the server will need to a Private Key file and a Certificate file. These can be generated for testing and development.
 
-### Generating SSL Files for Testing
+## Generating SSL Files for Testing
 
 In order to generate the files needed for testing and development there are several commands which need to be ran. These commands were pulled from [The Most Common OpenSSL Commands](https://www.sslshopper.com/article-most-common-openssl-commands.html).
 
@@ -27,7 +27,7 @@ There will be several prompts for information: Below is an example for getting i
 
     Country Name (2 letter code) [AU]:US
     State or Province Name (full name) [Some-State]:Washington
-    Locality Name (eg, city) []:Redmond 
+    Locality Name (eg, city) []:Redmond
     Organization Name (eg, company) [Internet Widgits Pty Ltd]:Some Company
     Organizational Unit Name (eg, section) []:A Division
     Common Name (e.g. server FQDN or YOUR name) []:localhost
@@ -37,13 +37,13 @@ There will be several prompts for information: Below is an example for getting i
     A challenge password []:Don't enter one as Express HTTPS will not have a way of entering the passphrase when navigating to the server.
     An optional company name []: If there is an optional company name enter it here.
 
-This will create a Private Key file and a Certificate Signing Request file. We aren't done yet though, we still need to generate a Self-Signed Certificate file. 
+This will create a Private Key file and a Certificate Signing Request file. We aren't done yet though, we still need to generate a Self-Signed Certificate file.
 
     openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -keyout privateKey.key -out certificate.crt
 
 The same questions will be prompted from above except for the "extra" ones.
 
-### Updating Config.json
+## Updating Config.json
 
 Once the keys are generated they can be added under the "https" property under the server being configured. Only two of the SSL files generated are needed for testing.
 
@@ -51,17 +51,17 @@ Once the keys are generated they can be added under the "https" property under t
         "server": {
             "port": 8443,
             "https": {
-                keyFile: "path/to/key/file.key",
-                certFile: "path/to/cert/file.crt"
+                "keyFile": "path/to/key/file.key",
+                "certFile": "path/to/cert/file.crt"
             }
-        
+
         }
         ...
     }
-    
+
 When set, the server will attempt to load these files and start the server up using HTTPS.
 
-An easy way to see if this works is to go to the https://hostname:port and you will get a warning about not being able to verify the certificate, but you will have an https connection.
+An easy way to see if this works is to go to https://hostname:8443 (replace `hostname` with your server's name or use `localhost` if developing on your own machine) and you will get a warning about not being able to verify the certificate, but you will have an https connection.
 
 Optionally you can run the command:
 
