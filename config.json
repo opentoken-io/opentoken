@@ -1,7 +1,10 @@
 {
+    "debug": false,
     "server": {
-        "debug": false,
+        "certificateFile": "./certificate.crt",
+        "keyFile": "./privateKey.key",
         "https": false,
+        "name": "OpenToken.io",
         "port": 8443,
         "proxyProtocol": false
     }
