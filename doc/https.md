@@ -3,12 +3,11 @@ HTTPS
 
 HTTPS for Open Token can be enabled by adding/updating a configuration option in config.json.
 
-The default "https" property doesn't need to exist or can be set to "false". This will tell the server not to use HTTPS for its connections and therefore will not set it up when starting.
+The default settings do not enable HTTPS.
 
     {
         "server": {
             "port": 8443,
-            "https": false
         }
         ...
     }
@@ -17,7 +16,9 @@ If the server is going to need/want HTTPS then there are a few things to do.
 
 First the server will need to a Private Key file and a Certificate file. These can be generated for testing and development.
 
-## Generating SSL Files for Testing
+
+Generating SSL Files for Testing
+--------------------------------
 
 In order to generate the files needed for testing and development there are several commands which need to be ran. These commands were pulled from [The Most Common OpenSSL Commands](https://www.sslshopper.com/article-most-common-openssl-commands.html).
 
@@ -34,8 +35,10 @@ There will be several prompts for information: Below is an example for getting i
     Email Address []:some.one@example.net
 
     There are a few "extra" options, these aren't required to make the site work.
-    A challenge password []:Don't enter one as Express HTTPS will not have a way of entering the passphrase when navigating to the server.
+    A challenge password []:
     An optional company name []: If there is an optional company name enter it here.
+
+Do not enter a password because the config file does not support entering a passwrod at this time.
 
 This will create a Private Key file and a Certificate Signing Request file. We aren't done yet though, we still need to generate a Self-Signed Certificate file.
 
@@ -43,25 +46,24 @@ This will create a Private Key file and a Certificate Signing Request file. We a
 
 The same questions will be prompted from above except for the "extra" ones.
 
-## Updating Config.json
 
-Once the keys are generated they can be added under the "https" property under the server being configured. Only two of the SSL files generated are needed for testing.
+Updating `config.json`
+----------------------
+
+Once the keys are generated they can be added under the "server" property.  Only the private key and the certificate are required.
 
     {
         "server": {
-            "port": 8443,
-            "https": {
-                "keyFile": "path/to/key/file.key",
-                "certFile": "path/to/cert/file.crt"
-            }
-
+            "certificateFile": "./certificate.crt",
+            "keyFile": "./privateKey.key",
+            "port": 8443
         }
         ...
     }
 
 When set, the server will attempt to load these files and start the server up using HTTPS.
 
-An easy way to see if this works is to go to https://hostname:8443 (replace `hostname` with your server's name or use `localhost` if developing on your own machine) and you will get a warning about not being able to verify the certificate, but you will have an https connection.
+An easy way to see if this works is to go to `https://hostname:8443/`.  Replace `hostname` with your server's name or use `localhost` if developing on your own machine.  You will get a warning about not being able to verify the certificate, but you will have an encrypted connection.
 
 Optionally you can run the command:
 

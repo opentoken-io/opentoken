@@ -34,7 +34,7 @@
     "devDependencies": {},
     "dependencies": {
         "dizzy": "^1.0.2",
-        "express": "^4.13.4",
-        "findhit-proxywrap": "^0.3.11"
+        "findhit-proxywrap": "^0.3.11",
+        "restify": "opentoken-io/node-restify#proxywrap"
     }
 }
