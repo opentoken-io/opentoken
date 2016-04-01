@@ -1,12 +1,29 @@
 {
     "parserOptions": {
         "ecmaVersion": 6
-     },
+    },
+    "env": {
+        "node": true
+    },
     "extends": "eslint:recommended",
     "rules": {
-        "indent": ["error", 4],
-        "quotes": ["error", "double"],
-        "linebreak-style": ["error", "unix"],
-        "no-trailing-spaces": [2, { "skipBlankLines": false }]
+        "indent": [
+            "error",
+            4
+        ],
+        "quotes": [
+            "error",
+            "double"
+        ],
+        "linebreak-style": [
+            "error",
+            "unix"
+        ],
+        "no-trailing-spaces": [
+            2,
+            {
+                "skipBlankLines": false
+            }
+        ]
     }
 }
