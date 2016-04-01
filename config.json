@@ -1,10 +1,7 @@
 {
     "debug": false,
     "server": {
-        "baseUrl": "https://localhost:8080",
-        "certificateFile": "./certificate.crt",
-        "keyFile": "./privateKey.key",
-        "https": false,
+        "baseUrl": "https://localhost:8080/",
         "name": "OpenToken.io",
         "port": 8443,
         "proxyProtocol": false
