@@ -33,7 +33,6 @@
     "homepage": "https://github.com/opentoken-io/opentoken#readme",
     "devDependencies": {},
     "dependencies": {
-        "connect": "^3.4.1",
         "dizzy": "^1.0.2",
         "findhit-proxywrap": "^0.3.11",
         "helmet": "^1.3.0",

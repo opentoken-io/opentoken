@@ -4,6 +4,7 @@
         "baseUrl": "https://localhost:8080/",
         "name": "OpenToken.io",
         "port": 8443,
+        "profileMiddleware": false,
         "proxyProtocol": false
     }
 }
