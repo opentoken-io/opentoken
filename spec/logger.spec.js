@@ -1,15 +1,15 @@
-var log, logger;
-
-logger = require("../lib/logger");
-
-beforeEach(function () {
-    spyOn(console, "log");
-    spyOn(console, "error");
-    spyOn(console.log, "apply");
-});
-
 describe("logger", function () {
     "use strict";
+
+    var log, logger;
+
+    logger = require("../lib/logger");
+
+    beforeEach(function () {
+        spyOn(console, "log");
+        spyOn(console, "error");
+        spyOn(console.log, "apply");
+    });
 
     describe("constructor", function () {
         beforeEach(function () {
