@@ -3,7 +3,7 @@ Open Token
 [![Build Status][travis-image]][Travis CI]
 [![Dependencies][dependencies-image]][Dependencies]
 [![Dev Dependencies][devdependencies-image]][Dev Dependencies]
-[![codecov.io][codecov-image][Code Coverage]
+[![codecov.io][codecov-image]][Code Coverage]
 
 
 [Code Coverage]: https://codecov.io/github/AbsentSemicolon/opentoken?branch=testing
