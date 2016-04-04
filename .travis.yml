@@ -1,8 +1,22 @@
 language: node_js
 node_js:
+    - 4.0.0
+    - 4.1.0
+    - 4.1.1
+    - 4.1.2
+    - 4.2.0
+    - 4.2.1
+    - 4.2.2
+    - 4.2.3
+    - 4.2.4
+    - 4.2.5
+    - 4.2.6
+    - 4.3.0
+    - 4.3.1
+    - 4.3.2
     - 4.4.0
+    - 4.4.1
+    - 4.4.2
     - 5.10.0
 before_install:
     - "npm install -g npm@latest"
-    - "npm install -g codecov"
-    
