@@ -5,7 +5,7 @@
     "main": "lib/opentoken.js",
     "scripts": {
         "start": "node bin/server.js || true",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "./node_modules/.bin/jasmine-node test --autotest --watch || true"
     },
     "repository": {
         "type": "git",
@@ -31,7 +31,9 @@
         "url": "https://github.com/opentoken-io/opentoken/issues"
     },
     "homepage": "https://github.com/opentoken-io/opentoken#readme",
-    "devDependencies": {},
+    "devDependencies": {
+        "jasmine-node": "^1.14.5"
+    },
     "dependencies": {
         "dizzy": "^1.0.2",
         "findhit-proxywrap": "^0.3.11",
