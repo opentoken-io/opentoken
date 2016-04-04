@@ -1,0 +1,5 @@
+instrumentation:
+    excludes: [
+        load-test.js   
+    ]
+    include-all-sources: true
