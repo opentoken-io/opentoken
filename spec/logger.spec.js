@@ -1,9 +1,8 @@
 /* globals beforeEach, expect, describe, it, spyOn */
 
-var config, log, logger;
+var log, logger;
 
 logger = require("../lib/logger");
-config = require("../config.json");
 
 beforeEach(function () {
     spyOn(console, "log");
@@ -16,7 +15,7 @@ describe("logger", function () {
 
     describe("constructor", function () {
         beforeEach(function () {
-            log = new logger(config);
+            log = new logger({});
         });
 
         it("prints to log from info", function () {
@@ -47,8 +46,9 @@ describe("logger", function () {
 
     describe("constructor with debug set", function () {
         beforeEach(function () {
-            config.debug = true;
-            log = new logger(config);
+            log = new logger({
+                debug: true
+            });
         });
 
         it("prints to error from debug", function () {
