@@ -1,5 +1,3 @@
-/* globals beforeEach, expect, describe, it, spyOn */
-
 var log, logger;
 
 logger = require("../lib/logger");
