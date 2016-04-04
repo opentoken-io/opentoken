@@ -5,7 +5,8 @@
     "main": "lib/opentoken.js",
     "scripts": {
         "start": "node bin/server.js || true",
-        "test": "./node_modules/.bin/jasmine-node spec --autotest --watch || true"
+        "test": "./node_modules/.bin/jasmine-node spec || true",
+        "watch": "./node_modules/.bin/jasmine-node spec --autotest --watch || true"
     },
     "repository": {
         "type": "git",
