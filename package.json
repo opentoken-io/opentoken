@@ -4,7 +4,7 @@
     "description": "Public and free software API to tokenize or encrypt data.",
     "main": "lib/opentoken.js",
     "scripts": {
-        "start": "node bin/server.js",
+        "start": "node bin/server.js || true",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "repository": {
@@ -33,7 +33,10 @@
     "homepage": "https://github.com/opentoken-io/opentoken#readme",
     "devDependencies": {},
     "dependencies": {
-        "dizzy": "^1.0.1",
-        "express": "^4.13.4"
+        "dizzy": "^1.0.2",
+        "findhit-proxywrap": "^0.3.11",
+        "helmet": "^1.3.0",
+        "restify": "opentoken-io/node-restify#proxywrap",
+        "restify-links": "opentoken-io/node-restify-links#ldo"
     }
 }
