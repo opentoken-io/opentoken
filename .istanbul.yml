@@ -1,5 +1,5 @@
 instrumentation:
-    excludes: [
-        load-test.js   
-    ]
+    excludes: 
+        - load-test.js
+        - "*.spec.js"
     include-all-sources: true
