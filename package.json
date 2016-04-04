@@ -5,8 +5,8 @@
     "main": "lib/opentoken.js",
     "scripts": {
         "start": "node bin/server.js || true",
-        "test": "(istanbul cover jasmine-node --captureExceptions spec/ && ./node_modules/.bin/codecov) || true",
-        "watch": "./node_modules/.bin/jasmine-node spec --autotest --watch || true"
+        "test": "istanbul cover jasmine-node --captureExceptions spec/ && codecov",
+        "watch": "jasmine-node spec --autotest --watch"
     },
     "repository": {
         "type": "git",
