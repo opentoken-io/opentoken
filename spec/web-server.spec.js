@@ -1,132 +1,62 @@
 describe("web-server", function () {
     "use strict";
 
-    var fs, logger, restify, restMiddleware, webServer, WebServer;
-
-    WebServer = require("../lib/web-server");
+    var logger, restMiddleware, webServer;
 
     beforeEach(function () {
-        fs = {
-            readFileSync: function () {}
-        };
+        var fs, LoggerMock, restify, WebServer;
 
-        logger = {
-            console: function () {},
-            debug: function () {},
-            error: function () {},
-            info: function () {},
-            warn: function () {}
-        };
+        LoggerMock = require("./mock/logger-mock");
+        WebServer = require("../lib/web-server");
 
-        restify = {
-            createServer: function () {
-                return {};
-            }
-        };
+        fs = jasmine.createSpyObj("fs", [
+            "readFileSync"
+        ]);
 
-        restMiddleware = function () {
+        restify = jasmine.createSpyObj("restify", [
+            "createServer"
+        ]);
+        restify.createServer.andReturn({});
 
-        };
+        restMiddleware = jasmine.createSpy("restMiddleware");
 
-        spyOn(fs, "readFileSync");
-        spyOn(logger, "console");
-        spyOn(logger, "debug");
-        spyOn(logger, "error");
-        spyOn(logger, "info");
-        spyOn(logger, "warn");
-        spyOn(restify, "createServer").andReturn({});
-    });
-
-    beforeEach(function () {
+        logger = new LoggerMock();
         webServer = new WebServer(fs, logger, restify, restMiddleware);
     });
 
     describe("constructor and configure", function () {
-        it("should set up properties without config options then calls configure", function () {
-            expect(webServer.config).toEqual({
-                baseUrl: "",
-                certificateFile: null,
-                keyFile: null,
-                https: false,
-                name: "OpenToken API",
-                port: 8080,
-                profileMiddleware: false,
-                proxyProtocol: false,
-                spdy: null,
-                version: null
-            });
-
+        it("should set up for HTTPS", function () {
             webServer.configure({
-                baseUrl: "https://localhost:8443",
                 certificateFile: "./cert.crt",
                 keyFile: "./key.key",
-                name: "OpenToken API Test",
-                port: 8443,
-                profileMiddleware: true,
-                proxyProtocol: true,
-                spdy: true,
-                version: "2"
             });
 
-            expect(webServer.config).toEqual({
-                baseUrl: "https://localhost:8443",
-                certificateFile: "./cert.crt",
-                keyFile: "./key.key",
-                https: true,
-                name: "OpenToken API Test",
-                port: 8443,
-                profileMiddleware: true,
-                proxyProtocol: true,
-                spdy: true,
-                version: "2"
-            });
-
-            expect(webServer.restifyConfig).toEqual({
-                handleUncaughtExceptions: true,
-                handleUpgrades: false,
-                httpsServerOptions: null,
-                name: "OpenToken API Test",
-                proxyProtocol: true,
-                spdy: true,
-                version: "2"
-            });
-
-            expect(fs.readFileSync).toHaveBeenCalledWith("./cert.crt");
-            expect(fs.readFileSync).toHaveBeenCalledWith("./key.key");
+            expect(webServer.config.https).toBe(true);
         });
 
-        it("should set up properties while missing cert file config", function () {
+        it("should not have HTTPS from missing cert file", function () {
             webServer.configure({
-                baseUrl: "https://localhost:8443",
                 certificateFile: null,
                 keyFile: "./key.key",
             });
 
-            expect(webServer.config).toEqual({
-                baseUrl: "https://localhost:8443",
-                certificateFile: null,
-                keyFile: null,
-                https: false,
-                name: "OpenToken API",
-                port: 8080,
-                profileMiddleware: false,
-                proxyProtocol: false,
-                spdy: null,
-                version: null
-            });
-
-            expect(fs.readFileSync).not.toHaveBeenCalled();
-            expect(fs.readFileSync).not.toHaveBeenCalled();
+            expect(webServer.config.https).toBe(false);
         });
 
-        it("should set up properties with extra slash in host name", function () {
+        it("should take out extra slash in host name", function () {
             webServer.configure({
-                baseUrl: "https://localhost:8443/",
-                certificateFile: null,
-                keyFile: "./key.key",
+                baseUrl: "https://localhost:8443/"
             });
 
             expect(webServer.config.baseUrl).toEqual("https://localhost:8443");
+        });
+
+        it("should take out extra slash in host name with just a slash", function () {
+            webServer.configure({
+                baseUrl: "/"
+            });
+
+            expect(webServer.config.baseUrl).toEqual("");
         });
     });
 
@@ -178,7 +108,6 @@ describe("web-server", function () {
     describe("app", function () {
         beforeEach(function () {
             spyOn(webServer, "profileMiddleware");
-            spyOn(webServer, "restMiddleware");
         });
 
         it("should set up the server", function () {
