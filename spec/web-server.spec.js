@@ -19,7 +19,9 @@ describe("web-server", function () {
         };
 
         restify = {
-
+            createServer: function () {
+                return {};
+            }
         };
 
         restMiddleware = function () {
@@ -32,6 +34,7 @@ describe("web-server", function () {
         spyOn(logger, "error");
         spyOn(logger, "info");
         spyOn(logger, "warn");
+        spyOn(restify, "createServer").andReturn({});
     });
 
     describe("constructor", function () {
@@ -88,6 +91,66 @@ describe("web-server", function () {
 
             expect(fs.readFileSync).toHaveBeenCalledWith("./cert.crt");
             expect(fs.readFileSync).toHaveBeenCalledWith("./key.key");
+        });
+    });
+
+    describe("addRoute", function () {
+        var webServer;
+
+        beforeEach(function () {
+            webServer = new WebServer(fs, logger, restify, restMiddleware);
+
+            spyOn(webServer, "app").andReturn({"get": function () {
+
+            }});
+        });
+
+        it("adds a route", function () {
+            webServer.addRoute("get", "/", (req, res, next) => {
+                // does something magical
+            });
+
+            expect(logger.debug).toHaveBeenCalledWith("Adding route: get /");
+
+        });
+    });
+
+    describe("app", function () {
+        var webServer;
+
+        beforeEach(function () {
+            webServer = new WebServer(fs, logger, restify, restMiddleware);
+
+            spyOn(webServer, "profileMiddleware");
+            spyOn(webServer, "restMiddleware");
+        });
+
+        it("sets up the server", function () {
+            webServer.config = {
+                name: "OpenToken API"
+            };
+
+            webServer.app();
+
+            expect(logger.debug).toHaveBeenCalledWith("Creating server with config: {\"name\":\"OpenToken API\"}");
+            expect(webServer.restMiddleware).toHaveBeenCalled();
+
+        });
+
+        it("sets up the server to profile", function () {
+            webServer.config = {
+                name: "OpenToken API",
+                profileMiddleware: true
+            };
+
+            webServer.app();
+
+            expect(logger.debug).toHaveBeenCalledWith("Creating server with config: {\"name\":\"OpenToken API\",\"profileMiddleware\":true}");
+            expect(webServer.profileMiddleware).toHaveBeenCalledWith({});
+            expect(webServer.restMiddleware).toHaveBeenCalledWith({
+                name: "OpenToken API",
+                profileMiddleware: true
+            }, {});
         });
     });
 });
