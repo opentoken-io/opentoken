@@ -6,11 +6,11 @@ Open Token
 [![codecov.io][codecov-image]][Code Coverage]
 
 
-[Code Coverage]: https://codecov.io/github/AbsentSemicolon/opentoken?branch=testing
-[codecov-image]: https://codecov.io/github/AbsentSemicolon/opentoken/coverage.svg?branch=testing
-[Dev Dependencies]: https://david-dm.org/AbsentSemicolon/opentoken#info=devDependencies
-[devdependencies-image]: https://david-dm.org/AbsentSemicolon/opentoken/dev-status.png
-[Dependencies]: https://david-dm.org/AbsentSemicolon/opentoken
-[dependencies-image]: https://david-dm.org/AbsentSemicolon/opentoken.png
-[travis-image]: https://secure.travis-ci.org/AbsentSemicolon/opentoken.png
-[Travis CI]: http://travis-ci.org/AbsentSemicolon/opentoken
+[Code Coverage]: https://codecov.io/github/opentoken-io/opentoken?branch=master
+[codecov-image]: https://codecov.io/github/opentoken-io/opentoken/coverage.svg?branch=master
+[Dev Dependencies]: https://david-dm.org/opentoken-io/opentoken#info=devDependencies
+[devdependencies-image]: https://david-dm.org/opentoken-io/opentoken/dev-status.png
+[Dependencies]: https://david-dm.org/opentoken-io/opentoken
+[dependencies-image]: https://david-dm.org/opentoken-io/opentoken.png
+[travis-image]: https://secure.travis-ci.org/opentoken-io/opentoken.png
+[Travis CI]: http://travis-ci.org/opentoken-io/opentoken
