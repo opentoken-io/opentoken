@@ -1,7 +1,7 @@
 describe("web-server", function () {
     "use strict";
 
-    var fs, logger, restify, restMiddleware, WebServer;
+    var fs, logger, restify, restMiddleware, webServer, WebServer;
 
     WebServer = require("../lib/web-server");
 
@@ -37,10 +37,12 @@ describe("web-server", function () {
         spyOn(restify, "createServer").andReturn({});
     });
 
+    beforeEach(function () {
+        webServer = new WebServer(fs, logger, restify, restMiddleware);
+    });
+
     describe("constructor and configure", function () {
         it("sets up properties without config options then calls configure", function () {
-            var webServer = new WebServer(fs, logger, restify, restMiddleware);
-
             expect(webServer.config).toEqual({
                 baseUrl: "",
                 certificateFile: null,
@@ -94,8 +96,6 @@ describe("web-server", function () {
         });
 
         it("sets up properties while missing cert file config", function () {
-            var webServer = new WebServer(fs, logger, restify, restMiddleware);
-
             webServer.configure({
                 baseUrl: "https://localhost:8443",
                 certificateFile: null,
@@ -120,8 +120,6 @@ describe("web-server", function () {
         });
 
         it("sets up properties while missing cert file config", function () {
-            var webServer = new WebServer(fs, logger, restify, restMiddleware);
-
             webServer.configure({
                 baseUrl: "https://localhost:8443/",
                 certificateFile: null,
@@ -134,10 +132,7 @@ describe("web-server", function () {
 
 
     describe("addMiddleware", function () {
-        var webServer;
-
         beforeEach(function () {
-            webServer = new WebServer(fs, logger, restify, restMiddleware);
             webServer.server = {
                 use: function (a, b) {
                 }
@@ -165,11 +160,7 @@ describe("web-server", function () {
     });
 
     describe("addRoute", function () {
-        var webServer;
-
         beforeEach(function () {
-            webServer = new WebServer(fs, logger, restify, restMiddleware);
-
             spyOn(webServer, "app").andReturn({"get": function () {
 
             }});
@@ -181,16 +172,11 @@ describe("web-server", function () {
             });
 
             expect(logger.debug).toHaveBeenCalledWith("Adding route: get /");
-
         });
     });
 
     describe("app", function () {
-        var webServer;
-
         beforeEach(function () {
-            webServer = new WebServer(fs, logger, restify, restMiddleware);
-
             spyOn(webServer, "profileMiddleware");
             spyOn(webServer, "restMiddleware");
         });
@@ -204,7 +190,6 @@ describe("web-server", function () {
 
             expect(logger.debug).toHaveBeenCalledWith("Creating server with config: {\"name\":\"OpenToken API\"}");
             expect(webServer.restMiddleware).toHaveBeenCalled();
-
         });
 
         it("sets up the server to profile", function () {
@@ -222,5 +207,31 @@ describe("web-server", function () {
                 profileMiddleware: true
             }, {});
         });
+    });
+
+    describe("startServer", function () {
+        beforeEach(function () {
+            webServer.server = {
+                listen: function (port, callback) {
+                    logger.info();
+                }
+            };
+
+            spyOn(webServer.server, "listen");
+            spyOn(webServer, "attachErrorHandlers");
+        });
+
+        it("starts the server", function () {
+            webServer.config = {
+                port: 8443
+            };
+
+            webServer.startServer();
+
+            expect(logger.debug).toHaveBeenCalled();
+            expect(webServer.attachErrorHandlers).toHaveBeenCalled();
+            expect(webServer.app().listen).toHaveBeenCalledWith(8443, jasmine.any(Function));
+        });
+
     });
 });
