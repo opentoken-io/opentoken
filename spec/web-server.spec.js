@@ -37,7 +37,7 @@ describe("web-server", function () {
         spyOn(restify, "createServer").andReturn({});
     });
 
-    describe("constructor", function () {
+    describe("constructor and configure", function () {
         it("sets up properties without config options then calls configure", function () {
             var webServer = new WebServer(fs, logger, restify, restMiddleware);
 
@@ -91,6 +91,44 @@ describe("web-server", function () {
 
             expect(fs.readFileSync).toHaveBeenCalledWith("./cert.crt");
             expect(fs.readFileSync).toHaveBeenCalledWith("./key.key");
+        });
+
+        it("sets up properties while missing cert file config", function () {
+            var webServer = new WebServer(fs, logger, restify, restMiddleware);
+
+            webServer.configure({
+                baseUrl: "https://localhost:8443",
+                certificateFile: null,
+                keyFile: "./key.key",
+            });
+
+            expect(webServer.config).toEqual({
+                baseUrl: "https://localhost:8443",
+                certificateFile: null,
+                keyFile: null,
+                https: false,
+                name: "OpenToken API",
+                port: 8080,
+                profileMiddleware: false,
+                proxyProtocol: false,
+                spdy: null,
+                version: null
+            });
+
+            expect(fs.readFileSync).not.toHaveBeenCalled();
+            expect(fs.readFileSync).not.toHaveBeenCalled();
+        });
+
+        it("sets up properties while missing cert file config", function () {
+            var webServer = new WebServer(fs, logger, restify, restMiddleware);
+
+            webServer.configure({
+                baseUrl: "https://localhost:8443/",
+                certificateFile: null,
+                keyFile: "./key.key",
+            });
+
+            expect(webServer.config.baseUrl).toEqual("https://localhost:8443");
         });
     });
 
