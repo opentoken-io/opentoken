@@ -94,6 +94,38 @@ describe("web-server", function () {
         });
     });
 
+
+    describe("addMiddleware", function () {
+        var webServer;
+
+        beforeEach(function () {
+            webServer = new WebServer(fs, logger, restify, restMiddleware);
+            webServer.server = {
+                use: function (a, b) {
+                }
+            };
+
+            spyOn(webServer.server, "use");
+        });
+
+        it("adds middleware with path and callback", function () {
+            webServer.addMiddleware("/path", function () {
+                // Magical code
+                return true;
+            });
+
+            expect(logger.debug).toHaveBeenCalledWith("Adding middleware for route: /path");
+            expect(webServer.app().use).toHaveBeenCalledWith("/path", jasmine.any(Function));
+        });
+
+        it("adds middleware with path", function () {
+            webServer.addMiddleware("/path2");
+
+            expect(logger.debug).toHaveBeenCalledWith("Adding middleware");
+            expect(webServer.app().use).toHaveBeenCalledWith("/path2");
+        });
+    });
+
     describe("addRoute", function () {
         var webServer;
 
