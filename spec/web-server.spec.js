@@ -147,14 +147,14 @@ describe("web-server", function () {
                 return true;
             });
 
-            expect(logger.debug).toHaveBeenCalledWith("Adding middleware for route: /path");
+            expect(logger.debug).toHaveBeenCalled();
             expect(webServer.app().use).toHaveBeenCalledWith("/path", jasmine.any(Function));
         });
 
         it("adds middleware with path", function () {
             webServer.addMiddleware("/path2");
 
-            expect(logger.debug).toHaveBeenCalledWith("Adding middleware");
+            expect(logger.debug).toHaveBeenCalled();
             expect(webServer.app().use).toHaveBeenCalledWith("/path2");
         });
     });
@@ -171,7 +171,7 @@ describe("web-server", function () {
                 // does something magical
             });
 
-            expect(logger.debug).toHaveBeenCalledWith("Adding route: get /");
+            expect(logger.debug).toHaveBeenCalled();
         });
     });
 
@@ -188,7 +188,7 @@ describe("web-server", function () {
 
             webServer.app();
 
-            expect(logger.debug).toHaveBeenCalledWith("Creating server with config: {\"name\":\"OpenToken API\"}");
+            expect(logger.debug).toHaveBeenCalled();
             expect(webServer.restMiddleware).toHaveBeenCalled();
         });
 
@@ -200,7 +200,7 @@ describe("web-server", function () {
 
             webServer.app();
 
-            expect(logger.debug).toHaveBeenCalledWith("Creating server with config: {\"name\":\"OpenToken API\",\"profileMiddleware\":true}");
+            expect(logger.debug).toHaveBeenCalled();
             expect(webServer.profileMiddleware).toHaveBeenCalledWith({});
             expect(webServer.restMiddleware).toHaveBeenCalledWith({
                 name: "OpenToken API",
@@ -213,11 +213,11 @@ describe("web-server", function () {
         beforeEach(function () {
             webServer.server = {
                 listen: function (port, callback) {
-                    logger.info();
+                    callback();
                 }
             };
 
-            spyOn(webServer.server, "listen");
+            spyOn(webServer.server, "listen").andCallThrough();
             spyOn(webServer, "attachErrorHandlers");
         });
 
@@ -231,7 +231,7 @@ describe("web-server", function () {
             expect(logger.debug).toHaveBeenCalled();
             expect(webServer.attachErrorHandlers).toHaveBeenCalled();
             expect(webServer.app().listen).toHaveBeenCalledWith(8443, jasmine.any(Function));
+            expect(logger.info).toHaveBeenCalled();
         });
-
     });
 });
