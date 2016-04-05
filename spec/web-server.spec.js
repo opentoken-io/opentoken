@@ -42,7 +42,7 @@ describe("web-server", function () {
     });
 
     describe("constructor and configure", function () {
-        it("sets up properties without config options then calls configure", function () {
+        it("should set up properties without config options then calls configure", function () {
             expect(webServer.config).toEqual({
                 baseUrl: "",
                 certificateFile: null,
@@ -95,7 +95,7 @@ describe("web-server", function () {
             expect(fs.readFileSync).toHaveBeenCalledWith("./key.key");
         });
 
-        it("sets up properties while missing cert file config", function () {
+        it("should set up properties while missing cert file config", function () {
             webServer.configure({
                 baseUrl: "https://localhost:8443",
                 certificateFile: null,
@@ -119,7 +119,7 @@ describe("web-server", function () {
             expect(fs.readFileSync).not.toHaveBeenCalled();
         });
 
-        it("sets up properties while missing cert file config", function () {
+        it("should set up properties with extra slash in host name", function () {
             webServer.configure({
                 baseUrl: "https://localhost:8443/",
                 certificateFile: null,
@@ -141,7 +141,7 @@ describe("web-server", function () {
             spyOn(webServer.server, "use");
         });
 
-        it("adds middleware with path and callback", function () {
+        it("should add middleware with a path and callback", function () {
             webServer.addMiddleware("/path", function () {
                 // Magical code
                 return true;
@@ -151,7 +151,7 @@ describe("web-server", function () {
             expect(webServer.app().use).toHaveBeenCalledWith("/path", jasmine.any(Function));
         });
 
-        it("adds middleware with path", function () {
+        it("should add middleware with just a path", function () {
             webServer.addMiddleware("/path2");
 
             expect(logger.debug).toHaveBeenCalled();
@@ -166,7 +166,7 @@ describe("web-server", function () {
             }});
         });
 
-        it("adds a route", function () {
+        it("should add a route", function () {
             webServer.addRoute("get", "/", (req, res, next) => {
                 // does something magical
             });
@@ -181,7 +181,7 @@ describe("web-server", function () {
             spyOn(webServer, "restMiddleware");
         });
 
-        it("sets up the server", function () {
+        it("should set up the server", function () {
             webServer.config = {
                 name: "OpenToken API"
             };
@@ -192,7 +192,7 @@ describe("web-server", function () {
             expect(webServer.restMiddleware).toHaveBeenCalled();
         });
 
-        it("sets up the server to profile", function () {
+        it("should set up the server to profile", function () {
             webServer.config = {
                 name: "OpenToken API",
                 profileMiddleware: true
@@ -201,7 +201,7 @@ describe("web-server", function () {
             webServer.app();
 
             expect(logger.debug).toHaveBeenCalled();
-            expect(webServer.profileMiddleware).toHaveBeenCalledWith({});
+            expect(webServer.profileMiddleware).toHaveBeenCalledWith({}, setInterval);
             expect(webServer.restMiddleware).toHaveBeenCalledWith({
                 name: "OpenToken API",
                 profileMiddleware: true
@@ -221,7 +221,7 @@ describe("web-server", function () {
             spyOn(webServer, "attachErrorHandlers");
         });
 
-        it("starts the server", function () {
+        it("should attach error handlers and lister to port set", function () {
             webServer.config = {
                 port: 8443
             };
@@ -232,6 +232,28 @@ describe("web-server", function () {
             expect(webServer.attachErrorHandlers).toHaveBeenCalled();
             expect(webServer.app().listen).toHaveBeenCalledWith(8443, jasmine.any(Function));
             expect(logger.info).toHaveBeenCalled();
+        });
+    });
+
+    describe("profileMiddleware", function () {
+        var server, useSpy;
+
+        beforeEach(function () {
+            useSpy = jasmine.createSpy("server.use");
+
+            server = {
+                use: useSpy
+            };
+        });
+
+        it("should monkey patch server.use and call at interval", function () {
+            var intervalFn = jasmine.createSpy("intervalFn");
+
+            webServer.profileMiddleware(server, intervalFn);
+
+            expect(server.use).not.toEqual(useSpy);
+            expect(server.use).toEqual(jasmine.any(Function));
+            expect(intervalFn).toHaveBeenCalled();
         });
     });
 });
