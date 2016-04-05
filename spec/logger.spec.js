@@ -1,14 +1,12 @@
 describe("logger", function () {
     "use strict";
-
     var log, logger;
 
-    logger = require("../lib/logger");
-
     beforeEach(function () {
+        logger = require("../lib/logger");
+
         spyOn(console, "log");
         spyOn(console, "error");
-        spyOn(console.log, "apply");
     });
 
     describe("constructor", function () {
@@ -33,7 +31,7 @@ describe("logger", function () {
 
         it("prints to log from console", function () {
             log.console("something");
-            expect(console.log.apply.mostRecentCall.args[1]).toEqual(["something"]);
+            expect(console.log).toHaveBeenCalledWith("something");
         });
 
         it("does not print to error from debug", function () {
