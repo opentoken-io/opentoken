@@ -63,12 +63,11 @@ describe("web-server", function () {
 
     describe("addMiddleware", function () {
         beforeEach(function () {
-            webServer.server = {
-                use: function (a, b) {
-                }
-            };
+            webServer.app = jasmine.createSpy("webServer.app");
 
-            spyOn(webServer.server, "use");
+            webServer.app.andReturn({
+                use: jasmine.createSpy("use")
+            });
         });
 
         it("should add middleware with a path and callback", function () {
@@ -91,9 +90,11 @@ describe("web-server", function () {
 
     describe("addRoute", function () {
         beforeEach(function () {
-            spyOn(webServer, "app").andReturn({"get": function () {
+            webServer.app = jasmine.createSpy("webServer.app");
 
-            }});
+            webServer.app.andReturn({
+                get: jasmine.createSpy("get")
+            });
         });
 
         it("should add a route", function () {
@@ -107,7 +108,7 @@ describe("web-server", function () {
 
     describe("app", function () {
         beforeEach(function () {
-            spyOn(webServer, "profileMiddleware");
+            webServer.profileMiddleware = jasmine.createSpy("webServer.profileMiddleware");
         });
 
         it("should set up the server", function () {
@@ -140,14 +141,12 @@ describe("web-server", function () {
 
     describe("startServer", function () {
         beforeEach(function () {
-            webServer.server = {
-                listen: function (port, callback) {
-                    callback();
-                }
-            };
+            webServer.attachErrorHandlers = jasmine.createSpy("webServer.attachErrorHandlers");
+            webServer.app = jasmine.createSpy("webServer.app");
 
-            spyOn(webServer.server, "listen").andCallThrough();
-            spyOn(webServer, "attachErrorHandlers");
+            webServer.app.andReturn({
+                listen: jasmine.createSpy("listen")
+            });
         });
 
         it("should attach error handlers and lister to port set", function () {
@@ -160,7 +159,6 @@ describe("web-server", function () {
             expect(logger.debug).toHaveBeenCalled();
             expect(webServer.attachErrorHandlers).toHaveBeenCalled();
             expect(webServer.app().listen).toHaveBeenCalledWith(8443, jasmine.any(Function));
-            expect(logger.info).toHaveBeenCalled();
         });
     });
 
