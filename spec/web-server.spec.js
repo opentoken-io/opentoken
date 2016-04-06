@@ -213,6 +213,25 @@ describe("WebServer", () => {
 
             expect(restMiddleware.mostRecentCall.args[0].baseUrl).toBe("/bunnies");
         });
+        it("passes profileMiddleware", () => {
+            var args;
+
+            webServer.profileMiddleware = jasmine.createSpy("webServer.profileMiddleware");
+            webServer.configure({
+                profileMiddleware: true
+            });
+
+            // Trigger the internal call to this.app() because that
+            // sends the configuration to restify.createServer().
+            webServer.addMiddleware(() => {});
+
+            expect(webServer.profileMiddleware).toHaveBeenCalled();
+            args = webServer.profileMiddleware.mostRecentCall.args;
+            expect(args.length).toBe(2);
+            expect(args[0]).toBe(restifyServer);
+            expect(args[1]).toEqual(jasmine.any(Function));
+            expect(logger.debug).toHaveBeenCalled();
+        });
     });
     describe(".startServer()", () => {
         it("calls listen", () => {
