@@ -27,5 +27,7 @@ $*
 nbproject/
 
 # Generated
+/coverage/
 /node_modules/
 npm-debug.log
+
