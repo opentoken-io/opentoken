@@ -251,9 +251,36 @@ describe("WebServer", () => {
 
             webServer.startServer();
             callback = restifyServer.listen.mostRecentCall.args[1];
-            expect(function () {
+            expect(function() {
                 callback();
             }).not.toThrow();
+        });
+
+        it("has a working callback", () => {
+            var callback, args, uncaughtCallback, req, res, route;
+
+            req = jasmine.createSpy("req");
+            res = jasmine.createSpyObj("res", [
+                "send",
+                "write"
+            ]);
+
+            webServer.startServer();
+            callback = restifyServer.listen.mostRecentCall.args[1];
+            expect(function() {
+                callback();
+            });
+
+            expect(restifyServer.on).toHaveBeenCalled();
+            args = restifyServer.on.mostRecentCall.args;
+            expect(args.length).toBe(2);
+            expect(args[0]).toBe("uncaughtException");
+            expect(args[1]).toEqual(jasmine.any(Function));
+            uncaughtCallback = args[1];
+            uncaughtCallback(req, res, route, {"error": true});
+            expect(logger.error).toHaveBeenCalled();
+            expect(res.send).toHaveBeenCalledWith(500);
+            expect(res.write).not.toHaveBeenCalled();
         });
     });
 });
