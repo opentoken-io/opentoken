@@ -1,10 +1,10 @@
-describe("web-server", function () {
-    "use strict";
+"use strict";
 
-    var logger, restMiddleware, webServer;
+describe("WebServer", () => {
+    var fs, logger, restify, restifyServer, restMiddleware, webServer;
 
-    beforeEach(function () {
-        var fs, LoggerMock, restify, WebServer;
+    beforeEach(() => {
+        var LoggerMock, WebServer;
 
         LoggerMock = require("./mock/logger-mock");
         WebServer = require("../lib/web-server");
@@ -13,174 +13,228 @@ describe("web-server", function () {
             "readFileSync"
         ]);
 
+        restifyServer = jasmine.createSpyObj("restifyServer", [
+            "del",
+            "get",
+            "listen",
+            "on",
+            "use"
+        ]);
         restify = jasmine.createSpyObj("restify", [
             "createServer"
         ]);
-        restify.createServer.andReturn({});
+        restify.createServer.andReturn(restifyServer);
 
         restMiddleware = jasmine.createSpy("restMiddleware");
 
         logger = new LoggerMock();
         webServer = new WebServer(fs, logger, restify, restMiddleware);
     });
+    it("exposes known public methods", () => {
+        expect(webServer.addMiddleware).toEqual(jasmine.any(Function));
+        expect(webServer.addRoute).toEqual(jasmine.any(Function));
+        expect(webServer.configure).toEqual(jasmine.any(Function));
+        expect(webServer.startServer).toEqual(jasmine.any(Function));
+    });
+    describe(".addMiddleware()", () => {
+        it("adds middleware without a route", () => {
+            function testFn() {}
 
-    describe("constructor and configure", function () {
-        it("should set up for HTTPS", function () {
-            webServer.configure({
-                certificateFile: "./cert.crt",
-                keyFile: "./key.key",
-            });
-
-            expect(webServer.config.https).toBe(true);
+            expect(restifyServer.use).not.toHaveBeenCalled();
+            webServer.addMiddleware(testFn);
+            expect(restifyServer.use).toHaveBeenCalledWith(testFn);
         });
+        it("adds middleware with a route", () => {
+            function testFn() {}
 
-        it("should not have HTTPS from missing cert file", function () {
-            webServer.configure({
-                certificateFile: null,
-                keyFile: "./key.key",
-            });
-
-            expect(webServer.config.https).toBe(false);
+            expect(restifyServer.use).not.toHaveBeenCalled();
+            webServer.addMiddleware("/flowers", testFn);
+            expect(restifyServer.use).toHaveBeenCalledWith("/flowers", testFn);
         });
+        it("adds more than one middleware", () => {
+            function testFn1() {}
 
-        it("should take out extra slash in host name", function () {
-            webServer.configure({
-                baseUrl: "https://localhost:8443/"
-            });
+            function testFn2() {}
 
-            expect(webServer.config.baseUrl).toEqual("https://localhost:8443");
-        });
-
-        it("should take out extra slash in host name with just a slash", function () {
-            webServer.configure({
-                baseUrl: "/"
-            });
-
-            expect(webServer.config.baseUrl).toEqual("");
+            expect(restifyServer.use).not.toHaveBeenCalled();
+            webServer.addMiddleware(testFn1);
+            expect(restifyServer.use).toHaveBeenCalledWith(testFn1);
+            expect(restifyServer.use).not.toHaveBeenCalledWith("/flowers", testFn2);
+            webServer.addMiddleware("/flowers", testFn2);
+            expect(restifyServer.use).toHaveBeenCalledWith("/flowers", testFn2);
         });
     });
+    describe(".addRoute()", () => {
+        it("assigns middleware to a route and a verb", () => {
+            function testFn() {}
 
-
-    describe("addMiddleware", function () {
-        beforeEach(function () {
-            webServer.app = jasmine.createSpy("webServer.app");
-
-            webServer.app.andReturn({
-                use: jasmine.createSpy("use")
-            });
+            expect(restifyServer.get).not.toHaveBeenCalled();
+            webServer.addRoute("get", "/", testFn);
+            expect(restifyServer.get).toHaveBeenCalledWith("/", testFn);
         });
+        it("lowercases methods and converts 'delete'", () => {
+            function testFn() {}
 
-        it("should add middleware with a path and callback", function () {
-            webServer.addMiddleware("/path", function () {
-                // Magical code
-                return true;
-            });
-
-            expect(logger.debug).toHaveBeenCalled();
-            expect(webServer.app().use).toHaveBeenCalledWith("/path", jasmine.any(Function));
-        });
-
-        it("should add middleware with just a path", function () {
-            webServer.addMiddleware("/path2");
-
-            expect(logger.debug).toHaveBeenCalled();
-            expect(webServer.app().use).toHaveBeenCalledWith("/path2");
+            expect(restifyServer.get).not.toHaveBeenCalled();
+            webServer.addRoute("DELETE", "/", testFn);
+            expect(restifyServer.del).toHaveBeenCalledWith("/", testFn);
         });
     });
+    describe(".configure()", () => {
+        var defaultConfig;
 
-    describe("addRoute", function () {
-        beforeEach(function () {
-            webServer.app = jasmine.createSpy("webServer.app");
+        function testConfig(input, expected) {
+            var actual;
 
-            webServer.app.andReturn({
-                get: jasmine.createSpy("get")
-            });
-        });
-
-        it("should add a route", function () {
-            webServer.addRoute("get", "/", (req, res, next) => {
-                // does something magical
+            // Set defaults in expected
+            Object.keys(defaultConfig).forEach((key) => {
+                if (expected[key] === undefined) {
+                    expected[key] = defaultConfig[key];
+                }
             });
 
-            expect(logger.debug).toHaveBeenCalled();
-        });
-    });
+            // Set the config
+            webServer.configure(input);
 
-    describe("app", function () {
-        beforeEach(function () {
-            webServer.profileMiddleware = jasmine.createSpy("webServer.profileMiddleware");
-        });
+            // Trigger the internal call to this.app() because that
+            // sends the configuration to restify.createServer().
+            webServer.addMiddleware(() => {});
 
-        it("should set up the server", function () {
-            webServer.config = {
-                name: "OpenToken API"
-            };
+            // test the config passed to restifyServer
+            expect(restify.createServer.callCount).toBe(1);
+            expect(restify.createServer.mostRecentCall.args.length).toBe(1);
+            actual = restify.createServer.mostRecentCall.args[0];
+            expect(actual).toEqual(expected);
+        }
 
-            webServer.app();
-
-            expect(logger.debug).toHaveBeenCalled();
-            expect(webServer.restMiddleware).toHaveBeenCalled();
-        });
-
-        it("should set up the server to profile", function () {
-            webServer.config = {
+        beforeEach(() => {
+            defaultConfig = {
+                handleUncaughtExceptions: true,
+                handleUpgrades: false,
+                httpsServerOptions: null,
                 name: "OpenToken API",
-                profileMiddleware: true
+                proxyProtocol: false,
+                spdy: null,
+                version: null
             };
-
-            webServer.app();
-
-            expect(logger.debug).toHaveBeenCalled();
-            expect(webServer.profileMiddleware).toHaveBeenCalledWith({}, setInterval);
-            expect(webServer.restMiddleware).toHaveBeenCalledWith({
-                name: "OpenToken API",
-                profileMiddleware: true
+        });
+        it("works with no configuration", () => {
+            // This confirms all of the defaults work as expected
+            testConfig({}, {});
+        });
+        it("does not trigger https without certificateFile", () => {
+            testConfig({
+                keyFile: "test1"
             }, {});
         });
-    });
+        it("does not trigger https without keyFile", () => {
+            testConfig({
+                certificateFile: "test1"
+            }, {});
+        });
+        it("reads certificate and key files", () => {
+            fs.readFileSync.andCallFake((fn) => {
+                if (fn == "keyfile") {
+                    return "keyfile ok";
+                }
 
-    describe("startServer", function () {
-        beforeEach(function () {
-            webServer.attachErrorHandlers = jasmine.createSpy("webServer.attachErrorHandlers");
-            webServer.app = jasmine.createSpy("webServer.app");
+                if (fn == "certfile") {
+                    return "certfile ok";
+                }
 
-            webServer.app.andReturn({
-                listen: jasmine.createSpy("listen")
+                throw new Error("Invalid file: " + fn.toString());
+            });
+            testConfig({
+                certificateFile: "certfile",
+                keyFile: "keyfile"
+            }, {
+                certificate: "certfile ok",
+                key: "keyfile ok"
             });
         });
+        it("passes name", () => {
+            testConfig({
+                name: "flowers"
+            }, {
+                name: "flowers"
+            });
+        });
+        it("passes proxyProtocol", () => {
+            testConfig({
+                proxyProtocol: 123
+            }, {
+                proxyProtocol: 123
+            });
+        });
+        it("passes spdy", () => {
+            testConfig({
+                spdy: 123
+            }, {
+                spdy: 123
+            });
+        });
+        it("passes version", () => {
+            testConfig({
+                version: "flowers"
+            }, {
+                version: "flowers"
+            });
+        });
+        it("forces the baseUrl to not have a trailing slash", () => {
+            var args;
 
-        it("should attach error handlers and lister to port set", function () {
-            webServer.config = {
-                port: 8443
-            };
+            webServer.configure({
+                baseUrl: "/bunnies/"
+            });
 
-            webServer.startServer();
+            // Trigger the internal call to this.app() because that
+            // sends the configuration to restify.createServer().
+            webServer.addMiddleware(() => {});
 
-            expect(logger.debug).toHaveBeenCalled();
-            expect(webServer.attachErrorHandlers).toHaveBeenCalled();
-            expect(webServer.app().listen).toHaveBeenCalledWith(8443, jasmine.any(Function));
+            expect(restMiddleware).toHaveBeenCalled();
+            expect(restMiddleware.callCount).toBe(1);
+            args = restMiddleware.mostRecentCall.args;
+            expect(args.length).toBe(2);
+            expect(args[1]).toBe(restifyServer);
+            expect(args[0]).toEqual(jasmine.any(Object));
+            expect(args[0].baseUrl).toBe("/bunnies");
+        });
+        it("does not trim a baseUrl without a trailing slash", () => {
+            webServer.configure({
+                baseUrl: "/bunnies"
+            });
+
+            // Trigger the internal call to this.app() because that
+            // sends the configuration to restify.createServer().
+            webServer.addMiddleware(() => {});
+
+            // Skipping most checks here because they were done
+            // in the previous test.
+
+            expect(restMiddleware.mostRecentCall.args[0].baseUrl).toBe("/bunnies");
         });
     });
+    describe(".startServer()", () => {
+        it("calls listen", () => {
+            var args;
 
-    describe("profileMiddleware", function () {
-        var server, useSpy;
-
-        beforeEach(function () {
-            useSpy = jasmine.createSpy("server.use");
-
-            server = {
-                use: useSpy
-            };
+            expect(restifyServer.listen).not.toHaveBeenCalled();
+            webServer.startServer();
+            expect(restifyServer.listen).toHaveBeenCalled();
+            expect(restifyServer.listen.callCount).toBe(1);
+            args = restifyServer.listen.mostRecentCall.args;
+            expect(args[0]).toBe(8080);  // default port
+            expect(args[1]).toEqual(jasmine.any(Function));
+            expect(args.length).toBe(2);
         });
+        it("has a working callback", () => {
+            var callback;
 
-        it("should monkey patch server.use and call at interval", function () {
-            var intervalFn = jasmine.createSpy("intervalFn");
-
-            webServer.profileMiddleware(server, intervalFn);
-
-            expect(server.use).not.toEqual(useSpy);
-            expect(server.use).toEqual(jasmine.any(Function));
-            expect(intervalFn).toHaveBeenCalled();
+            webServer.startServer();
+            callback = restifyServer.listen.mostRecentCall.args[1];
+            expect(function () {
+                callback();
+            }).not.toThrow();
         });
     });
 });
