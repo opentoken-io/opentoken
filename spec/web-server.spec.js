@@ -1,18 +1,16 @@
 "use strict";
 
 describe("WebServer", () => {
-    var fs, logger, restify, restifyServer, restMiddleware, webServer;
+    var fs, logger, middlewareProfiler, restify, restifyServer, restMiddleware, webServer;
 
     beforeEach(() => {
         var LoggerMock, WebServer;
 
         LoggerMock = require("./mock/logger-mock");
         WebServer = require("../lib/web-server");
-
         fs = jasmine.createSpyObj("fs", [
             "readFileSync"
         ]);
-
         restifyServer = jasmine.createSpyObj("restifyServer", [
             "del",
             "get",
@@ -24,11 +22,13 @@ describe("WebServer", () => {
             "createServer"
         ]);
         restify.createServer.andReturn(restifyServer);
-
         restMiddleware = jasmine.createSpy("restMiddleware");
-
+        middlewareProfiler = jasmine.createSpyObj("middlewareProfiler", [
+            "displayAtInterval",
+            "profileServer"
+        ]);
         logger = new LoggerMock();
-        webServer = new WebServer(fs, logger, restify, restMiddleware);
+        webServer = new WebServer(fs, logger, middlewareProfiler, restify, restMiddleware);
     });
     it("exposes known public methods", () => {
         expect(webServer.addMiddleware).toEqual(jasmine.any(Function));
@@ -221,16 +221,25 @@ describe("WebServer", () => {
                 profileMiddleware: true
             });
 
+            expect(middlewareProfiler.profileServer).not.toHaveBeenCalled();
+            expect(middlewareProfiler.displayAtInterval).not.toHaveBeenCalled();
+
             // Trigger the internal call to this.app() because that
             // sends the configuration to restify.createServer().
             webServer.addMiddleware(() => {});
 
-            expect(webServer.profileMiddleware).toHaveBeenCalled();
-            args = webServer.profileMiddleware.mostRecentCall.args;
-            expect(args.length).toBe(2);
+            expect(middlewareProfiler.profileServer).toHaveBeenCalled();
+            expect(middlewareProfiler.displayAtInterval).toHaveBeenCalled();
+            args = middlewareProfiler.profileServer.mostRecentCall.args;
+            expect(args.length).toBe(1);
             expect(args[0]).toBe(restifyServer);
+            args = middlewareProfiler.displayAtInterval.mostRecentCall.args;
+            expect(args.length).toBe(2);
+            expect(args[0]).toEqual(jasmine.any(Number));
             expect(args[1]).toEqual(jasmine.any(Function));
-            expect(logger.debug).toHaveBeenCalled();
+            expect(function () {
+                args[1]("test");
+            }).not.toThrow();
         });
     });
     describe(".startServer()", () => {
