@@ -4,8 +4,9 @@ describe("WebServer", () => {
     var fs, logger, middlewareProfiler, restify, restifyServer, restMiddleware, webServer;
 
     beforeEach(() => {
-        var LoggerMock, WebServer;
+        var LoggerMock, promiseMock, WebServer;
 
+        promiseMock = require("./mock/promise-mock")();
         LoggerMock = require("./mock/logger-mock");
         WebServer = require("../lib/web-server");
         fs = jasmine.createSpyObj("fs", [
@@ -28,7 +29,7 @@ describe("WebServer", () => {
             "profileServer"
         ]);
         logger = new LoggerMock();
-        webServer = new WebServer(fs, logger, middlewareProfiler, restify, restMiddleware);
+        webServer = new WebServer(fs, logger, middlewareProfiler, promiseMock, restify, restMiddleware);
     });
     it("exposes known public methods", () => {
         expect(webServer.addMiddleware).toEqual(jasmine.any(Function));
