@@ -31,3 +31,24 @@ Putting a File
     }
 
     putFile();
+
+Getting a File
+--------------
+
+    "use strict";
+
+    function getFile () {
+        var aws, s3Bucket;
+
+        aws = require("aws-sdk");
+        aws.config.region = "us-east-1";
+        s3Bucket = new aws.S3({params: {Bucket: "opentoken-io-test-s3"}});
+
+        s3Bucket.getObject({Key: FILE_NAME}).on("success", (response) => {
+            console.log("Got file successfully.");
+        }).on("error", (error) => {
+            console.log("Could not get file: " + error);
+        }).send();
+    }
+
+    getFile();
