@@ -1,16 +1,16 @@
 "use strict";
 
 describe("WebServer", () => {
-    var fs, logger, middlewareProfiler, restify, restifyServer, restMiddleware, webServer;
+    var fs, logger, middlewareProfiler, promiseMock, restify, restifyServer, restMiddleware, webServer;
 
     beforeEach(() => {
-        var LoggerMock, promiseMock, WebServer;
+        var LoggerMock, WebServer;
 
-        promiseMock = require("./mock/promise-mock")();
+        promiseMock = require("./mock/promise-mock");
         LoggerMock = require("./mock/logger-mock");
         WebServer = require("../lib/web-server");
         fs = jasmine.createSpyObj("fs", [
-            "readFileSync"
+            "readFileAsync"
         ]);
         restifyServer = jasmine.createSpyObj("restifyServer", [
             "del",
@@ -134,16 +134,16 @@ describe("WebServer", () => {
             }, {});
         });
         it("reads certificate and key files", () => {
-            fs.readFileSync.andCallFake((fn) => {
+            fs.readFileAsync.andCallFake((fn) => {
                 if (fn == "keyfile") {
-                    return "keyfile ok";
+                    return promiseMock.resolve("keyfile ok");
                 }
 
                 if (fn == "certfile") {
-                    return "certfile ok";
+                    return promiseMock.resolve("certfile ok");
                 }
 
-                throw new Error("Invalid file: " + fn.toString());
+                return promiseMock.reject("Invalid file: " + fn.toString());
             });
             testConfig({
                 certificateFile: "certfile",
@@ -265,8 +265,7 @@ describe("WebServer", () => {
                 callback();
             }).not.toThrow();
         });
-
-        it("has a working callback", () => {
+        it("executes the uncaughtException callback", () => {
             var callback, args, uncaughtCallback, req, res, route;
 
             req = jasmine.createSpy("req");
@@ -274,13 +273,11 @@ describe("WebServer", () => {
                 "send",
                 "write"
             ]);
-
             webServer.startServer();
             callback = restifyServer.listen.mostRecentCall.args[1];
-            expect(function() {
+            expect(function () {
                 callback();
             });
-
             expect(restifyServer.on).toHaveBeenCalled();
             args = restifyServer.on.mostRecentCall.args;
             expect(args.length).toBe(2);
