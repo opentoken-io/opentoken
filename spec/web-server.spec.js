@@ -19,6 +19,9 @@ describe("WebServer", () => {
             "on",
             "use"
         ]);
+        restifyServer.listen.andCallFake((port, callback) => {
+            callback();
+        });
         restify = jasmine.createSpyObj("restify", [
             "createServer"
         ]);
@@ -43,6 +46,7 @@ describe("WebServer", () => {
 
             expect(restifyServer.use).not.toHaveBeenCalled();
             webServer.addMiddleware(testFn);
+            webServer.startServer();
             expect(restifyServer.use).toHaveBeenCalledWith(testFn);
         });
         it("adds middleware with a route", () => {
@@ -50,6 +54,7 @@ describe("WebServer", () => {
 
             expect(restifyServer.use).not.toHaveBeenCalled();
             webServer.addMiddleware("/flowers", testFn);
+            webServer.startServer();
             expect(restifyServer.use).toHaveBeenCalledWith("/flowers", testFn);
         });
         it("adds more than one middleware", () => {
@@ -59,9 +64,9 @@ describe("WebServer", () => {
 
             expect(restifyServer.use).not.toHaveBeenCalled();
             webServer.addMiddleware(testFn1);
-            expect(restifyServer.use).toHaveBeenCalledWith(testFn1);
-            expect(restifyServer.use).not.toHaveBeenCalledWith("/flowers", testFn2);
             webServer.addMiddleware("/flowers", testFn2);
+            webServer.startServer();
+            expect(restifyServer.use).toHaveBeenCalledWith(testFn1);
             expect(restifyServer.use).toHaveBeenCalledWith("/flowers", testFn2);
         });
     });
@@ -71,6 +76,7 @@ describe("WebServer", () => {
 
             expect(restifyServer.get).not.toHaveBeenCalled();
             webServer.addRoute("get", "/", testFn);
+            webServer.startServer();
             expect(restifyServer.get).toHaveBeenCalledWith("/", testFn);
         });
         it("lowercases methods and converts 'delete'", () => {
@@ -78,6 +84,7 @@ describe("WebServer", () => {
 
             expect(restifyServer.get).not.toHaveBeenCalled();
             webServer.addRoute("DELETE", "/", testFn);
+            webServer.startServer();
             expect(restifyServer.del).toHaveBeenCalledWith("/", testFn);
         });
     });
@@ -96,10 +103,7 @@ describe("WebServer", () => {
 
             // Set the config
             webServer.configure(input);
-
-            // Trigger the internal call to this.app() because that
-            // sends the configuration to restify.createServer().
-            webServer.addMiddleware(() => {});
+            webServer.startServer();
 
             // test the config passed to restifyServer
             expect(restify.createServer.callCount).toBe(1);
@@ -187,11 +191,7 @@ describe("WebServer", () => {
             webServer.configure({
                 baseUrl: "/bunnies/"
             });
-
-            // Trigger the internal call to this.app() because that
-            // sends the configuration to restify.createServer().
-            webServer.addMiddleware(() => {});
-
+            webServer.startServer();
             expect(restMiddleware).toHaveBeenCalled();
             expect(restMiddleware.callCount).toBe(1);
             args = restMiddleware.mostRecentCall.args;
@@ -204,31 +204,21 @@ describe("WebServer", () => {
             webServer.configure({
                 baseUrl: "/bunnies"
             });
-
-            // Trigger the internal call to this.app() because that
-            // sends the configuration to restify.createServer().
-            webServer.addMiddleware(() => {});
+            webServer.startServer();
 
             // Skipping most checks here because they were done
             // in the previous test.
-
             expect(restMiddleware.mostRecentCall.args[0].baseUrl).toBe("/bunnies");
         });
         it("passes profileMiddleware", () => {
             var args;
 
-            webServer.profileMiddleware = jasmine.createSpy("webServer.profileMiddleware");
             webServer.configure({
                 profileMiddleware: true
             });
-
             expect(middlewareProfiler.profileServer).not.toHaveBeenCalled();
             expect(middlewareProfiler.displayAtInterval).not.toHaveBeenCalled();
-
-            // Trigger the internal call to this.app() because that
-            // sends the configuration to restify.createServer().
-            webServer.addMiddleware(() => {});
-
+            webServer.startServer();
             expect(middlewareProfiler.profileServer).toHaveBeenCalled();
             expect(middlewareProfiler.displayAtInterval).toHaveBeenCalled();
             args = middlewareProfiler.profileServer.mostRecentCall.args;
@@ -238,7 +228,7 @@ describe("WebServer", () => {
             expect(args.length).toBe(2);
             expect(args[0]).toEqual(jasmine.any(Number));
             expect(args[1]).toEqual(jasmine.any(Function));
-            expect(function () {
+            expect(() => {
                 args[1]("test");
             }).not.toThrow();
         });
