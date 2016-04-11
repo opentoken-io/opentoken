@@ -6,12 +6,12 @@ describe("dependencies", () => {
     beforeEach(() => {
         dependencies = require("../lib/dependencies");
     });
-
-    it("resolves a dependency", () => {
+    it("returns an object", () => {
         expect(dependencies).toEqual(jasmine.any(Object));
+    });
+    it("resolves a dependency", () => {
         expect(dependencies.resolve("config")).toEqual(jasmine.any(Object));
     });
-
     it("resolve a dependency which has methods to run", () => {
         var webServer;
 

@@ -1,14 +1,14 @@
 "use strict";
 
 describe("restMiddleware", () => {
-    var configMock, HelmetMock, logger, restMiddleware, ServerMock, restifyLinks;
+    var configMock, helmetMock, logger, restMiddleware, serverMock, restifyLinks;
 
     beforeEach(() => {
         var LoggerMock, RestMiddleware;
 
         RestMiddleware = require("../lib/rest-middleware");
         LoggerMock = require("./mock/logger-mock");
-        HelmetMock = jasmine.createSpyObj("helmetMock", [
+        helmetMock = jasmine.createSpyObj("helmetMock", [
             "frameguard",
             "hidePoweredBy",
             "hsts",
@@ -17,7 +17,7 @@ describe("restMiddleware", () => {
             "noSniff",
             "xssFilter"
         ]);
-        ServerMock = jasmine.createSpyObj("serverMock", [
+        serverMock = jasmine.createSpyObj("serverMock", [
             "use"
         ]);
         configMock = {
@@ -26,10 +26,34 @@ describe("restMiddleware", () => {
         };
         restifyLinks = jasmine.createSpy();
         logger = new LoggerMock();
-        restMiddleware = new RestMiddleware(HelmetMock, logger, restifyLinks);
+        restMiddleware = new RestMiddleware(helmetMock, logger, restifyLinks);
     });
 
+    function expectNormalMiddlewareWasCalled () {
+        expect(helmetMock.frameguard).toHaveBeenCalled();
+        expect(helmetMock.ieNoOpen).toHaveBeenCalled();
+        expect(helmetMock.hidePoweredBy).toHaveBeenCalled();
+        expect(helmetMock.ieNoOpen).toHaveBeenCalled();
+        expect(helmetMock.noCache).toHaveBeenCalled();
+        expect(helmetMock.noSniff).toHaveBeenCalled();
+        expect(helmetMock.xssFilter).toHaveBeenCalled();
+        expect(restifyLinks).toHaveBeenCalled();
+    }
+
     it("calls restMiddleware without https", () => {
+        restMiddleware(configMock, serverMock);
+
+        expectNormalMiddlewareWasCalled();
+        expect(helmetMock.hsts).not.toHaveBeenCalled();
+    });
+    it("calls restMiddleware with https", () => {
+        configMock.https = true;
+        restMiddleware(configMock, serverMock);
+
+        expectNormalMiddlewareWasCalled();
+        expect(helmetMock.hsts).toHaveBeenCalled();
+    });
+    it("sets up link discovery", () => {
         var next, req, res, standardLinks;
         res = jasmine.createSpyObj("resMock", [
             "links"
@@ -41,20 +65,14 @@ describe("restMiddleware", () => {
         }
         spyOn(req, "href").andCallThrough();
         next = jasmine.createSpy("nextMock");
-        restMiddleware(configMock, ServerMock);
-        expect(logger.debug).toHaveBeenCalled();
-        expect(HelmetMock.frameguard).toHaveBeenCalled();
-        expect(HelmetMock.ieNoOpen).toHaveBeenCalled();
-        expect(HelmetMock.hidePoweredBy).toHaveBeenCalled();
-        expect(HelmetMock.hsts).not.toHaveBeenCalled();
-        expect(HelmetMock.ieNoOpen).toHaveBeenCalled();
-        expect(HelmetMock.noCache).toHaveBeenCalled();
-        expect(HelmetMock.noSniff).toHaveBeenCalled();
-        expect(HelmetMock.xssFilter).toHaveBeenCalled();
-        expect(restifyLinks).toHaveBeenCalled();
-        standardLinks = ServerMock.use.mostRecentCall.args[0];
+
+        restMiddleware(configMock, serverMock);
+
+        standardLinks = serverMock.use.mostRecentCall.args[0];
         expect(standardLinks).toEqual(jasmine.any(Function));
-        standardLinks(req, res, next);
+        expect(() => {
+            standardLinks(req, res, next);
+        }).not.toThrow();
         expect(res.links).toHaveBeenCalledWith({
             self: "http://localhost:8443/path",
             up: {
@@ -62,13 +80,5 @@ describe("restMiddleware", () => {
                 title: "self-discovery"
             }
         });
-    });
-
-    it("calls restMiddleware with https", () => {
-        configMock.https = true;
-        restMiddleware(configMock, ServerMock);
-
-        // Other calls are tested above
-        expect(HelmetMock.hsts).toHaveBeenCalled();
     });
 });
