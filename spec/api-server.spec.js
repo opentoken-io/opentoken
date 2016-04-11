@@ -1,7 +1,7 @@
 "use strict";
 
 describe("ApiServer", () => {
-    var apiServer, ApiServer, config, webServerMock;
+    var ApiServer, webServerMock;
 
     beforeEach(() => {
         ApiServer = require("../lib/api-server");
@@ -12,6 +12,8 @@ describe("ApiServer", () => {
         ]);
     });
     it("starts a server", () => {
+        var apiServer, config;
+
         config = {
             server: {
                 "baseUrl": "https://localhost:8080/",
@@ -19,7 +21,6 @@ describe("ApiServer", () => {
             }
         };
         apiServer = new ApiServer(config, webServerMock);
-
         expect(webServerMock.configure).toHaveBeenCalledWith({
             "baseUrl": "https://localhost:8080/",
             "port": 8443
@@ -28,19 +29,21 @@ describe("ApiServer", () => {
         expect(webServerMock.startServer).toHaveBeenCalled();
     });
     it("sets up a route", () => {
-        var next, req, res, routeCall;
+        var addRouteCallback, next, req, res;
+
         res = jasmine.createSpyObj("resMock", [
             "setHeader",
             "send"
         ]);
         next = jasmine.createSpy("nextMock");
-
-        apiServer = new ApiServer({}, webServerMock);
-
+        new ApiServer({}, webServerMock);
         expect(webServerMock.addRoute).toHaveBeenCalledWith("get", "/", jasmine.any(Function));
-        routeCall = webServerMock.addRoute.mostRecentCall.args[2];
+        addRouteCallback = webServerMock.addRoute.mostRecentCall.args[2];
         expect(() => {
-            routeCall(req, res, next);
+            addRouteCallback(req, res, next);
         }).not.toThrow();
+        expect(res.setHeader).toHaveBeenCalled();
+        expect(res.send).toHaveBeenCalled();
+        expect(next).toHaveBeenCalled();
     });
 });
