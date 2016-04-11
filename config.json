@@ -1,5 +1,9 @@
 {
     "debug": false,
+    "storage": {
+        "bucket": "opentoken-io-test-s3",
+        "region": "us-east-1"
+    },
     "server": {
         "baseUrl": "https://localhost:8080/",
         "name": "OpenToken.io",
