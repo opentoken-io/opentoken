@@ -1,6 +1,4 @@
 instrumentation:
     excludes:
-        - load-test.js
-        - "*.spec.js"
-        - "*-mock.js"
+        - spec/**/*.js
     include-all-sources: true

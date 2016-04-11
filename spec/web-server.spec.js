@@ -1,15 +1,16 @@
 "use strict";
 
 describe("WebServer", () => {
-    var fs, logger, middlewareProfiler, restify, restifyServer, restMiddleware, webServer;
+    var fs, logger, middlewareProfiler, promiseMock, restify, restifyServer, restMiddleware, webServer;
 
     beforeEach(() => {
         var LoggerMock, WebServer;
 
+        promiseMock = require("./mock/promise-mock");
         LoggerMock = require("./mock/logger-mock");
         WebServer = require("../lib/web-server");
         fs = jasmine.createSpyObj("fs", [
-            "readFileSync"
+            "readFileAsync"
         ]);
         restifyServer = jasmine.createSpyObj("restifyServer", [
             "del",
@@ -18,6 +19,9 @@ describe("WebServer", () => {
             "on",
             "use"
         ]);
+        restifyServer.listen.andCallFake((port, callback) => {
+            callback();
+        });
         restify = jasmine.createSpyObj("restify", [
             "createServer"
         ]);
@@ -28,7 +32,7 @@ describe("WebServer", () => {
             "profileServer"
         ]);
         logger = new LoggerMock();
-        webServer = new WebServer(fs, logger, middlewareProfiler, restify, restMiddleware);
+        webServer = new WebServer(fs, logger, middlewareProfiler, promiseMock, restify, restMiddleware);
     });
     it("exposes known public methods", () => {
         expect(webServer.addMiddleware).toEqual(jasmine.any(Function));
@@ -42,6 +46,7 @@ describe("WebServer", () => {
 
             expect(restifyServer.use).not.toHaveBeenCalled();
             webServer.addMiddleware(testFn);
+            webServer.startServer();
             expect(restifyServer.use).toHaveBeenCalledWith(testFn);
         });
         it("adds middleware with a route", () => {
@@ -49,6 +54,7 @@ describe("WebServer", () => {
 
             expect(restifyServer.use).not.toHaveBeenCalled();
             webServer.addMiddleware("/flowers", testFn);
+            webServer.startServer();
             expect(restifyServer.use).toHaveBeenCalledWith("/flowers", testFn);
         });
         it("adds more than one middleware", () => {
@@ -58,9 +64,9 @@ describe("WebServer", () => {
 
             expect(restifyServer.use).not.toHaveBeenCalled();
             webServer.addMiddleware(testFn1);
-            expect(restifyServer.use).toHaveBeenCalledWith(testFn1);
-            expect(restifyServer.use).not.toHaveBeenCalledWith("/flowers", testFn2);
             webServer.addMiddleware("/flowers", testFn2);
+            webServer.startServer();
+            expect(restifyServer.use).toHaveBeenCalledWith(testFn1);
             expect(restifyServer.use).toHaveBeenCalledWith("/flowers", testFn2);
         });
     });
@@ -70,6 +76,7 @@ describe("WebServer", () => {
 
             expect(restifyServer.get).not.toHaveBeenCalled();
             webServer.addRoute("get", "/", testFn);
+            webServer.startServer();
             expect(restifyServer.get).toHaveBeenCalledWith("/", testFn);
         });
         it("lowercases methods and converts 'delete'", () => {
@@ -77,6 +84,7 @@ describe("WebServer", () => {
 
             expect(restifyServer.get).not.toHaveBeenCalled();
             webServer.addRoute("DELETE", "/", testFn);
+            webServer.startServer();
             expect(restifyServer.del).toHaveBeenCalledWith("/", testFn);
         });
     });
@@ -95,10 +103,7 @@ describe("WebServer", () => {
 
             // Set the config
             webServer.configure(input);
-
-            // Trigger the internal call to this.app() because that
-            // sends the configuration to restify.createServer().
-            webServer.addMiddleware(() => {});
+            webServer.startServer();
 
             // test the config passed to restifyServer
             expect(restify.createServer.callCount).toBe(1);
@@ -133,16 +138,16 @@ describe("WebServer", () => {
             }, {});
         });
         it("reads certificate and key files", () => {
-            fs.readFileSync.andCallFake((fn) => {
+            fs.readFileAsync.andCallFake((fn) => {
                 if (fn == "keyfile") {
-                    return "keyfile ok";
+                    return promiseMock.resolve("keyfile ok");
                 }
 
                 if (fn == "certfile") {
-                    return "certfile ok";
+                    return promiseMock.resolve("certfile ok");
                 }
 
-                throw new Error("Invalid file: " + fn.toString());
+                return promiseMock.reject("Invalid file: " + fn.toString());
             });
             testConfig({
                 certificateFile: "certfile",
@@ -186,11 +191,7 @@ describe("WebServer", () => {
             webServer.configure({
                 baseUrl: "/bunnies/"
             });
-
-            // Trigger the internal call to this.app() because that
-            // sends the configuration to restify.createServer().
-            webServer.addMiddleware(() => {});
-
+            webServer.startServer();
             expect(restMiddleware).toHaveBeenCalled();
             expect(restMiddleware.callCount).toBe(1);
             args = restMiddleware.mostRecentCall.args;
@@ -203,31 +204,21 @@ describe("WebServer", () => {
             webServer.configure({
                 baseUrl: "/bunnies"
             });
-
-            // Trigger the internal call to this.app() because that
-            // sends the configuration to restify.createServer().
-            webServer.addMiddleware(() => {});
+            webServer.startServer();
 
             // Skipping most checks here because they were done
             // in the previous test.
-
             expect(restMiddleware.mostRecentCall.args[0].baseUrl).toBe("/bunnies");
         });
         it("passes profileMiddleware", () => {
             var args;
 
-            webServer.profileMiddleware = jasmine.createSpy("webServer.profileMiddleware");
             webServer.configure({
                 profileMiddleware: true
             });
-
             expect(middlewareProfiler.profileServer).not.toHaveBeenCalled();
             expect(middlewareProfiler.displayAtInterval).not.toHaveBeenCalled();
-
-            // Trigger the internal call to this.app() because that
-            // sends the configuration to restify.createServer().
-            webServer.addMiddleware(() => {});
-
+            webServer.startServer();
             expect(middlewareProfiler.profileServer).toHaveBeenCalled();
             expect(middlewareProfiler.displayAtInterval).toHaveBeenCalled();
             args = middlewareProfiler.profileServer.mostRecentCall.args;
@@ -237,7 +228,7 @@ describe("WebServer", () => {
             expect(args.length).toBe(2);
             expect(args[0]).toEqual(jasmine.any(Number));
             expect(args[1]).toEqual(jasmine.any(Function));
-            expect(function () {
+            expect(() => {
                 args[1]("test");
             }).not.toThrow();
         });
@@ -264,8 +255,7 @@ describe("WebServer", () => {
                 callback();
             }).not.toThrow();
         });
-
-        it("has a working callback", () => {
+        it("executes the uncaughtException callback", () => {
             var callback, args, uncaughtCallback, req, res, route;
 
             req = jasmine.createSpy("req");
@@ -273,13 +263,11 @@ describe("WebServer", () => {
                 "send",
                 "write"
             ]);
-
             webServer.startServer();
             callback = restifyServer.listen.mostRecentCall.args[1];
-            expect(function() {
+            expect(function () {
                 callback();
             });
-
             expect(restifyServer.on).toHaveBeenCalled();
             args = restifyServer.on.mostRecentCall.args;
             expect(args.length).toBe(2);
