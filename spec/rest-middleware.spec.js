@@ -1,9 +1,9 @@
 "use strict";
 
-describe("restMiddleware", function() {
+describe("restMiddleware", () => {
     var configMock, HelmetMock, logger, restMiddleware, ServerMock, restifyLinks;
 
-    beforeEach(function() {
+    beforeEach(() => {
         var LoggerMock, RestMiddleware;
 
         RestMiddleware = require("../lib/rest-middleware");
@@ -29,7 +29,7 @@ describe("restMiddleware", function() {
         restMiddleware = new RestMiddleware(HelmetMock, logger, restifyLinks);
     });
 
-    it("calls restMiddleware without https", function() {
+    it("calls restMiddleware without https", () => {
         var next, req, res, standardLinks;
         res = jasmine.createSpyObj("resMock", [
             "links"
@@ -64,7 +64,7 @@ describe("restMiddleware", function() {
         });
     });
 
-    it("calls restMiddleware with https", function() {
+    it("calls restMiddleware with https", () => {
         configMock.https = true;
         restMiddleware(configMock, ServerMock);
 
