@@ -37,6 +37,29 @@ describe("storage/s3", () => {
         };
         s3 = new s3File(AwsSdkMock, promiseMock);
     });
+    describe("configure", () => {
+        beforeEach(() => {
+            AwsSdkMock.S3 = jasmine.createSpy("s3Mock");
+        });
+        it("passes in configuration options for all", () => {
+            s3.transit();
+            expect(s3.aws.config.region).toBe("us-east-1");
+            expect(AwsSdkMock.S3).toHaveBeenCalledWith({params: {
+                Bucket: null
+            }});
+        });
+        it("passes in configuration options for all", () => {
+            s3.configure({
+                region: "us-west-1",
+                bucket: "test-bucket"
+            });
+            s3.transit();
+            expect(s3.aws.config.region).toBe("us-west-1");
+            expect(AwsSdkMock.S3).toHaveBeenCalledWith({params: {
+                Bucket: "test-bucket"
+            }});
+        });
+    });
     describe("fileDel", () => {
         var transit;
         
