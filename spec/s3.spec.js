@@ -1,192 +1,167 @@
 "use strict";
 
 describe("storage/s3", () => {
-    var AwsSdkMock, promiseMock, s3;
-    
-    /**
-     * Checks the result for the promise object passed in.
-     *
-     * @param {Object} results
-     * @param {boolean} successful
-     * @param {string} message
-     */
-    function checkPromiseResults(results, successful, message) {
-        expect(results.success).toBe(successful);
-        expect(results.value).toEqual(message);
-    }
-    
+    var awsSdkMock, promiseMock, s3;
+
     beforeEach(() => {
         var s3File;
-        
+
         s3File = require("../lib/storage/s3");
         promiseMock = require("./mock/promise-mock");
         class S3Fake {
             constructor(params) {
                 this.params = params;
-                this.deleteObjectAsync = jasmine.createSpy("deleteObjectAsync");
-                this.getObjectAsync = jasmine.createSpy("getObjectAsync");
-                this.listObjectsAsync = jasmine.createSpy("listObjectsAsync");
-                this.putObjectAsync = jasmine.createSpy("putObjectAsync");
+                [
+                    "deleteObjectAsync",
+                    "getObjectAsync",
+                    "listObjectsAsync",
+                    "putObjectAsync"
+                ].forEach((method) => {
+                    this[method] = jasmine.createSpy(method);
+                    this[method].andCallFake((params) => {
+                        return promiseMock.resolve(params);
+                    });
+                });
             }
         }
-        AwsSdkMock = {
-            "S3": S3Fake,
-            "config": {
-                "region": null
+        awsSdkMock = {
+            S3: S3Fake,
+            config: {
+                region: null
             }
         };
-        s3 = new s3File(AwsSdkMock, promiseMock);
+        s3 = new s3File(awsSdkMock, promiseMock);
     });
-    describe("configure", () => {
+    describe("configure()", () => {
         beforeEach(() => {
-            AwsSdkMock.S3 = jasmine.createSpy("s3Mock");
+            awsSdkMock.S3 = jasmine.createSpy("s3Mock");
         });
         it("passes in configuration options for all", () => {
-            s3.transit();
             expect(s3.aws.config.region).toBe("us-east-1");
-            expect(AwsSdkMock.S3).toHaveBeenCalledWith({params: {
-                Bucket: null
-            }});
+            s3.transit();
+            expect(awsSdkMock.S3).toHaveBeenCalledWith({
+                params: {
+                    Bucket: null
+                }
+            });
         });
         it("passes in configuration options for all", () => {
             s3.configure({
                 region: "us-west-1",
                 bucket: "test-bucket"
             });
-            s3.transit();
             expect(s3.aws.config.region).toBe("us-west-1");
-            expect(AwsSdkMock.S3).toHaveBeenCalledWith({params: {
-                Bucket: "test-bucket"
-            }});
-        });
-    });
-    describe("fileDel", () => {
-        var transit;
-        
-        beforeEach(() => {
-            transit = s3.transit();
-            transit.deleteObjectAsync.andCallFake((params) => {
-                if (params.Key == "afile") {
-                    return promiseMock.resolve("deleted file");
+            s3.transit();
+            expect(awsSdkMock.S3).toHaveBeenCalledWith({
+                params: {
+                    Bucket: "test-bucket"
                 }
-
-                return promiseMock.reject("error deleting file");
             });
         });
+    });
+    describe("del()", () => {
         it("deletes a file", () => {
-            checkPromiseResults(s3.fileDel("afile"), true, "deleted file");
-        });
-    });
-    describe("fileGet", () => {
-        var transit;
-        
-        beforeEach(() => {
-            transit = s3.transit();
-            transit.getObjectAsync.andCallFake((params) => {
-                if (params.Key == "afile") {
-                    return promiseMock.resolve("got data");
+            expect(s3.del("afile").status()).toEqual({
+                success: true,
+                value: {
+                    Key: "afile"
                 }
-
-                return promiseMock.reject("error fetching file");
             });
         });
+    });
+    describe("get()", () => {
         it("gets an object back", () => {
-            checkPromiseResults(s3.fileGet("afile"), true, "got data");
-        });
-    });
-    describe("fileList", () => {
-        var transit;
-
-        beforeEach(() => {
-            transit = s3.transit();
-            transit.listObjectsAsync.andCallFake((params) => {
-                if (! params.Prefix) {
-                    return promiseMock.resolve("got list from top level");
-                }
-                
-                if (params.Prefix && params.Prefix === "accounts") {
-                    return promiseMock.resolve("got list from accounts");
-                } else {
-                    return promiseMock.reject("error fetching list");
+            expect(s3.get("afile").status()).toEqual({
+                success: true,
+                value: {
+                    Key: "afile"
                 }
             });
         });
+    });
+    describe("list()", () => {
         it("gets top level list", () => {
-            checkPromiseResults(s3.fileList(), true, "got list from top level");
+            expect(s3.list().status()).toEqual({
+                success: true,
+                value: {
+                    Prefix: null
+                }
+            });
         });
         it("passes in a prefix", () => {
-            checkPromiseResults(s3.fileList("accounts"), true, "got list from accounts");
-        });
-    });
-    describe("filePut", () => {
-        var transit, expectedOptions;
-
-        beforeEach(() => {
-            transit = s3.transit();
-            transit.putObjectAsync.andCallFake((params) => {
-
-                if (params.Key) {
-                    expect(params.Body).toEqual(jasmine.any(Buffer));
-                    expect(params.ServerSideEncryption).toBe("AES256");
-                    
-                    if (params.Key === "options") {
-                        expect(params.ContentType).toBe(expectedOptions.contentType);
-                        expect(params.Expires).toBe(expectedOptions.expires);
-                        return promiseMock.resolve("puts file");
-                    }
-                    
-                    return promiseMock.resolve("puts file");
+            expect(s3.list("accounts").status()).toEqual({
+                success: true,
+                value: {
+                    Prefix: "accounts"
                 }
             });
         });
+    });
+    describe("put()", () => {
         it("passes in contents as a string", () => {
-            var putReturn;
-            
-            putReturn = s3.filePut("string", "this is a string");
-            checkPromiseResults(putReturn, true, "puts file");
+            expect(s3.put("string", "this is a string").status()).toEqual({
+                success: true,
+                value: {
+                    Body: jasmine.any(Buffer),
+                    ContentType: "application/octet-stream",
+                    Key: "string",
+                    ServerSideEncryption: "AES256"
+                }
+            });
         });
         it("passes in contents as a buffer", () => {
-            var putReturn;
-            
-            putReturn = s3.filePut("string", new Buffer("this is a buffer", "binary"));
-            checkPromiseResults(putReturn, true, "puts file");
+            expect(s3.put("buffer", new Buffer("this is a buffer", "binary")).status()).toEqual({
+                success: true,
+                value: {
+                    Body: jasmine.any(Buffer),
+                    ContentType: "application/octet-stream",
+                    Key: "buffer",
+                    ServerSideEncryption: "AES256"
+                }
+            });
         });
-        it("passes in options", () => {
-            var putReturn;
-
-            expectedOptions = {
-                expires: "a date",
-                contentType: "text/plain"
-            }
-            putReturn = s3.filePut("options", "file contents", {
+        xit("passes in options", () => {
+            expect(s3.put("options", "file contents", {
                 contentType: "text/plain",
                 expires: "a date"
+            }).status()).toEqual({
+                success: true,
+                value: {
+                    Body: jasmine.any(Buffer),
+                    ContentType: "text/plain",
+                    Expires: "a date",
+                    Key: "string",
+                    ServerSideEncryption: "AES256"
+                }
             });
-            checkPromiseResults(putReturn, true, "puts file");
         });
         it("passes in content type option", () => {
-            var putReturn;
-
-            expectedOptions = {
-                expires: null,
+            expect(s3.put("options", "file contents", {
                 contentType: "text/plain"
-            }
-            putReturn = s3.filePut("options", "file contents", {
-                contentType: "text/plain"
+            }).status()).toEqual({
+                success: true,
+                value: {
+                    Body: jasmine.any(Buffer),
+                    ContentType: "text/plain",
+                    Expires: null,
+                    Key: "options",
+                    ServerSideEncryption: "AES256"
+                }
             });
-            checkPromiseResults(putReturn, true, "puts file");
         });
         it("passes in expires option", () => {
-            var putReturn;
-
-            expectedOptions = {
-                expires: "a date",
-                contentType: "application/octet-stream"
-            }
-            putReturn = s3.filePut("options", "file contents", {
+            expect(s3.put("options", "file contents", {
                 expires: "a date"
+            }).status()).toEqual({
+                success: true,
+                value: {
+                    Body: jasmine.any(Buffer),
+                    ContentType: "application/octet-stream",
+                    Expires: "a date",
+                    Key: "options",
+                    ServerSideEncryption: "AES256"
+                }
             });
-            checkPromiseResults(putReturn, true, "puts file");
         });
     });
 });
