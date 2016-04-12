@@ -6,8 +6,8 @@ describe("storage/s3", () => {
     beforeEach(() => {
         var s3File;
 
-        s3File = require("../lib/storage/s3");
-        promiseMock = require("./mock/promise-mock");
+        s3File = require("../../lib/storage/s3");
+        promiseMock = require("../mock/promise-mock");
         class S3Fake {
             constructor(params) {
                 this.params = params;
