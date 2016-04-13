@@ -72,10 +72,12 @@ describe("storage/s3", () => {
     describe("get()", () => {
         beforeEach(() => {
             var transit;
-            
+
             transit = s3.transit();
             transit.getObjectAsync.andCallFake((params) => {
-                return promiseMock.resolve({Body: new Buffer("this is a buffer", "binary")});
+                return promiseMock.resolve({
+                    Body: new Buffer("this is a buffer", "binary")
+                });
             });
         });
         it("gets an object back", () => {
@@ -126,7 +128,7 @@ describe("storage/s3", () => {
                 }
             });
         });
-        xit("passes in options", () => {
+        it("passes in options", () => {
             expect(s3.put("options", "file contents", {
                 contentType: "text/plain",
                 expires: "a date"
@@ -136,7 +138,7 @@ describe("storage/s3", () => {
                     Body: jasmine.any(Buffer),
                     ContentType: "text/plain",
                     Expires: "a date",
-                    Key: "string",
+                    Key: "options",
                     ServerSideEncryption: "AES256"
                 }
             });
