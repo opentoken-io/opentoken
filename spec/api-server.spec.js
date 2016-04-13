@@ -6,8 +6,8 @@ describe("ApiServer", () => {
     beforeEach(() => {
         ApiServer = require("../lib/api-server");
         webServerMock = jasmine.createSpyObj("webServerMock", [
-            "configure",
             "addRoute",
+            "configure",
             "startServer"
         ]);
     });
@@ -32,8 +32,8 @@ describe("ApiServer", () => {
         var addRouteCallback, next, req, res;
 
         res = jasmine.createSpyObj("resMock", [
-            "setHeader",
-            "send"
+            "send",
+            "setHeader"
         ]);
         next = jasmine.createSpy("nextMock");
         new ApiServer({}, webServerMock);
