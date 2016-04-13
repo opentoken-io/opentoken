@@ -11,9 +11,9 @@ describe("storage/s3", () => {
         class S3Fake {
             constructor(params) {
                 this.params = params;
+                this.getObjectAsync = jasmine.createSpy("getObjectAsync");
                 [
                     "deleteObjectAsync",
-                    "getObjectAsync",
                     "listObjectsAsync",
                     "putObjectAsync"
                 ].forEach((method) => {
@@ -70,12 +70,18 @@ describe("storage/s3", () => {
         });
     });
     describe("get()", () => {
+        beforeEach(() => {
+            var transit;
+            
+            transit = s3.transit();
+            transit.getObjectAsync.andCallFake((params) => {
+                return promiseMock.resolve({Body: new Buffer("this is a buffer", "binary")});
+            });
+        });
         it("gets an object back", () => {
             expect(s3.get("afile").status()).toEqual({
                 success: true,
-                value: {
-                    Key: "afile"
-                }
+                value: jasmine.any(Buffer)
             });
         });
     });
