@@ -31,12 +31,12 @@ describe("OtDate", () => {
         OtDate = require("../lib/ot-date")(MomentFake);
     });
     describe("fromDate()", () => {
-        it("returns date", () => {
+        it("gets an OtDate object back from a custom date/time", () => {
             expect(OtDate.fromDate("2016-04-16")).toEqual(jasmine.any(OtDate));
         });
     });
     describe("fromBuffer()", () => {
-        it("returns date", () => {
+        it("gets an OtDate object back from a buffer object", () => {
             var b;
 
             b = new Buffer(4);
@@ -46,23 +46,22 @@ describe("OtDate", () => {
         });
     });
     describe("isBefore()", () => {
-        it("returns true", () => {
-            expect(OtDate.now().isBefore("2016-04-16")).toEqual(true);
+        it("checks the date is before the set date", () => {
+            expect(OtDate.fromDate("2016-04-17").isBefore("2016-04-16")).toEqual(true);
         });
     });
     describe("now()", () => {
-        it("gets the current date", () => {
+        it("gets the OtDate object back", () => {
             var anotherTime, currentTime, result;
 
             currentTime = new Date();
             result = OtDate.now();
             anotherTime = new Date();
-
             expect(result).toEqual(jasmine.any(OtDate));
         });
     });
     describe("plus()", () => {
-        it("returns a moment object", () => {
+        it("sets the current time to three hours ahead", () => {
             var result;
 
             result = OtDate.now().plus({
@@ -73,17 +72,17 @@ describe("OtDate", () => {
         });
     });
     describe("toBuffer()", () => {
-        it("returns a string", () => {
+        it("makes the current date/time a buffer object", () => {
             expect(OtDate.now().toBuffer()).toEqual(jasmine.any(Buffer));
         });
     });
     describe("toDate()", () => {
-        it("returns a moment object", () => {
+        it("gets the current time as a date time object", () => {
             expect(OtDate.now().toDate()).toEqual(jasmine.any(Object));
         });
     });
     describe("toString()", () => {
-        it("returns a string", () => {
+        it("gets the formatted date back as a string", () => {
             var result;
 
             result = OtDate.now().toString();
