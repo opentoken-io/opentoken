@@ -22,24 +22,26 @@ describe("encryption", () => {
         });
         encryption = require("../lib/encryption")(ciphersAndHashes, crypto, promiseMock, random);
     });
+    it("encrypts from a buffer with a key as a buffer", (done) => {
+        // The rest of the tests use Buffers because it is WAY easier
+        encryption.encryptAsync(new Buffer("as a string", "binary"), new Buffer("key", "binary"), {
+            algorithm: "md5",
+            digest: "sha1",
+            iterations: 50
+        }, {
+            algorithm: "seed-cfb",
+            digest: "ripemd",
+            iterations: 29
+        }).then((result) => {
+            expect(result.toString("hex")).toEqual("0001053200000040031d0000000b00000053f8a825e3b1c5e9537c20800324153042424242424242424242424242424242e94cea7494417116671128");
+        }).then(done, done);
+    })
     it("decrypts from a string with a key as a buffer", (done) => {
         // The rest of the tests use Buffers because it is WAY easier
-        //
-        // This was generated with the following code
-        //
-        // encryption.encryptAsync("as a string", "key", {
-        //     algorithm: "md5",
-        //     digest: "sha1",
-        //     iterations: 50
-        // }, {
-        //     algorithm: "seed-cfb",
-        //     digest: "ripemd",
-        //     iterations: 29
-        // }).then((result) => {
-        //     console.log(JSON.stringify(result.toString("binary")));
-        //     console.log(JSON.stringify(result.toString("hex")));
-        // });
-        encryption.decryptAsync("\u0000\u0001\u00052\u0000\u0000\u0000@\u0003\u001d\u0000\u0000\u0000\u000b\u0000\u0000\u0000Sø¨%ã±ÅéS| \u0003$\u00150BBBBBBBBBBBBBBBBéLêtAq\u0016g\u0011(", new Buffer("key")).then((result) => {
+        var asString;
+
+        asString = (new Buffer("0001053200000040031d0000000b00000053f8a825e3b1c5e9537c20800324153042424242424242424242424242424242e94cea7494417116671128", "hex")).toString("binary");
+        encryption.decryptAsync(asString, new Buffer("key")).then((result) => {
             expect(result.toString("binary")).toEqual("as a string");
         }).then(done, done);
     });
