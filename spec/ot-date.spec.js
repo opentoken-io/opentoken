@@ -1,99 +1,126 @@
 "use strict";
 
 describe("OtDate", () => {
-    var OtDate, MomentFake;
+    var otDate;
+
+    function testDate(actual, expected) {
+        expect(actual).toEqual(jasmine.any(Date));
+        expect(actual.toISOString()).toEqual(expected);
+    }
+
+    function testOtDate(actual, expected) {
+        expect(actual).toEqual(jasmine.any(otDate));
+        expect(actual.toString()).toEqual(expected);
+    }
 
     beforeEach(() => {
-        class MomentFake {
-            constructor() {
-                [
-                    "add",
-                    "fromString",
-                    "toDate",
-                    "utc",
-                    "unix"
-                ].forEach((method) => {
-                    this[method] = jasmine.createSpy(method);
-                    this[method].andCallFake(() => {
-                        return this;
-                    });
-                });
-                this.isBefore = jasmine.createSpy("isBefore");
-                this.isBefore.andCallFake((date) => {
-                    return true;
-                });
-                this.toString = jasmine.createSpy("toString");
-                this.toString.andCallFake(() => {
-                    return "a formatted date";
-                });
-            }
-        };
-        OtDate = require("../lib/ot-date")(MomentFake);
+        var moment;
+
+        moment = require("moment");
+        otDate = require("../lib/ot-date")(moment);
     });
-    describe("fromDate()", () => {
+    describe("fromDate() & toDate()", () => {
         it("gets an OtDate object back from a custom date/time", () => {
-            expect(OtDate.fromDate("2016-04-16")).toEqual(jasmine.any(OtDate));
+            var result;
+
+            // Date -> OtDate
+            result = otDate.fromDate(new Date("2016-04-16"));
+            testOtDate(result, "2016-04-16T00:00:00.000Z");
+            result = result.toDate();
+            testDate(result, "2016-04-16T00:00:00.000Z");
         });
     });
-    describe("fromBuffer()", () => {
-        it("gets an OtDate object back from a buffer object", () => {
+    describe("toBuffer() & fromBuffer()", () => {
+        it("gets an OtDate object back from a buffer after creating as a buffer", () => {
+            var result;
+
+            result = otDate.fromDate(new Date("2016-04-16")).toBuffer();
+            expect(result).toEqual(jasmine.any(Buffer));
+            expect(result.length).toBe(4);
+            testOtDate(otDate.fromBuffer(result), "2016-04-16T00:00:00.000Z");
+        });
+        it("gets an OtDate object back from a buffer at 1", () => {
             var b;
 
-            b = new Buffer(4);
-            b.writeUInt32LE("2016-04-16", 0);
-
-            expect(OtDate.fromBuffer(b)).toEqual(jasmine.any(OtDate));
+            b = new Buffer(5);
+            otDate.fromDate(new Date("2016-04-16")).toBuffer(b, 1);
+            testOtDate(otDate.fromBuffer(b, 1), "2016-04-16T00:00:00.000Z");
+        });
+    });
+    describe("fromString()", () => {
+        it("passes in a date string", () => {
+            testOtDate(otDate.fromString("2016-04-16"), "2016-04-16T00:00:00.000Z");
+        });
+        it("passes in a date string with time", () => {
+            testOtDate(otDate.fromString("2016-04-16T03:00:00"), "2016-04-16T03:00:00.000Z");
+        });
+        it("passes in a date string with time and time zone converting to UTC", () => {
+            testOtDate(otDate.fromString("2016-04-16T03:00:00.000+0600"), "2016-04-15T21:00:00.000Z");
         });
     });
     describe("isBefore()", () => {
         it("checks the date is before the set date", () => {
-            expect(OtDate.fromDate("2016-04-17").isBefore("2016-04-16")).toEqual(true);
+            expect(otDate.fromDate(new Date("2016-04-17")).isBefore("2016-04-16")).toEqual(false);
+        });
+        it("checks the date is after the set date", () => {
+            expect(otDate.fromDate(new Date("2016-04-17")).isBefore("2016-04-19")).toEqual(true);
+        });
+        it("checks the date is after the set date and is a Date object", () => {
+            expect(otDate.fromDate(new Date("2016-04-16")).isBefore(new Date("2016-04-16"))).toEqual(false);
+        });
+        it("checks the date is after the set date and is an instance of OtDate", () => {
+            var otherDate;
+
+            otherDate = otDate.fromString("2016-04-15");
+            expect(otDate.fromDate(new Date("2016-04-16")).isBefore(otherDate)).toEqual(false);
         });
     });
     describe("now()", () => {
-        it("gets the OtDate object back", () => {
-            var anotherTime, currentTime, result;
+        it("generates a time that represents 'now'", () => {
+            var afterTime, beforeTime, result;
 
-            currentTime = new Date();
-            result = OtDate.now();
-            anotherTime = new Date();
-            expect(result).toEqual(jasmine.any(OtDate));
+            beforeTime = new Date();
+            result = otDate.now().toDate();
+            afterTime = new Date();
+
+            // Test that the result is between beforeTime and afterTime
+            expect(result).not.toBeLessThan(beforeTime);
+            expect(result).not.toBeGreaterThan(afterTime);
         });
     });
     describe("plus()", () => {
-        it("sets the current time to three hours ahead", () => {
+        it("moves the current time to three hours ahead", () => {
             var result;
 
-            result = OtDate.now().plus({
+            result = otDate.fromDate(new Date("2016-04-16 03:00:00")).plus({
                 hours: 3
             });
-
-            expect(result).toEqual(jasmine.any(Object));
-        });
-    });
-    describe("toBuffer()", () => {
-        it("makes the current date/time a buffer object", () => {
-            expect(OtDate.now().toBuffer()).toEqual(jasmine.any(Buffer));
-        });
-    });
-    describe("toDate()", () => {
-        it("gets the current time as a date time object", () => {
-            expect(OtDate.now().toDate()).toEqual(jasmine.any(Object));
+            testOtDate(result, "2016-04-16T06:00:00.000Z");
         });
     });
     describe("toString()", () => {
-        it("gets the formatted date back as a string", () => {
+        it("gets the formatted date/time back as a string", () => {
             var result;
 
-            result = OtDate.now().toString();
+            result = otDate.fromDate(new Date("2016-04-16")).toString();
+            expect(result).toEqual("2016-04-16T00:00:00.000Z");
+        });
+        it("gets the UTC date/time when passing in a local date/time", () => {
+            var result;
 
-            expect(result).toEqual(jasmine.any(String));
-            expect(result).toBe("a formatted date");
+            result = otDate.fromDate(new Date("2016-04-16T14:00:00.000+0600")).toString();
+            expect(result).toEqual("2016-04-16T08:00:00.000Z");
+        });
+        it("gets the UTC date/time when no timezone is set", () => {
+            var result;
+
+            result = otDate.fromDate(new Date("2016-04-16T03:00:00.000")).toString();
+            expect(result).toEqual("2016-04-16T03:00:00.000Z");
         });
     });
     it("throws an error when calling class directly", () => {
         expect(() => {
-            new OtDate();
+            new otDate();
         }).toThrow();
     });
 });
