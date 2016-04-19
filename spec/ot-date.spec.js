@@ -23,11 +23,15 @@ describe("OtDate", () => {
         it("gets an OtDate object back from a custom date/time", () => {
             var result;
 
-            // Date -> OtDate
             result = otDate.fromDate(new Date("2016-04-16"));
             testOtDate(result, "2016-04-16T00:00:00.000Z");
             result = result.toDate();
             testDate(result, "2016-04-16T00:00:00.000Z");
+        });
+        it("throws an error for not getting passed a Date object", () => {
+            expect(() => {
+                otDate.fromDate("2016-04-16");
+            }).toThrow();
         });
     });
     describe("toBuffer() & fromBuffer()", () => {
@@ -56,6 +60,11 @@ describe("OtDate", () => {
         });
         it("passes in a date string with time and time zone converting to UTC", () => {
             testOtDate(otDate.fromString("2016-04-16T03:00:00.000+0600"), "2016-04-15T21:00:00.000Z");
+        });
+        it("throws an error for not getting passed a Date object", () => {
+            expect(() => {
+                otDate.fromString(new Date("2016-04-16"));
+            }).toThrow();
         });
     });
     describe("isBefore()", () => {
