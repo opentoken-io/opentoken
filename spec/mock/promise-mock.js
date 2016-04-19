@@ -5,6 +5,15 @@ var TestPromise;
 TestPromise = require("./test-promise");
 
 module.exports = {
+    /**
+     * Resolves when all promises are resolved.
+     *
+     * Fulfilled value will be an array of the values from the array
+     * of promises.  Rejects when any promise is rejected.
+     *
+     * @param {Array.<Promise>} promises
+     * @return {Promise.<Array>}
+     */
     all: function (promises) {
         var finalPromise, isDone, needed, result;
 
@@ -41,6 +50,14 @@ module.exports = {
 
         return finalPromise;
     },
+
+    /**
+     * Resolved when the first promise is resolved.  Rejected when the
+     * first promise is rejected.
+     *
+     * @param {Array.<Promise>} promises
+     * @return {Promise.<*>}
+     */
     any: function (promises) {
         var finalPromise, isDone;
 
@@ -70,6 +87,14 @@ module.exports = {
 
         return finalPromise;
     },
+
+
+    /**
+     * Creates a Promise using ES6 syntax
+     *
+     * @param {Function(resolve,reject)} cb
+     * @return {Promise.<*>}
+     */
     create: function (cb) {
         var promise;
 
@@ -78,6 +103,15 @@ module.exports = {
 
         return promise;
     },
+
+
+    /**
+     * Provides a "done" callback to a function so you can wrap
+     * Node-style callbacks and make them return promises.
+     *
+     * @param {Function(done)} fn
+     * @return {Promise.<*>}
+     */
     fromCallback: function (fn) {
         var promise;
 
@@ -92,6 +126,14 @@ module.exports = {
 
         return promise;
     },
+
+
+    /**
+     * Changes one Node-style callback function into returning a Promise.
+     *
+     * @param {Function} fn
+     * @return {Promise.<*>}
+     */
     promisify: function (fn) {
         return function () {
             var args, promise;
@@ -110,6 +152,15 @@ module.exports = {
             return promise;
         };
     },
+
+
+    /**
+     * Runs `promisify()` on all properties of an object, saving
+     * the promised version of the method with "Async" appended.
+     *
+     * @param {Object} object
+     * @return {Object}
+     */
     promisifyAll: function (object) {
         var name, result;
 
@@ -122,6 +173,51 @@ module.exports = {
 
         return result;
     },
+
+
+    /**
+     * Waits for all properties of an object ot be resolved and then
+     * resolves the promise with an object containing fulfilled values.
+     * If any are rejected, the promise is rejected.
+     *
+     * @param {Object} obj
+     * @return {Promise.<Object>}
+     */
+    props: function (obj) {
+        var needed, promise, result;
+
+        needed = 0;
+        result = {};
+        promise = new TestPromise();
+        Object.keys(obj).forEach((key) => {
+            var childPromise, val;
+
+            needed += 1;
+            val = obj[key];
+            childPromise = new TestPromise();
+            childPromise.resolve(val);
+            childPromise.then((doneVal) => {
+                needed -= 1;
+                result[key] = doneVal;
+
+                if (!needed) {
+                    promise.resolve(result);
+                }
+            }, (err) => {
+                promise.reject(err);
+            });
+        });
+
+        return promise;
+    },
+
+
+    /**
+     * Creates a rejected promise.
+     *
+     * @param {*} val
+     * @return {Promise}
+     */
     reject: function (val) {
         var promise;
 
@@ -130,11 +226,58 @@ module.exports = {
 
         return promise;
     },
+
+
+    /**
+     * Creates a resolved promise.
+     *
+     * @param {*} val
+     * @return {Promise.<*>}
+     */
     resolve: function (val) {
         var promise;
 
         promise = new TestPromise();
         promise.resolve(val);
+
+        return promise;
+    },
+
+
+    /**
+     * Write your code in a synchronous way.  When anything throws an
+     * exception, this rejects the generated promise.
+     *
+     * Old:
+     *
+     *   return promise.create((resolve, reject) => {
+     *       try {
+     *           resolve(thing());
+     *       } catch (e) {
+     *           reject(e);
+     *       }
+     *   });
+     *
+     * New:
+     *
+     *   return promise.try(() => {
+     *       return thing();
+     *   });
+     *
+     * @param {Function} fn
+     * @return {Promise.<*>}
+     */
+    try: function (fn) {
+        var promise, result;
+
+        promise = new TestPromise();
+
+        try {
+            result = fn();
+            promise.resolve(result);
+        } catch (e) {
+            promise.reject(e);
+        }
 
         return promise;
     }

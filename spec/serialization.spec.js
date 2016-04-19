@@ -10,6 +10,17 @@ describe("serialization", () => {
         zlib = require("zlib");
         serialization = require("../lib/serialization")(promiseMock, zlib);
     });
+    it("serializes a buffer", (done) => {
+        // The rest of the tests use strings for ease
+        serialization.serializeAsync(new Buffer("testing")).then((result) => {
+            expect(result.toString("hex")).toEqual("0063090000002b492d2ec9cc4b0700");
+        }).then(done, done);
+    });
+    it("deserializes a string", (done) => {
+        serialization.deserializeAsync((new Buffer("0063090000002b492d2ec9cc4b0700", "hex")).toString("binary")).then((result) => {
+            expect(result.toString("binary")).toEqual("testing");
+        }).then(done, done);
+    });
     [
         {
             // "moo" is larger when compressed, thus that's why there
@@ -25,112 +36,119 @@ describe("serialization", () => {
             plain: "asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf"
         }
     ].forEach((scenario) => {
-        it("serializes (version 0): " + scenario.name, () => {
-            var promise;
-
-            runs(() => {
-                promise = serialization.serialize(scenario.plain);
-            });
-            waitsFor(() => {
-                return promise.status();
-            });
-            runs(() => {
-                var status;
-
-                status = promise.status();
-                status.value = status.value.toString("hex");
-                expect(status).toEqual({
-                    success: true,
-                    value: scenario.hex
-                });
-            });
+        it("serializes (version 0): " + scenario.name, (done) => {
+            serialization.serializeAsync(scenario.plain).then((result) => {
+                expect(result.toString("hex")).toEqual(scenario.hex);
+            }).then(done, done);
         });
-        it("deserializes (version 0): " + scenario.name, () => {
-            var promise;
-
-            runs(() => {
-                promise = serialization.deserialize(new Buffer(scenario.hex, "hex"));
-            });
-            waitsFor(() => {
-                return promise.status();
-            });
-            runs(() => {
-                var status;
-
-                status = promise.status();
-                status.value = status.value.toString("binary");
-                expect(status).toEqual({
-                    success: true,
-                    value: scenario.plain
-                });
-            });
+        it("deserializes (version 0): " + scenario.name, (done) => {
+            serialization.deserializeAsync(new Buffer(scenario.hex, "hex")).then((result) => {
+                expect(result.toString("binary")).toEqual(scenario.plain);
+            }).then(done, done);
         });
     });
     [
         {
             deserializes: true,
             expires: new Date("2100-01-01T00:00:00Z"),
-            hex: "006518000000323130302d30312d30315430303a30303a30302e3030305a6306000000333432360100",
+            hex: "01005786f46306000000333432360100",
             name: "future date",
             plain: "1234"
         },
         {
             deserializes: false,
             expires: new Date("2000-01-01T00:00:00Z"),
-            hex: "006518000000323030302d30312d30315430303a30303a30302e3030305a6306000000333432360100",
+            hex: "0180436d386306000000333432360100",
             name: "past date",
             plain: "1234"
         }
     ].forEach((scenario) => {
-        it("serializes (version 1): " + scenario.name, () => {
-            var promise;
-
-            runs(() => {
-                promise = serialization.serialize(scenario.plain, {
-                    expires: scenario.expires
-                });
-            });
-            waitsFor(() => {
-                return promise.status();
-            });
-            runs(() => {
-                var status;
-
-                status = promise.status();
-                status.value = status.value.toString("hex");
-                expect(status).toEqual({
-                    success: true,
-                    value: scenario.hex
-                });
+        it("serializes (version 1): " + scenario.name, (done) => {
+            serialization.serializeAsync(scenario.plain, {
+                expires: scenario.expires
+            }).then((result) => {
+                expect(result.toString("hex")).toEqual(scenario.hex);
+            }).then(done, done);
+        });
+        it("deserializes (version 1): " + scenario.name, (done) => {
+            serialization.deserializeAsync(new Buffer(scenario.hex, "hex")).then((result) => {
+                expect(scenario.deserializes).toBe(true);
+                expect(result.toString("binary")).toEqual(scenario.plain);
+                done();
+            }, (err) => {
+                expect(scenario.deserializes).toBe(false);
+                expect(err).toEqual(jasmine.any(Error));
+                done();
             });
         });
-        it("deserializes (version 1): " + scenario.name, () => {
-            var promise;
+    });
 
-            runs(() => {
-                promise = serialization.deserialize(new Buffer(scenario.hex, "hex"));
-            });
-            waitsFor(() => {
-                return promise.status();
-            });
-            runs(() => {
-                var status;
 
-                status = promise.status();
-                status.value = status.value.toString("binary");
+    /**
+     * Ensure backwards compatibility for all previous serialization formats.
+     */
+    [
+        {
+            hex: "006305000000cbcdcf0700",
+            name: "version 0",
+            plain: "moo"
+        },
+        {
+            hex: "01005786f46306000000333432360100",
+            name: "version 1 - expires 2100-01-01T00:00:00Z",
+            plain: "1234"
+        }
+    ].forEach((scenario) => {
+        it("deserializes: " + scenario.name, (done) => {
+            serialization.deserializeAsync(new Buffer(scenario.hex, "hex")).then((result) => {
+                expect(result.toString("binary")).toEqual(scenario.plain);
+            }).then(done, done);
+        });
+    });
 
-                if (scenario.deserializes) {
-                    expect(status).toEqual({
-                        success: true,
-                        value: scenario.plain
-                    });
-                } else {
-                    expect(status).toEqual({
-                        success: false,
-                        value: "Error: Expired"
-                    });
-                }
-            });
+
+    /**
+     * Handle errors
+     */
+    describe("error handling", () => {
+        var expectError, fail;
+
+        beforeEach(() => {
+            expectError = (done, contains) => {
+                // Generate a function that asserts the result is an error
+                // and contains some text in the message.
+                return (err) => {
+                    expect(err).toEqual(jasmine.any(Error));
+                    expect(err.toString()).toContain(contains);
+                    done();
+                };
+            };
+            fail = (done) => {
+                // Generate a function that always fails
+                return () => {
+                    // Unconditionally cause a failure
+                    expect(true).toBe(false);
+                    done();
+                };
+            };
+        });
+        it("does not parse the next version number", (done) => {
+            // When you update this test, PLEASE make sure to add a new
+            // test in the "backwards compatibility" section!
+            serialization.deserializeAsync("\x02").then(fail(done), expectError(done, "Invalid serialized version identifier"));
+        });
+        it("dies at an invalid chunk character (versions 0, 1)", (done) => {
+            // "e" chunk has length of 0, so it reads.
+            // Later it is parsed and "e" is an invalid chunk type.
+            serialization.deserializeAsync("\x00e\x00\x00\x00\x00").then(fail(done), expectError(done, "Invalid chunk at"));
+        });
+        it("dies at an invalid chunk length (versions 0, 1)", (done) => {
+            // Length of "x" chunk is 2 bytes, but only 1 byte is
+            // available.
+            serialization.deserializeAsync("\x00x\x02\x00\x00\x00m").then(fail(done), expectError(done, "Corrupt"));
+        });
+        it("dies when there is no compresed data (versions 0, 1)", (done) => {
+            serialization.deserializeAsync("\x00").then(fail(done), expectError(done, "No compressed data"));
         });
     });
 });
