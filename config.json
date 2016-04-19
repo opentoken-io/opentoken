@@ -32,5 +32,9 @@
         "port": 8443,
         "profileMiddleware": false,
         "proxyProtocol": false
+    },
+    "storage": {
+        "bucket": "",
+        "region": ""
     }
 }
