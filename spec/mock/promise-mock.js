@@ -176,7 +176,7 @@ module.exports = {
 
 
     /**
-     * Waits for all properties of an object ot be resolved and then
+     * Waits for all properties of an object to be resolved and then
      * resolves the promise with an object containing fulfilled values.
      * If any are rejected, the promise is rejected.
      *
