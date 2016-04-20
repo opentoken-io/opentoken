@@ -1,6 +1,18 @@
 "use strict";
 
-describe("promsie", () => {
+const methods = [
+    "all",
+    "any",
+    "fromCallback",
+    "promisify",
+    "promisifyAll",
+    "props",
+    "reject",
+    "resolve",
+    "try"
+];
+
+describe("promise", () => {
     var promise;
 
     beforeEach(() => {
@@ -8,32 +20,18 @@ describe("promsie", () => {
             callback();
         }
 
-        [
-            "all",
-            "any",
-            "fromCallback",
-            "promisify",
-            "promisifyAll",
-            "reject",
-            "resolve"
-        ].forEach((name) => {
+        methods.forEach((name) => {
             fakeBluebird[name] = jasmine.createSpy(name);
         });
         promise = require("../lib/promise")(fakeBluebird);
     });
-    [
-        "all",
-        "any",
-        "create",
-        "fromCallback",
-        "promisify",
-        "promisifyAll",
-        "reject",
-        "resolve"
-    ].forEach((name) => {
+    methods.forEach((name) => {
         it("exposes the " + name + " method", function () {
             expect(promise[name]).toEqual(jasmine.any(Function));
         });
+    });
+    it("exposes the create method (not tested previously)", function () {
+        expect(promise.create).toEqual(jasmine.any(Function));
     });
     it("creates a new promise", function () {
         var testedCallback;
