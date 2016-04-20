@@ -1,9 +1,6 @@
 "use strict";
 
-var TestPromise;
-
-TestPromise = require("./test-promise");
-
+/*global Promise*/
 module.exports = {
     /**
      * Resolves when all promises are resolved.
@@ -15,40 +12,39 @@ module.exports = {
      * @return {Promise.<Array>}
      */
     all: function (promises) {
-        var finalPromise, isDone, needed, result;
+        return new Promise((resolve, reject) => {
+            var isDone, needed, result;
 
-        function resolved(index, val) {
-            if (isDone) {
-                return;
+            function resolved(index, val) {
+                if (isDone) {
+                    return;
+                }
+
+                result[index] = val;
+                needed -= 1;
+
+                if (!needed) {
+                    isDone = true;
+                    resolve(result);
+                }
             }
 
-            result[index] = val;
-            needed -= 1;
+            function rejected(val) {
+                if (isDone) {
+                    return;
+                }
 
-            if (!needed) {
                 isDone = true;
-                finalPromise.resolve(result);
-            }
-        }
-
-        function rejected(val) {
-            if (isDone) {
-                return;
+                reject(val);
             }
 
-            isDone = true;
-            finalPromise.reject(val);
-        }
-
-        isDone = false;
-        result = [];
-        needed = promises.length;
-        finalPromise = new TestPromise();
-        promises.forEach((promise, key) => {
-            promise.then(resolved.bind(null, key), rejected);
+            isDone = false;
+            result = [];
+            needed = promises.length;
+            promises.forEach((promise, key) => {
+                promise.then(resolved.bind(null, key), rejected);
+            });
         });
-
-        return finalPromise;
     },
 
     /**
@@ -59,33 +55,32 @@ module.exports = {
      * @return {Promise.<*>}
      */
     any: function (promises) {
-        var finalPromise, isDone;
+        return new Promise((resolve, reject) => {
+            var isDone;
 
-        function resolved(val) {
-            if (isDone) {
-                return;
+            function resolved(val) {
+                if (isDone) {
+                    return;
+                }
+
+                isDone = true;
+                resolve(val);
             }
 
-            isDone = true;
-            finalPromise.resolve(val);
-        }
+            function rejected(val) {
+                if (isDone) {
+                    return;
+                }
 
-        function rejected(val) {
-            if (isDone) {
-                return;
+                isDone = true;
+                reject(val);
             }
 
-            isDone = true;
-            finalPromise.reject(val);
-        }
-
-        isDone = false;
-        finalPromise = new TestPromise();
-        promises.forEach((promise) => {
-            promise.then(resolved, rejected);
+            isDone = false;
+            promises.forEach((promise) => {
+                promise.then(resolved, rejected);
+            });
         });
-
-        return finalPromise;
     },
 
 
@@ -96,12 +91,7 @@ module.exports = {
      * @return {Promise.<*>}
      */
     create: function (cb) {
-        var promise;
-
-        promise = new TestPromise();
-        cb(promise.resolve.bind(promise), promise.reject.bind(promise));
-
-        return promise;
+        return new Promise(cb);
     },
 
 
@@ -113,18 +103,15 @@ module.exports = {
      * @return {Promise.<*>}
      */
     fromCallback: function (fn) {
-        var promise;
-
-        promise = new TestPromise();
-        fn((err, val) => {
-            if (err) {
-                promise.reject(err);
-            } else {
-                promise.resolve(val);
-            }
+        return new Promise((resolve, reject) => {
+            fn((err, val) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(val);
+                }
+            });
         });
-
-        return promise;
     },
 
 
@@ -136,20 +123,20 @@ module.exports = {
      */
     promisify: function (fn) {
         return function () {
-            var args, promise;
+            var args;
 
-            promise = new TestPromise();
             args = [].slice.call(arguments);
-            args.push((err, val) => {
-                if (err) {
-                    promise.reject(err);
-                } else {
-                    promise.resolve(val);
-                }
-            });
-            fn.apply(this, args);
 
-            return promise;
+            return new Promise((resolve, reject) => {
+                args.push((err, val) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(val);
+                    }
+                });
+                fn.apply(this, args);
+            });
         };
     },
 
@@ -184,31 +171,34 @@ module.exports = {
      * @return {Promise.<Object>}
      */
     props: function (obj) {
-        var needed, promise, result;
+        return new Promise((resolve, reject) => {
+            var needed, result;
 
-        needed = 0;
-        result = {};
-        promise = new TestPromise();
-        Object.keys(obj).forEach((key) => {
-            var childPromise, val;
-
-            needed += 1;
-            val = obj[key];
-            childPromise = new TestPromise();
-            childPromise.resolve(val);
-            childPromise.then((doneVal) => {
+            function doneWithOne() {
                 needed -= 1;
-                result[key] = doneVal;
 
                 if (!needed) {
-                    promise.resolve(result);
+                    resolve(result);
                 }
-            }, (err) => {
-                promise.reject(err);
-            });
-        });
+            }
 
-        return promise;
+            needed = 1; // Fake number, removed later
+            result = {};
+            Object.keys(obj).forEach((key) => {
+                needed += 1;
+                (new Promise((childResolve) => {
+                    childResolve(obj[key]);
+                })).then((resolvedValue) => {
+                    result[key] = resolvedValue;
+                    doneWithOne();
+                }, (rejectedValue) => {
+                    needed = -1;  // Force this to never call resolve();
+                    reject(rejectedValue);
+                });
+            });
+
+            doneWithOne();
+        });
     },
 
 
@@ -219,12 +209,9 @@ module.exports = {
      * @return {Promise}
      */
     reject: function (val) {
-        var promise;
-
-        promise = new TestPromise();
-        promise.reject(val);
-
-        return promise;
+        return new Promise((resolve, reject) => {
+            reject(val);
+        });
     },
 
 
@@ -235,12 +222,9 @@ module.exports = {
      * @return {Promise.<*>}
      */
     resolve: function (val) {
-        var promise;
-
-        promise = new TestPromise();
-        promise.resolve(val);
-
-        return promise;
+        return new Promise((resolve) => {
+            resolve(val);
+        });
     },
 
 
@@ -268,17 +252,12 @@ module.exports = {
      * @return {Promise.<*>}
      */
     try: function (fn) {
-        var promise, result;
-
-        promise = new TestPromise();
-
-        try {
-            result = fn();
-            promise.resolve(result);
-        } catch (e) {
-            promise.reject(e);
-        }
-
-        return promise;
+        return new Promise((resolve, reject) => {
+            try {
+                resolve(fn());
+            } catch (e) {
+                reject(e);
+            }
+        });
     }
 };

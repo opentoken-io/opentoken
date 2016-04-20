@@ -16,6 +16,6 @@ describe("dependencies", () => {
         var webServer;
 
         webServer = dependencies.resolve("webServer");
-        expect(webServer.startServer).toEqual(jasmine.any(Function));
+        expect(webServer.startServerAsync).toEqual(jasmine.any(Function));
     });
 });

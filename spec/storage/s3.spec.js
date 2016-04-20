@@ -6,8 +6,6 @@ describe("storage/s3", () => {
     beforeEach(() => {
         var s3File;
 
-        s3File = require("../../lib/storage/s3");
-        promiseMock = require("../mock/promise-mock");
         class S3Fake {
             constructor(params) {
                 this.params = params;
@@ -24,6 +22,9 @@ describe("storage/s3", () => {
                 });
             }
         }
+
+        s3File = require("../../lib/storage/s3");
+        promiseMock = require("../mock/promise-mock");
         awsSdkMock = {
             S3: S3Fake,
             config: {
@@ -59,14 +60,13 @@ describe("storage/s3", () => {
             });
         });
     });
-    describe("del()", () => {
+    describe("del()", (done) => {
         it("deletes a file", () => {
-            expect(s3.del("afile").status()).toEqual({
-                success: true,
-                value: {
+            s3.delAsync("afile").then((val) => {
+                expect(val).toEqual({
                     Key: "afile"
-                }
-            });
+                });
+            }).then(done, done);
         });
     });
     describe("get()", () => {
@@ -74,102 +74,94 @@ describe("storage/s3", () => {
             var transit;
 
             transit = s3.transit();
-            transit.getObjectAsync.andCallFake((params) => {
+            transit.getObjectAsync.andCallFake(() => {
                 return promiseMock.resolve({
                     Body: new Buffer("this is a buffer", "binary")
                 });
             });
         });
-        it("gets an object back", () => {
-            expect(s3.get("afile").status()).toEqual({
-                success: true,
-                value: jasmine.any(Buffer)
-            });
+        it("gets an object back", (done) => {
+            s3.getAsync("afile").then((val) => {
+                expect(val).toEqual(jasmine.any(Buffer));
+            }).then(done, done);
         });
     });
     describe("list()", () => {
-        it("gets top level list", () => {
-            expect(s3.list().status()).toEqual({
-                success: true,
-                value: {
+        it("gets top level list", (done) => {
+            s3.listAsync().then((val) => {
+                expect(val).toEqual({
                     Prefix: null
-                }
-            });
+                });
+            }).then(done, done);
         });
-        it("passes in a prefix", () => {
-            expect(s3.list("accounts").status()).toEqual({
-                success: true,
-                value: {
+        it("passes in a prefix", (done) => {
+            s3.listAsync("accounts").then((val) => {
+                expect(val).toEqual({
                     Prefix: "accounts"
-                }
-            });
+                });
+            }).then(done, done);
         });
     });
     describe("put()", () => {
-        it("passes in contents as a string", () => {
-            expect(s3.put("string", "this is a string").status()).toEqual({
-                success: true,
-                value: {
+        it("passes in contents as a string", (done) => {
+            s3.putAsync("string", "this is a string").then((val) => {
+                expect(val).toEqual({
                     Body: jasmine.any(Buffer),
                     ContentType: "application/octet-stream",
                     Key: "string",
                     ServerSideEncryption: "AES256"
-                }
-            });
+                });
+            }).then(done, done);
         });
-        it("passes in contents as a buffer", () => {
-            expect(s3.put("buffer", new Buffer("this is a buffer", "binary")).status()).toEqual({
-                success: true,
-                value: {
+        it("passes in contents as a buffer", (done) => {
+            s3.putAsync("buffer", new Buffer("this is a buffer", "binary")).then((val) => {
+                expect(val).toEqual({
                     Body: jasmine.any(Buffer),
                     ContentType: "application/octet-stream",
                     Key: "buffer",
                     ServerSideEncryption: "AES256"
-                }
-            });
+                });
+            }).then(done, done);
         });
-        it("passes in options", () => {
-            expect(s3.put("options", "file contents", {
+        it("passes in options", (done) => {
+            s3.putAsync("options", "file contents", {
                 contentType: "text/plain",
                 expires: "a date"
-            }).status()).toEqual({
-                success: true,
-                value: {
+            }).then((val) => {
+                expect(val).toEqual({
                     Body: jasmine.any(Buffer),
                     ContentType: "text/plain",
                     Expires: "a date",
                     Key: "options",
                     ServerSideEncryption: "AES256"
-                }
-            });
+                });
+            }).then(done, done);
         });
-        it("passes in content type option", () => {
-            expect(s3.put("options", "file contents", {
+        it("passes in content type option", (done) => {
+            s3.putAsync("options", "file contents", {
                 contentType: "text/plain"
-            }).status()).toEqual({
-                success: true,
-                value: {
+            }).then((val) => {
+                expect(val).toEqual({
                     Body: jasmine.any(Buffer),
                     ContentType: "text/plain",
                     Expires: null,
                     Key: "options",
                     ServerSideEncryption: "AES256"
-                }
-            });
+                });
+            }).then(done, done);
         });
-        it("passes in expires option", () => {
-            expect(s3.put("options", "file contents", {
+        it("passes in expires option", (done) => {
+            s3.putAsync("options", "file contents", {
                 expires: "a date"
-            }).status()).toEqual({
-                success: true,
-                value: {
+            }).then((val) => {
+                expect(val).toEqual({
                     Body: jasmine.any(Buffer),
                     ContentType: "application/octet-stream",
                     Expires: "a date",
                     Key: "options",
                     ServerSideEncryption: "AES256"
-                }
-            });
+                });
+            }).then(done, done);
         });
     });
 });
