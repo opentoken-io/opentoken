@@ -1,6 +1,6 @@
 "use strict";
 
-var config, container, logger;
+var apiServer, config, container, logger;
 
 container = require("../lib/dependencies");
 
@@ -19,4 +19,5 @@ if (process.env.DEBUG) {
     config.debug = true;
 }
 
-container.resolve("apiServer");
+apiServer = container.resolve("apiServer");
+apiServer.startServerAsync();
