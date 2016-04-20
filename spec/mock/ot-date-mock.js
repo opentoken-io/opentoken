@@ -71,4 +71,4 @@ module.exports = {
     now: () => {
         return new OtDateMock(new Date());
     }
-}
+};
