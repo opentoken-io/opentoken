@@ -1,8 +1,30 @@
 {
     "debug": false,
-    "storage": {
-        "bucket": "",
-        "region": ""
+    "encryption": {
+        "primary": {
+            "cipher": {
+                "algo": "aes-256-cbc",
+                "digest": "sha512",
+                "iterations": 10000
+            },
+            "hmac": {
+                "algo": "sha512",
+                "digest": "sha512",
+                "iterations": 10000
+            }
+        },
+        "secondary": {
+            "cipher": {
+                "algo": "bf-cbc",
+                "digest": "whirlpool",
+                "iterations": 10000
+            },
+            "hmac": {
+                "algo": "whirlpool",
+                "digest": "whirlpool",
+                "iterations": 10000
+            }
+        }
     },
     "server": {
         "baseUrl": "https://localhost:8080/",
@@ -10,5 +32,9 @@
         "port": 8443,
         "profileMiddleware": false,
         "proxyProtocol": false
+    },
+    "storage": {
+        "bucket": "",
+        "region": ""
     }
 }

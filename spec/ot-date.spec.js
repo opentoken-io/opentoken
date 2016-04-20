@@ -101,7 +101,7 @@ describe("OtDate", () => {
         it("moves the current time to three hours ahead", () => {
             var result;
 
-            result = otDate.fromDate(new Date("2016-04-16 03:00:00")).plus({
+            result = otDate.fromDate(new Date("2016-04-16 03:00:00Z")).plus({
                 hours: 3
             });
             testOtDate(result, "2016-04-16T06:00:00.000Z");

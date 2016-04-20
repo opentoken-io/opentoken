@@ -1,0 +1,154 @@
+"use strict";
+
+describe("serialization", () => {
+    var serialization;
+
+    beforeEach(() => {
+        var promiseMock, zlib;
+
+        promiseMock = require("./mock/promise-mock");
+        zlib = require("zlib");
+        serialization = require("../lib/serialization")(promiseMock, zlib);
+    });
+    it("serializes a buffer", (done) => {
+        // The rest of the tests use strings for ease
+        serialization.serializeAsync(new Buffer("testing")).then((result) => {
+            expect(result.toString("hex")).toEqual("0063090000002b492d2ec9cc4b0700");
+        }).then(done, done);
+    });
+    it("deserializes a string", (done) => {
+        serialization.deserializeAsync((new Buffer("0063090000002b492d2ec9cc4b0700", "hex")).toString("binary")).then((result) => {
+            expect(result.toString("binary")).toEqual("testing");
+        }).then(done, done);
+    });
+    [
+        {
+            // "moo" is larger when compressed, thus that's why there
+            // are 5 bytes in the compressed data after the header.
+            hex: "006305000000cbcdcf0700",
+            name: "moo",
+            plain: "moo"
+        },
+        {
+            // This ensures the data is compressed before encrypting
+            hex: "0063090000004b2c4e494b24010300",
+            name: "asdf 12 times",
+            plain: "asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf"
+        }
+    ].forEach((scenario) => {
+        it("serializes (version 0): " + scenario.name, (done) => {
+            serialization.serializeAsync(scenario.plain).then((result) => {
+                expect(result.toString("hex")).toEqual(scenario.hex);
+            }).then(done, done);
+        });
+        it("deserializes (version 0): " + scenario.name, (done) => {
+            serialization.deserializeAsync(new Buffer(scenario.hex, "hex")).then((result) => {
+                expect(result.toString("binary")).toEqual(scenario.plain);
+            }).then(done, done);
+        });
+    });
+    [
+        {
+            deserializes: true,
+            expires: new Date("2100-01-01T00:00:00Z"),
+            hex: "01005786f46306000000333432360100",
+            name: "future date",
+            plain: "1234"
+        },
+        {
+            deserializes: false,
+            expires: new Date("2000-01-01T00:00:00Z"),
+            hex: "0180436d386306000000333432360100",
+            name: "past date",
+            plain: "1234"
+        }
+    ].forEach((scenario) => {
+        it("serializes (version 1): " + scenario.name, (done) => {
+            serialization.serializeAsync(scenario.plain, {
+                expires: scenario.expires
+            }).then((result) => {
+                expect(result.toString("hex")).toEqual(scenario.hex);
+            }).then(done, done);
+        });
+        it("deserializes (version 1): " + scenario.name, (done) => {
+            serialization.deserializeAsync(new Buffer(scenario.hex, "hex")).then((result) => {
+                expect(scenario.deserializes).toBe(true);
+                expect(result.toString("binary")).toEqual(scenario.plain);
+                done();
+            }, (err) => {
+                expect(scenario.deserializes).toBe(false);
+                expect(err).toEqual(jasmine.any(Error));
+                done();
+            });
+        });
+    });
+
+
+    /**
+     * Ensure backwards compatibility for all previous serialization formats.
+     */
+    [
+        {
+            hex: "006305000000cbcdcf0700",
+            name: "version 0",
+            plain: "moo"
+        },
+        {
+            hex: "01005786f46306000000333432360100",
+            name: "version 1 - expires 2100-01-01T00:00:00Z",
+            plain: "1234"
+        }
+    ].forEach((scenario) => {
+        it("deserializes: " + scenario.name, (done) => {
+            serialization.deserializeAsync(new Buffer(scenario.hex, "hex")).then((result) => {
+                expect(result.toString("binary")).toEqual(scenario.plain);
+            }).then(done, done);
+        });
+    });
+
+
+    /**
+     * Handle errors
+     */
+    describe("error handling", () => {
+        var expectError, fail;
+
+        beforeEach(() => {
+            expectError = (done, contains) => {
+                // Generate a function that asserts the result is an error
+                // and contains some text in the message.
+                return (err) => {
+                    expect(err).toEqual(jasmine.any(Error));
+                    expect(err.toString()).toContain(contains);
+                    done();
+                };
+            };
+            fail = (done) => {
+                // Generate a function that always fails
+                return () => {
+                    // Unconditionally cause a failure
+                    expect(true).toBe(false);
+                    done();
+                };
+            };
+        });
+        it("does not parse the next version number", (done) => {
+            // When you update this test, PLEASE make sure to add a new
+            // test in the "backwards compatibility" section!
+            serialization.deserializeAsync("\x02").then(fail(done), expectError(done, "Invalid serialized version identifier"));
+        });
+        it("dies at an invalid chunk character (versions 0, 1)", (done) => {
+            // "e" chunk has length of 0, so it reads.
+            // Later it is parsed and "e" is an invalid chunk type.
+            serialization.deserializeAsync("\x00e\x00\x00\x00\x00").then(fail(done), expectError(done, "Invalid chunk at"));
+        });
+        it("dies at an invalid chunk length (versions 0, 1)", (done) => {
+            // Length of "x" chunk is 2 bytes, but only 1 byte is
+            // available.
+            serialization.deserializeAsync("\x00x\x02\x00\x00\x00m").then(fail(done), expectError(done, "Corrupt"));
+        });
+        it("dies when there is no compresed data (versions 0, 1)", (done) => {
+            serialization.deserializeAsync("\x00").then(fail(done), expectError(done, "No compressed data"));
+        });
+    });
+});
