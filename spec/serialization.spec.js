@@ -1,14 +1,15 @@
 "use strict";
 
 describe("serialization", () => {
-    var serialization;
+    var otDateMock, serialization;
 
     beforeEach(() => {
         var promiseMock, zlib;
 
+        otDateMock = require("./mock/ot-date-mock");
         promiseMock = require("./mock/promise-mock");
         zlib = require("zlib");
-        serialization = require("../lib/serialization")(promiseMock, zlib);
+        serialization = require("../lib/serialization")(otDateMock, promiseMock, zlib);
     });
     it("serializes a buffer", (done) => {
         // The rest of the tests use strings for ease
@@ -50,14 +51,14 @@ describe("serialization", () => {
     [
         {
             deserializes: true,
-            expires: new Date("2100-01-01T00:00:00Z"),
+            expiresStr: "2100-01-01T00:00:00Z",
             hex: "01005786f46306000000333432360100",
             name: "future date",
             plain: "1234"
         },
         {
             deserializes: false,
-            expires: new Date("2000-01-01T00:00:00Z"),
+            expiresStr: "2000-01-01T00:00:00Z",
             hex: "0180436d386306000000333432360100",
             name: "past date",
             plain: "1234"
@@ -65,7 +66,7 @@ describe("serialization", () => {
     ].forEach((scenario) => {
         it("serializes (version 1): " + scenario.name, (done) => {
             serialization.serializeAsync(scenario.plain, {
-                expires: scenario.expires
+                expires: otDateMock.fromString(scenario.expiresStr)
             }).then((result) => {
                 expect(result.toString("hex")).toEqual(scenario.hex);
             }).then(done, done);
