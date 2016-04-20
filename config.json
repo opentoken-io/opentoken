@@ -1,13 +1,16 @@
 {
-    "debug": false,
     "account": {
         "initiateLifetime": {
             "hours": 1
         }
     },
-    "storage": {
-        "bucket": "",
-        "region": ""
+    "debug": false,
+    "hotp": {
+        "previous": {
+            "afterDrift": 0,
+            "beforeDrift": 1,
+            "drift": 1
+        }
     },
     "server": {
         "baseUrl": "https://localhost:8080/",
@@ -15,5 +18,9 @@
         "port": 8443,
         "profileMiddleware": false,
         "proxyProtocol": false
+    },
+    "storage": {
+        "bucket": "",
+        "region": ""
     }
 }
