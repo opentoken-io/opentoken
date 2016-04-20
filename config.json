@@ -1,5 +1,8 @@
 {
     "account": {
+        "completeLifetime": {
+            "days": 7
+        },
         "initiateLifetime": {
             "hours": 1
         }
