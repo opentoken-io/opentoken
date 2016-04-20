@@ -4,14 +4,18 @@ describe("ApiServer", () => {
     var ApiServer, webServerMock;
 
     beforeEach(() => {
+        var promiseMock;
+
         ApiServer = require("../lib/api-server");
         webServerMock = jasmine.createSpyObj("webServerMock", [
             "addRoute",
             "configure",
-            "startServer"
+            "startServerAsync"
         ]);
+        promiseMock = require("./mock/promise-mock");
+        webServerMock.startServerAsync.andReturn(promiseMock.resolve());
     });
-    it("starts a server", () => {
+    it("starts a server", (done) => {
         var apiServer, config;
 
         config = {
@@ -26,7 +30,10 @@ describe("ApiServer", () => {
             "port": 8443
         });
         expect(apiServer).toEqual(jasmine.any(Object));
-        expect(webServerMock.startServer).toHaveBeenCalled();
+        expect(webServerMock.startServerAsync).not.toHaveBeenCalled();
+        apiServer.startServerAsync().then(() => {
+            expect(webServerMock.startServerAsync).toHaveBeenCalled();
+        }).then(done, done);
     });
     it("sets up a route", () => {
         var addRouteCallback, next, req, res;
