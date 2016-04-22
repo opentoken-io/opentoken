@@ -41,9 +41,16 @@ describe("TwoFactorAutenticator", () => {
     });
     describe(".generateQRCode()", () => {
         it("returns data for a qr code", (done) => {
-            hotp.generateQRCode().then((result) => {
+            hotp.generateQRCode("secretKey", "some.one@example.net").then((result) => {
                 expect(result).toBe("data:image/png;base64,iVBORw0KGgoA....5CYII=");
             }).then(done, done);
+            expect(tfaMock.generateGoogleQRAsync).toHaveBeenCalledWith("OpenToken IO", "some.one@example.net", "secretKey");
+        });
+        it("returns data for a qr code without qr code", (done) => {
+            hotp.generateQRCode("secretKey").then((result) => {
+                expect(result).toBe("data:image/png;base64,iVBORw0KGgoA....5CYII=");
+            }).then(done, done);
+            expect(tfaMock.generateGoogleQRAsync).toHaveBeenCalledWith("OpenToken IO", "", "secretKey");
         });
     });
     describe(".verifyToken()", () => {
