@@ -1,9 +1,6 @@
 {
     "account": {
         "completeLifetime": {
-            "days": 7
-        },
-        "confirmLifetime": {
             "months": 6
         },
         "initiateLifetime": {
