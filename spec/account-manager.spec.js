@@ -58,6 +58,13 @@ describe("AccountManager", () => {
                 initiateLifetime: {
                     hours: 1
                 }
+            },
+            hotp: {
+                previous: {
+                    afterDrift: 1,
+                    beforeDrift: 1,
+                    drift: 2
+                }
             }
         };
         accountManager = new AccountManager(new AccountServiceFake, config, new HotpFake, otDateMock, randomMock, promiseMock);
@@ -126,6 +133,21 @@ describe("AccountManager", () => {
                 previousMfa: "123456",
                 password: "3439gajs933098fj3jfj90aj09fj9390a9023"
             }).then(fail(done), expectError(done, "Current MFA Token did not validate"));
+        });
+        it("does not have previous mfa information", (done) => {
+            /**
+             * Kind of forcing the test of the previous not validating
+             * but since we mock up other calls this represents what we
+             * should get back when we don't have the previous information
+             * as it would try to verify the previous as current.
+             */
+            accountManager.config.hotp = {};
+            accountManager.complete({
+                accountId: "aeifFeight3ighrFieigheilw5lfiek",
+                currentMfa: "123457",
+                previousMfa: "987654",
+                password: "3439gajs933098fj3jfj90aj09fj9390a9023"
+            }).then(fail(done), expectError(done, "Previous MFA Token did not validate"));
         });
     });
 });
