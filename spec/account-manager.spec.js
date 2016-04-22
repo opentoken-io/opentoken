@@ -137,6 +137,7 @@ describe("AccountManager", () => {
         it("does not have previous mfa information", (done) => {
             /**
              * Kind of forcing the test of the previous not validating
+             * when missing the hotp previous information,
              * but since we mock up other calls this represents what we
              * should get back when we don't have the previous information
              * as it would try to verify the previous as current.
