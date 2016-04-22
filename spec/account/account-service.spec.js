@@ -6,8 +6,8 @@ describe("AccountService", () => {
     beforeEach(() => {
         var AccountService, config, password, promiseMock;
 
-        AccountService = require("../lib/account/account-service");
-        promiseMock = require("./mock/promise-mock");
+        AccountService = require("../../lib/account/account-service");
+        promiseMock = require("../mock/promise-mock");
         class StorageFake {
             constructor() {
                 this.configure = jasmine.createSpy("storage.configure");

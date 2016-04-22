@@ -6,10 +6,10 @@ describe("AccountManager", () => {
     beforeEach(() => {
         var AccountManager, config, promiseMock, randomMock;
 
-        AccountManager = require("../lib/account/account-manager");
-        otDateMock = require("./mock/ot-date-mock");
-        promiseMock = require("./mock/promise-mock");
-        randomMock = require("./mock/random-mock");
+        AccountManager = require("../../lib/account/account-manager");
+        otDateMock = require("../mock/ot-date-mock");
+        promiseMock = require("../mock/promise-mock");
+        randomMock = require("../mock/random-mock");
         class AccountServiceFake {
             constructor() {
                 this.initiate = jasmine.createSpy("initiate");
