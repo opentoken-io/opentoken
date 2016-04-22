@@ -4,8 +4,12 @@ describe("AccountManager", () => {
     var accountManager, otDateMock;
 
     beforeEach(() => {
-        var AccountManager, config, promiseMock, random, randomMock;
+        var AccountManager, config, promiseMock, randomMock;
 
+        AccountManager = require("../lib/account/account-manager");
+        otDateMock = require("./mock/ot-date-mock");
+        promiseMock = require("./mock/promise-mock");
+        randomMock = require("./mock/random-mock");
         class AccountServiceFake {
             constructor() {
                 this.initiate = jasmine.createSpy("initiate");
@@ -28,18 +32,14 @@ describe("AccountManager", () => {
                     });
                 });
             }
-
         }
         class HotpFake {
             constructor() {
-                [
-                    "generateSecret"
-                ].forEach((method) => {
-                    this[method] = jasmine.createSpy(method);
-                    this[method].andCallFake(() => {
-                        return promiseMock.resolve("thisisasecrectcodefrommfa");
-                    });
+                this.generateSecret = jasmine.createSpy("generateSecret");
+                this.generateSecret.andCallFake(() => {
+                    return promiseMock.resolve("thisisasecrectcodefrommfa");
                 });
+                // This is a sync call
                 this.verifyToken = jasmine.createSpy();
                 this.verifyToken.andCallFake((key, token, opts) => {
                     if (token === "987654") {
@@ -50,10 +50,6 @@ describe("AccountManager", () => {
                 });
             }
         }
-        AccountManager = require("../lib/account/account-manager");
-        otDateMock = require("./mock/ot-date-mock");
-        promiseMock = require("./mock/promise-mock");
-        randomMock = require("./mock/random-mock");
         config = {
             account: {
                 completeLifetime: {
