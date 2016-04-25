@@ -32,22 +32,23 @@ describe("TwoFactorAutenticator", () => {
         });
         hotp = new HOTP(tfaMock, promiseMock);
     });
-    describe(".generateSecret()", () => {
+    describe(".generateSecretAsync()", () => {
         it("returns a key at the proper length", (done) => {
-            hotp.generateSecret().then((result) => {
+            hotp.generateSecretAsync().then((result) => {
                 expect(result).toBe("thisIsAReallyLongKeyForMFA");
             }).then(done, done);
+            expect(tfaMock.generateKeyAsync).toHaveBeenCalledWith(128);
         });
     });
-    describe(".generateQRCode()", () => {
+    describe(".generateQRCodeAsync()", () => {
         it("returns data for a qr code", (done) => {
-            hotp.generateQRCode("secretKey", "some.one@example.net").then((result) => {
+            hotp.generateQrCodeAsync("secretKey", "some.one@example.net").then((result) => {
                 expect(result).toBe("data:image/png;base64,iVBORw0KGgoA....5CYII=");
             }).then(done, done);
             expect(tfaMock.generateGoogleQRAsync).toHaveBeenCalledWith("OpenToken IO", "some.one@example.net", "secretKey");
         });
         it("returns data for a qr code without qr code", (done) => {
-            hotp.generateQRCode("secretKey").then((result) => {
+            hotp.generateQrCodeAsync("secretKey").then((result) => {
                 expect(result).toBe("data:image/png;base64,iVBORw0KGgoA....5CYII=");
             }).then(done, done);
             expect(tfaMock.generateGoogleQRAsync).toHaveBeenCalledWith("OpenToken IO", "", "secretKey");
@@ -60,7 +61,6 @@ describe("TwoFactorAutenticator", () => {
             expect(tfaMock.verifyTOTP.mostRecentCall.args[2]).toEqual({
                 afterDrift: 0,
                 beforeDrift: 0,
-                drift: 0,
                 step: 30
             });
         });
@@ -74,14 +74,12 @@ describe("TwoFactorAutenticator", () => {
             tfaMock.verifyTOTP.andReturn(true);
             options = {
                 afterDrift: 1,
-                beforeDrift: 1,
-                drift: 2
+                beforeDrift: 1
             };
             expect(hotp.verifyToken("secretKey", "054643", options)).toBe(true);
             expect(tfaMock.verifyTOTP.mostRecentCall.args[2]).toEqual({
                 afterDrift: 1,
                 beforeDrift: 1,
-                drift: 2,
                 step: 30
             });
         });

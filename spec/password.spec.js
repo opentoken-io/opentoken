@@ -4,6 +4,8 @@ describe("password", ()  => {
     var password, cryptoFake;
 
     beforeEach(() => {
+        var config;
+
         cryptoFake = jasmine.createSpyObj("cryptoFake", [
             "createHash",
             "digest",
@@ -12,7 +14,12 @@ describe("password", ()  => {
         cryptoFake.createHash = jasmine.createSpy("crypto.createHash").andReturn(cryptoFake);
         cryptoFake.digest = jasmine.createSpy("crypto.digest").andReturn("hashedcontent");
         cryptoFake.update = jasmine.createSpy("crypto.update").andReturn(cryptoFake);
-        password = require("../lib/password")(cryptoFake);
+        config = {
+            password: {
+                hashAlgo: "sha256"
+            }
+        };
+        password = require("../lib/password")(config, cryptoFake);
     });
     it("hashes a passed in value", () => {
         expect(password.hashContent("contenttohash")).toBe("hashedcontent");

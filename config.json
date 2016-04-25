@@ -41,6 +41,9 @@
             "drift": 1
         }
     },
+    "password": {
+        "hashAlgo": "sha256"
+    },
     "server": {
         "baseUrl": "https://localhost:8080/",
         "name": "OpenToken.io",
