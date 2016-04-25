@@ -6,6 +6,20 @@ describe("WebServer", () => {
     beforeEach(() => {
         var LoggerMock, WebServer;
 
+        // Set up a fake MiddlewareProfiler object
+        class MiddlewareProfilerMock {
+            constructor() {
+                middlewareProfiler = this;
+                [
+                    "displayAtInterval",
+                    "profileServer"
+                ].forEach((methodName) => {
+                    this[methodName] = jasmine.createSpy(methodName);
+                });
+            }
+        }
+
+        middlewareProfiler = null;
         promiseMock = require("./mock/promise-mock");
         LoggerMock = require("./mock/logger-mock");
         WebServer = require("../lib/web-server");
@@ -27,12 +41,8 @@ describe("WebServer", () => {
         ]);
         restify.createServer.andReturn(restifyServer);
         restMiddleware = jasmine.createSpy("restMiddleware");
-        middlewareProfiler = jasmine.createSpyObj("middlewareProfiler", [
-            "displayAtInterval",
-            "profileServer"
-        ]);
         logger = new LoggerMock();
-        webServer = new WebServer(fs, logger, middlewareProfiler, promiseMock, restify, restMiddleware);
+        webServer = new WebServer(fs, logger, MiddlewareProfilerMock, promiseMock, restify, restMiddleware);
     });
     it("exposes known public methods", () => {
         expect(webServer.addMiddleware).toEqual(jasmine.any(Function));
@@ -222,8 +232,7 @@ describe("WebServer", () => {
             webServer.configure({
                 profileMiddleware: true
             });
-            expect(middlewareProfiler.profileServer).not.toHaveBeenCalled();
-            expect(middlewareProfiler.displayAtInterval).not.toHaveBeenCalled();
+            expect(middlewareProfiler).toBe(null);
             webServer.startServerAsync().then(() => {
                 expect(middlewareProfiler.profileServer).toHaveBeenCalled();
                 expect(middlewareProfiler.displayAtInterval).toHaveBeenCalled();
