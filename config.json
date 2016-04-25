@@ -34,13 +34,6 @@
             }
         }
     },
-    "hotp": {
-        "previous": {
-            "afterDrift": 0,
-            "beforeDrift": 1,
-            "drift": 1
-        }
-    },
     "password": {
         "hashAlgo": "sha256"
     },
@@ -52,7 +45,7 @@
         "proxyProtocol": false
     },
     "storage": {
-        "bucket": "",
+        "bucket": "opentoken-io-test-s3",
         "region": ""
     }
 }

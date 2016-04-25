@@ -59,9 +59,7 @@ describe("TwoFactorAutenticator", () => {
             tfaMock.verifyTOTP.andReturn(true);
             expect(hotp.verifyToken("secretKey", "054643")).toBe(true);
             expect(tfaMock.verifyTOTP.mostRecentCall.args[2]).toEqual({
-                afterDrift: 0,
-                beforeDrift: 0,
-                step: 30
+                beforeDrift: 0
             });
         });
         it("returns false from a invalid check", () => {
@@ -73,14 +71,11 @@ describe("TwoFactorAutenticator", () => {
 
             tfaMock.verifyTOTP.andReturn(true);
             options = {
-                afterDrift: 1,
                 beforeDrift: 1
             };
             expect(hotp.verifyToken("secretKey", "054643", options)).toBe(true);
             expect(tfaMock.verifyTOTP.mostRecentCall.args[2]).toEqual({
-                afterDrift: 1,
-                beforeDrift: 1,
-                step: 30
+                beforeDrift: 1
             });
         });
     });
