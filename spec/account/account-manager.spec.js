@@ -11,19 +11,19 @@ describe("AccountManager", () => {
         promiseMock = require("../mock/promise-mock");
         randomMock = require("../mock/random-mock");
         accountServiceFake = jasmine.createSpyObj("accountServiceFake", [
-            "complete",
-            "get",
-            "initiate"
+            "completeAsync",
+            "getAsync",
+            "initiateAsync"
         ]);
-        accountServiceFake.complete = jasmine.createSpy("complete").andCallFake(() => {
+        accountServiceFake.completeAsync = jasmine.createSpy("complete").andCallFake(() => {
             return promiseMock.resolve(true);
         });
-        accountServiceFake.get = jasmine.createSpy("get").andCallFake(() => {
+        accountServiceFake.getAsync = jasmine.createSpy("get").andCallFake(() => {
             return promiseMock.resolve({
                 mfaKey: "339r93939303093"
             });
         });
-        accountServiceFake.initiate = jasmine.createSpy("initiate").andCallFake((accountId, accountInfo, options) => {
+        accountServiceFake.initiateAsync = jasmine.createSpy("initiate").andCallFake((accountId, accountInfo, options) => {
             return promiseMock.resolve({
                 accountId: accountInfo.accountId,
                 email: accountInfo.email,

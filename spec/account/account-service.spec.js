@@ -37,12 +37,12 @@ describe("AccountService", () => {
         });
         accountService = new AccountService(config, password, storageFake);
     });
-    describe(".complete()", () => {
+    describe(".completeAsync()", () => {
         it("puts the information successfully", (done) => {
             accountService.accountFile = {
                 "email": "some.one@example.net"
             };
-            accountService.complete("directory", {
+            accountService.completeAsync("directory", {
                 password: "somereallylonghashedpassword"
             }, {
                 expires: new Date()
@@ -54,9 +54,9 @@ describe("AccountService", () => {
             }).then(done, done);
         });
     });
-    describe(".get()", () => {
+    describe(".getAsync()", () => {
         it("gets a file", (done) => {
-            accountService.get("fdfasdfa").then((result) => {
+            accountService.getAsync("fdfasdfa").then((result) => {
                 expect(result).toEqual(jasmine.any(Object));
             }).then(done, done);
         });
@@ -66,9 +66,9 @@ describe("AccountService", () => {
             expect(accountService.getDirectory("accountIdUnhashed")).toEqual("account/hashedContent");
         });
     });
-    describe(".initiate()", (done) => {
+    describe(".initiateAsync()", (done) => {
         it("gets back what was put in", (done) => {
-            accountService.initiate("fasdfa", {
+            accountService.initiateAsync("fasdfa", {
                 accountId: "fasdfa",
                 email: "some.one@example.net",
                 mfa: "somesecretcodehere",
