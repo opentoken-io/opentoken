@@ -6,7 +6,7 @@ describe("TwoFactorAutenticator", () => {
     beforeEach(() => {
         var HOTP;
 
-        HOTP = require("../../lib/hotp/two-factor-authenticator");
+        HOTP = require("../../lib/mfa/hotp");
         promiseMock = require("../mock/promise-mock");
         tfaMock = jasmine.createSpyObj("tfaMock", [
             "generateKeyAsync",
