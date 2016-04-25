@@ -1,4 +1,12 @@
 {
+    "account": {
+        "completeLifetime": {
+            "months": 6
+        },
+        "initiateLifetime": {
+            "hours": 1
+        }
+    },
     "debug": false,
     "encryption": {
         "primary": {
@@ -24,6 +32,13 @@
                 "digest": "whirlpool",
                 "iterations": 10000
             }
+        }
+    },
+    "hotp": {
+        "previous": {
+            "afterDrift": 0,
+            "beforeDrift": 1,
+            "drift": 1
         }
     },
     "server": {
