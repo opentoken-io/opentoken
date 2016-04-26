@@ -4,23 +4,13 @@ describe("encryption", () => {
     var encryption;
 
     beforeEach(() => {
-        var ciphersAndHashes, crypto, promiseMock, random;
+        var ciphersAndHashes, crypto, promiseMock, randomMock;
 
         ciphersAndHashes = require("../lib/ciphers-and-hashes");
         crypto = require("crypto");
         promiseMock = require("./mock/promise-mock");
-        random = jasmine.createSpyObj("random", [
-            "bufferAsync"
-        ]);
-        random.bufferAsync.andCallFake((size) => {
-            var buff;
-
-            buff = new Buffer(size);
-            buff.fill(0x42);
-
-            return promiseMock.resolve(buff);
-        });
-        encryption = require("../lib/encryption")(ciphersAndHashes, crypto, promiseMock, random);
+        randomMock = require("./mock/random-mock");
+        encryption = require("../lib/encryption")(ciphersAndHashes, crypto, promiseMock, randomMock);
     });
     it("encrypts from a buffer with a key as a buffer", (done) => {
         // The rest of the tests use Buffers because it is WAY easier
