@@ -1,49 +1,52 @@
 "use strict";
 
 describe("logger", () => {
-    var log, logger;
+    var loggerFactory;
 
     beforeEach(() => {
-        logger = require("../lib/logger");
-
+        loggerFactory = require("../lib/logger");
         spyOn(console, "log");
         spyOn(console, "error");
     });
 
     describe("constructor", () => {
+        var log;
+
         beforeEach(() => {
-            log = new logger({});
+            log = loggerFactory({});
         });
 
         it("prints to log from info", () => {
-            log.info("something");
-            expect(console.log).toHaveBeenCalledWith("something");
+            log.info("something1");
+            expect(console.log).toHaveBeenCalledWith("something1");
         });
 
         it("prints to error from error", () => {
-            log.error("something");
-            expect(console.error).toHaveBeenCalledWith("ERROR: something");
+            log.error("something3");
+            expect(console.error).toHaveBeenCalledWith("ERROR: something3");
         });
 
         it("prints to error from warn", () => {
-            log.warn("something");
-            expect(console.error).toHaveBeenCalledWith("WARN: something");
+            log.warn("something4");
+            expect(console.error).toHaveBeenCalledWith("WARN: something4");
         });
 
         it("prints to log from console", () => {
-            log.console("something");
-            expect(console.log).toHaveBeenCalledWith("something");
+            log.console("something2");
+            expect(console.log).toHaveBeenCalledWith("something2");
         });
 
         it("does not print to error from debug", () => {
-            log.debug("something");
-            expect(console.error).not.toHaveBeenCalledWith("something");
+            log.debug("something5");
+            expect(console.error).not.toHaveBeenCalledWith("something5");
         });
     });
 
     describe("constructor with debug set", () => {
+        var log;
+
         beforeEach(() => {
-            log = new logger({
+            log = loggerFactory({
                 debug: true
             });
         });
