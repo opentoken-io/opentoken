@@ -1,17 +1,15 @@
 "use strict";
 
-class LoggerMock {
-    constructor() {
-        [
-            "console",
-            "debug",
-            "error",
-            "info",
-            "warn"
-        ].forEach((methodName) => {
-            this[methodName] = jasmine.createSpy("logger." + methodName);
-        });
-    }
-};
+var logger;
 
-module.exports = LoggerMock;
+logger = {};
+[
+    "console",
+    "debug",
+    "error",
+    "info",
+    "warn"
+].forEach((methodName) => {
+    logger[methodName] = jasmine.createSpy("logger." + methodName);
+});
+module.exports = logger;
