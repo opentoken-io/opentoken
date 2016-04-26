@@ -41,29 +41,35 @@ describe("HOTP", () => {
         it("returns a key with 256 length set in config", (done) => {
             hotp.generateSecretAsync().then((result) => {
                 expect(result).toBe("thisIsAReallyLongKeyForMFA");
+                expect(twofaMock.generateKeyAsync).toHaveBeenCalledWith(256);
             }).then(done, done);
-            expect(twofaMock.generateKeyAsync).toHaveBeenCalledWith(256);
         });
         it("returns a key without config value set", (done) => {
             hotp.config.hotp = {};
             hotp.generateSecretAsync().then((result) => {
                 expect(result).toBe("thisIsAReallyLongKeyForMFA");
+                expect(twofaMock.generateKeyAsync).toHaveBeenCalledWith(128);
             }).then(done, done);
-            expect(twofaMock.generateKeyAsync).toHaveBeenCalledWith(128);
         });
     });
     describe(".generateQRCodeAsync()", () => {
         it("returns data for a qr code", (done) => {
             hotp.generateQrCodeAsync("secretKey", "some.one@example.net").then((result) => {
                 expect(result).toBe("data:image/png;base64,iVBORw0KGgoA....5CYII=");
+                expect(twofaMock.generateGoogleQRAsync).toHaveBeenCalledWith("OpenToken.io", "some.one@example.net", "secretKey");
             }).then(done, done);
-            expect(twofaMock.generateGoogleQRAsync).toHaveBeenCalledWith("OpenToken IO", "some.one@example.net", "secretKey");
         });
         it("returns data for a qr code without qr code", (done) => {
             hotp.generateQrCodeAsync("secretKey").then((result) => {
                 expect(result).toBe("data:image/png;base64,iVBORw0KGgoA....5CYII=");
+                expect(twofaMock.generateGoogleQRAsync).toHaveBeenCalledWith("OpenToken.io", "", "secretKey");
             }).then(done, done);
-            expect(twofaMock.generateGoogleQRAsync).toHaveBeenCalledWith("OpenToken IO", "", "secretKey");
+        });
+        it("has a different application name", (done) => {
+            hotp.config.hotp.name = "opentoken.io alternate name";
+            hotp.generateQrCodeAsync("secretKey").then((result) => {
+                expect(twofaMock.generateGoogleQRAsync).toHaveBeenCalledWith("opentoken.io alternate name", "", "secretKey");
+            }).then(done, done);
         });
     });
     describe(".verifyToken()", () => {

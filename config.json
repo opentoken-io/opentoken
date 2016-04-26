@@ -34,6 +34,10 @@
             }
         }
     },
+    "hotp": {
+        "name": "OpenToken.io",
+        "keySize": 128
+    },
     "password": {
         "hashAlgo": "sha256"
     },

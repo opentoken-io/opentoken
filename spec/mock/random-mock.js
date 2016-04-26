@@ -7,7 +7,7 @@ random = jasmine.createSpyObj("random", [
     "password"
 ]);
 
-random.bufferAsync = jasmine.createSpy("random.bufferAsync").andCallFake((size) => {
+random.bufferAsync.andCallFake((size) => {
     var buff;
 
     buff = new Buffer(size);
@@ -18,7 +18,7 @@ random.bufferAsync = jasmine.createSpy("random.bufferAsync").andCallFake((size) 
     });
 });
 
-random.password = jasmine.createSpy("random.password").andCallFake((size) => {
+random.password.andCallFake((size) => {
     var buff;
 
     buff = new Buffer(size);
