@@ -20,15 +20,13 @@ Lifespan
 
 Account creation and use goes through several phases.
 
-Initiate
---------
+### Initiate
 
 The first part of an account's lifespan is `initiate`. This sets up a few pieces of data needed to properly generate and track an account. We generate an Account ID, MFA Key, abd Password Salt. An Email address must be passed in. These are then passed back to the user to store on their own and will be used to generate their password.
 
-This will save the account using a hash of the their `accountId`.
+This will save the account to a file named after the hash of their `accountId`.
 
-Complete
---------
+### Complete
 
 The second part of an account's lifespan is `complete`. This will need the client to pass in their hashed `password` and `accountId` which we gave them previously as well a `currentMfa` code and `previousMfa` code. This will allow us to find their account using the `accountId` hashing it and looking it up in storage. Getting the `mfaKey` off the account we are able to then validate the user using the MFA codes they passed in.
 
