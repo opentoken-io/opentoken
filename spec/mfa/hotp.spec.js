@@ -4,9 +4,14 @@ describe("HOTP", () => {
     var hotp, twofaMock, promiseMock;
 
     beforeEach(() => {
-        var HOTP;
+        var config, Hotp;
 
-        HOTP = require("../../lib/mfa/hotp");
+        Hotp = require("../../lib/mfa/hotp");
+        config = {
+            hotp: {
+                keySize: 256
+            }
+        };
         promiseMock = require("../mock/promise-mock");
         twofaMock = jasmine.createSpyObj("twofaMock", [
             "generateKeyAsync",
@@ -30,10 +35,17 @@ describe("HOTP", () => {
                 "data:image/png;base64,iVBORw0KGgoA....5CYII="
             );
         });
-        hotp = new HOTP(twofaMock, promiseMock);
+        hotp = new Hotp(config, twofaMock, promiseMock);
     });
     describe(".generateSecretAsync()", () => {
-        it("returns a key at the proper length", (done) => {
+        it("returns a key with 256 length set in config", (done) => {
+            hotp.generateSecretAsync().then((result) => {
+                expect(result).toBe("thisIsAReallyLongKeyForMFA");
+            }).then(done, done);
+            expect(twofaMock.generateKeyAsync).toHaveBeenCalledWith(256);
+        });
+        it("returns a key without config value set", (done) => {
+            hotp.config.hotp = {};
             hotp.generateSecretAsync().then((result) => {
                 expect(result).toBe("thisIsAReallyLongKeyForMFA");
             }).then(done, done);
