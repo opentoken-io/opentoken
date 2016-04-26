@@ -65,7 +65,7 @@ describe("AccountManager", () => {
     });
     describe(".initiate()", () => {
         it("gets an object back from service", (done) => {
-            accountManager.initiate({
+            accountManager.initiateAsync({
                 email: "some.one@example.net"
             }).then((result) => {
                 expect(result).toEqual({
@@ -80,7 +80,7 @@ describe("AccountManager", () => {
             }).then(done, done);
         });
     });
-    describe(".complete()", () => {
+    describe(".completeAsync()", () => {
         var expectError, fail;
 
         // TODO: Create custom matchers
@@ -104,7 +104,7 @@ describe("AccountManager", () => {
         }
 
         it("successfully completes", (done) => {
-            accountManager.complete({
+            accountManager.completeAsync({
                 accountId: "aeifFeight3ighrFieigheilw5lfiek",
                 currentMfa: "123456",
                 previousMfa: "098454",
@@ -114,7 +114,7 @@ describe("AccountManager", () => {
             }).then(done, done);
         });
         it("has an expired previous token", (done) => {
-            accountManager.complete({
+            accountManager.completeAsync({
                 accountId: "aeifFeight3ighrFieigheilw5lfiek",
                 currentMfa: "123456",
                 previousMfa: "987654",
@@ -122,7 +122,7 @@ describe("AccountManager", () => {
             }).then(fail(done), expectError(done, "Previous MFA Token did not validate"));
         });
         it("has an expired current token", (done) => {
-            accountManager.complete({
+            accountManager.completeAsync({
                 accountId: "aeifFeight3ighrFieigheilw5lfiek",
                 currentMfa: "987654",
                 previousMfa: "123456",
@@ -138,7 +138,7 @@ describe("AccountManager", () => {
              * as it would try to verify the previous as current.
              */
             accountManager.config.hotp = {};
-            accountManager.complete({
+            accountManager.completeAsync({
                 accountId: "aeifFeight3ighrFieigheilw5lfiek",
                 currentMfa: "123457",
                 previousMfa: "987654",
