@@ -6,9 +6,9 @@ describe("MiddlewareProfiler", () => {
     beforeEach(() => {
         var MiddlewareProfiler;
 
-        MiddlewareProfiler = require("../lib/middleware-profiler");
         setIntervalFn = jasmine.createSpy("setIntervalFn");
-        mp = new MiddlewareProfiler(setIntervalFn);
+        MiddlewareProfiler = require("../lib/middleware-profiler")(setIntervalFn);
+        mp = new MiddlewareProfiler();
     });
     it("exposes known public methods", () => {
         expect(mp.displayAtInterval).toEqual(jasmine.any(Function));

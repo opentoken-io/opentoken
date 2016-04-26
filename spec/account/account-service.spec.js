@@ -4,30 +4,26 @@ describe("AccountService", () => {
     var accountService;
 
     beforeEach(() => {
-        var AccountService, config, password, promiseMock;
+        var AccountService, config, password, promiseMock, storageFake;
 
         AccountService = require("../../lib/account/account-service");
         promiseMock = require("../mock/promise-mock");
-        class StorageFake {
-            constructor() {
-                this.configure = jasmine.createSpy("storage.configure");
-                this.configure.andCallFake(() => {
-                    return this;
-                });
-                this.getAsync = jasmine.createSpy("getAsync");
-                this.getAsync.andCallFake((params) => {
-                    return promiseMock.resolve(
-                        new Buffer('{"data": "thing"}', "binary")
-                    );
-                });
-                this.putAsync = jasmine.createSpy("putAsync");
-                this.putAsync.andCallFake((params) => {
-                    return promiseMock.resolve(() => {
-                        return true;
-                    });
-                });
-            }
-        }
+        storageFake = jasmine.createSpyObj("storageFake", [
+            "configure",
+            "getAsync",
+            "putAsync"
+        ]);
+        storageFake.configure = jasmine.createSpy("storageFake.configure").andCallFake(() => {
+            return storageFake;
+        });
+        storageFake.getAsync = jasmine.createSpy("storageFake.getAsync").andCallFake(() => {
+            return promiseMock.resolve(
+                new Buffer('{"data": "thing"}', "binary")
+            );
+        });
+        storageFake.putAsync = jasmine.createSpy("storageFake.putAsync").andCallFake(() => {
+            return promiseMock.resolve(true);
+        });
         config = {
             storage: {
                 bucket: "some-place-wonderful"
@@ -36,27 +32,31 @@ describe("AccountService", () => {
         password = jasmine.createSpyObj("password", [
             "hashContent"
         ]);
-        password.hashContent.andCallFake(() => {
+        password.hashContent = jasmine.createSpy("password.hashContent").andCallFake(() => {
             return "hashedContent";
         });
-        accountService = new AccountService(config, password, new StorageFake);
+        accountService = new AccountService(config, password, storageFake);
     });
-    describe(".complete()", () => {
+    describe(".completeAsync()", () => {
         it("puts the information successfully", (done) => {
-            accountService.complete("directory", {
-                email: "some.one@example.net",
-            }, {
+            accountService.accountFile = {
+                "email": "some.one@example.net"
+            };
+            accountService.completeAsync("directory", {
                 password: "somereallylonghashedpassword"
             }, {
                 expires: new Date()
             }).then((result) => {
-                expect(result).toEqual(true);
+                expect(result).toEqual({
+                    email: "some.one@example.net",
+                    password: "somereallylonghashedpassword"
+                });
             }).then(done, done);
         });
     });
-    describe(".get()", () => {
+    describe(".getAsync()", () => {
         it("gets a file", (done) => {
-            accountService.get("fdfasdfa").then((result) => {
+            accountService.getAsync("fdfasdfa").then((result) => {
                 expect(result).toEqual(jasmine.any(Object));
             }).then(done, done);
         });
@@ -66,9 +66,9 @@ describe("AccountService", () => {
             expect(accountService.getDirectory("accountIdUnhashed")).toEqual("account/hashedContent");
         });
     });
-    describe(".initiate()", (done) => {
+    describe(".initiateAsync()", (done) => {
         it("gets back what was put in", (done) => {
-            accountService.initiate("fasdfa", {
+            accountService.initiateAsync("fasdfa", {
                 accountId: "fasdfa",
                 email: "some.one@example.net",
                 mfa: "somesecretcodehere",
