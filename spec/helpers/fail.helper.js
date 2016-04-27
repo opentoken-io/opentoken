@@ -1,4 +1,11 @@
 if (! jasmine.fail) {
+    /**
+     * Sets up the scenario to actually fail; `actual` and `expected`
+     * need to never match.
+     *
+     * @param {string} actual
+     * @param {string} expected
+     */
     jasmine.fail = function (actual, expected) {
         if (typeof actual === "undefined") {
             actual = "the code";
