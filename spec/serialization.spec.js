@@ -112,44 +112,23 @@ describe("serialization", () => {
      * Handle errors
      */
     describe("error handling", () => {
-        var expectError, fail;
-
-        beforeEach(() => {
-            expectError = (done, contains) => {
-                // Generate a function that asserts the result is an error
-                // and contains some text in the message.
-                return (err) => {
-                    expect(err).toEqual(jasmine.any(Error));
-                    expect(err.toString()).toContain(contains);
-                    done();
-                };
-            };
-            fail = (done) => {
-                // Generate a function that always fails
-                return () => {
-                    // Unconditionally cause a failure
-                    expect(true).toBe(false);
-                    done();
-                };
-            };
-        });
         it("does not parse the next version number", (done) => {
             // When you update this test, PLEASE make sure to add a new
             // test in the "backwards compatibility" section!
-            serialization.deserializeAsync("\x02").then(fail(done), expectError(done, "Invalid serialized version identifier"));
+            jasmine.testPromiseFailure(serialization.deserializeAsync("\x02"), "Invalid serialized version identifier", done);
         });
         it("dies at an invalid chunk character (versions 0, 1)", (done) => {
             // "e" chunk has length of 0, so it reads.
             // Later it is parsed and "e" is an invalid chunk type.
-            serialization.deserializeAsync("\x00e\x00\x00\x00\x00").then(fail(done), expectError(done, "Invalid chunk at"));
+            jasmine.testPromiseFailure(serialization.deserializeAsync("\x00e\x00\x00\x00\x00"), "Invalid chunk at", done);
         });
         it("dies at an invalid chunk length (versions 0, 1)", (done) => {
             // Length of "x" chunk is 2 bytes, but only 1 byte is
             // available.
-            serialization.deserializeAsync("\x00x\x02\x00\x00\x00m").then(fail(done), expectError(done, "Corrupt"));
+            jasmine.testPromiseFailure(serialization.deserializeAsync("\x00x\x02\x00\x00\x00m"), "Corrupt", done);
         });
         it("dies when there is no compresed data (versions 0, 1)", (done) => {
-            serialization.deserializeAsync("\x00").then(fail(done), expectError(done, "No compressed data"));
+            jasmine.testPromiseFailure(serialization.deserializeAsync("\x00"), "No compressed data", done);
         });
     });
 });

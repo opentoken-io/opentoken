@@ -75,28 +75,6 @@ describe("AccountManager", () => {
         });
     });
     describe(".completeAsync()", () => {
-        var expectError, fail;
-
-        // TODO: Create custom matchers
-        function expectError (done, contains) {
-            // Generate a function that asserts the result is an error
-            // and contains some text in the message.
-            return (err) => {
-                expect(err).toEqual(jasmine.any(Error));
-                expect(err.toString()).toContain(contains);
-                done();
-            };
-        }
-
-        function fail (done) {
-            // Generate a function that always fails
-            return () => {
-                // Unconditionally cause a failure
-                expect(true).toBe(false);
-                done();
-            };
-        }
-
         it("successfully completes", (done) => {
             accountManager.completeAsync({
                 accountId: "aeifFeight3ighrFieigheilw5lfiek",
@@ -111,20 +89,20 @@ describe("AccountManager", () => {
             }).then(done, done);
         });
         it("has an expired previous token", (done) => {
-            accountManager.completeAsync({
+            jasmine.testPromiseFailure(accountManager.completeAsync({
                 accountId: "aeifFeight3ighrFieigheilw5lfiek",
                 currentMfa: "123456",
                 previousMfa: "987654",
                 password: "3439gajs933098fj3jfj90aj09fj9390a9023"
-            }).then(fail(done), expectError(done, "Previous MFA Token did not validate"));
+            }), "Previous MFA Token did not validate", done);
         });
         it("has an expired current token", (done) => {
-            accountManager.completeAsync({
+            jasmine.testPromiseFailure(accountManager.completeAsync({
                 accountId: "aeifFeight3ighrFieigheilw5lfiek",
                 currentMfa: "987654",
                 previousMfa: "123456",
                 password: "3439gajs933098fj3jfj90aj09fj9390a9023"
-            }).then(fail(done), expectError(done, "Current MFA Token did not validate"));
+            }), "Current MFA Token did not validate", done);
         });
         it("does not have previous mfa information", (done) => {
             /**
@@ -135,12 +113,12 @@ describe("AccountManager", () => {
              * as it would try to verify the previous as current.
              */
             accountManager.config.hotp = {};
-            accountManager.completeAsync({
+            jasmine.testPromiseFailure(accountManager.completeAsync({
                 accountId: "aeifFeight3ighrFieigheilw5lfiek",
                 currentMfa: "123457",
                 previousMfa: "987654",
                 password: "3439gajs933098fj3jfj90aj09fj9390a9023"
-            }).then(fail(done), expectError(done, "Previous MFA Token did not validate"));
+            }), "Previous MFA Token did not validate", done);
         });
     });
 });

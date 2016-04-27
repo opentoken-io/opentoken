@@ -36,27 +36,9 @@ describe("encryption", () => {
         }).then(done, done);
     });
     describe("error handling", () => {
-        var buff, cipherConfig, expectError, fail, hmacConfig, keySource, plain;
+        var buff, cipherConfig, hmacConfig, keySource, plain;
 
         beforeEach(() => {
-            expectError = (done, contains) => {
-                // Generate a function that asserts the result is an error
-                // and contains some text in the message.
-                return (err) => {
-                    expect(err).toEqual(jasmine.any(Error));
-                    expect(err.toString()).toContain(contains);
-                    done();
-                };
-            };
-            fail = (done) => {
-                // Generate a function that always fails
-                return () => {
-                    // Unconditionally cause a failure
-                    expect(true).toBe(false);
-                    done();
-                };
-            };
-
             // These are identical to the result from the "decrypts from
             // string and key from buffer" test, immediately above, but
             // all of the config is here so you can generate this again.
@@ -76,7 +58,7 @@ describe("encryption", () => {
         });
         it("errors with invalid HMAC", (done) => {
             buff[20] = buff[20] ^ 0xF;
-            encryption.decryptAsync(buff, keySource).then(fail(done), expectError(done, "HMAC invalid"));
+            jasmine.testPromiseFailure(encryption.decryptAsync(buff, keySource), "HMAC invalid", done);
         });
         [
             {
@@ -112,11 +94,11 @@ describe("encryption", () => {
                     cipherConfig: cipherConfig
                 };
                 config[scenario.config][scenario.property] = "invalid";
-                encryption.encryptAsync(plain, keySource, hmacConfig, cipherConfig).then(fail(done), expectError(done, scenario.text));
+                jasmine.testPromiseFailure(encryption.encryptAsync(plain, keySource, hmacConfig, cipherConfig), scenario.text, done);
             });
             it("errors with invalid header config - " + scenario.text, (done) => {
                 buff[scenario.byte] = 0xFF;
-                encryption.decryptAsync(buff, keySource).then(fail(done), expectError(done, scenario.text));
+                jasmine.testPromiseFailure(encryption.decryptAsync(buff, keySource), scenario.text, done);
             });
         });
     });
