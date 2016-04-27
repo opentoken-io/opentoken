@@ -33,31 +33,38 @@ describe("base64", () => {
             name: "DEAD BEEF"
         }
     ].forEach((scenario) => {
-        it("string encodes " + scenario.name, () => {
+        it("encodes a string to a string: " + scenario.name, () => {
             var result;
 
             result = base64.encode(scenario.decoded);
             expect(result).toEqual(scenario.encoded);
         });
-        it("buffer encodes " + scenario.name, () => {
+        it("encodes a buffer to a buffer: " + scenario.name, () => {
             var result;
 
             result = base64.encode(new Buffer(scenario.decoded, "binary"));
             expect(result).toEqual(jasmine.any(Buffer));
             expect(result.toString("binary")).toEqual(scenario.encoded);
         });
-        it("string decodes " + scenario.name, () => {
+        it("decodes a string from a string" + scenario.name, () => {
             var result;
 
             result = base64.decode(scenario.encoded);
             expect(result).toEqual(scenario.decoded);
         });
-        it("buffer decodes " + scenario.name, () => {
+        it("decodes a buffer from a buffer " + scenario.name, () => {
             var result;
 
             result = base64.decode(new Buffer(scenario.encoded, "binary"));
             expect(result).toEqual(jasmine.any(Buffer));
             expect(result.toString("binary")).toEqual(scenario.decoded);
         });
+    });
+    it("encodes a buffer for use in a URI", () => {
+        var result;
+
+        result = base64.encodeForUri(new Buffer("p5>T44d3?12Ui", "binary"));
+        expect(result).toEqual(jasmine.any(Buffer));
+        expect(result.toString("ascii")).toBe("cDU-VDQ0ZDM_MTJVaQ");
     });
 });
