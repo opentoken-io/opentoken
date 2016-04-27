@@ -60,4 +60,11 @@ describe("base64", () => {
             expect(result.toString("binary")).toEqual(scenario.decoded);
         });
     });
+    it("data encodes for URI", () => {
+        var result;
+
+        result = base64.encodeForUri(new Buffer("p5>T44d3?12Ui", "binary"));
+        expect(result).toEqual(jasmine.any(Buffer));
+        expect(result.toString()).toBe("cDU-VDQ0ZDM_MTJVaQ");
+    });
 });
