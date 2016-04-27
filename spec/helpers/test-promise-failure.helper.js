@@ -12,7 +12,7 @@ jasmine.testPromiseFailure = function (promise, errMessage, done) {
     }
 
     return promise.then(function () {
-        jasmine.failAsync("the promise", "rejected", done);
+        done(new Error("The promise should have been rejected"));
     }, function (err) {
         if (errMessage) {
             expect(err.toString()).toContain(errMessage);
