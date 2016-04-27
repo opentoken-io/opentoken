@@ -12,71 +12,48 @@ describe("schema", () => {
             "readdirAsync",
             "readFileAsync"
         ]);
+        fs.readFileAsync.andCallFake((fn) => {
+            if (fn.match("email.json")) {
+                return promiseMock.resolve(schemaEmail);
+            }
+
+            if (fn.match("number.json")) {
+                return promiseMock.resolve(schemaNumber);
+            }
+
+            return promiseMock.reject("Invalid file: " + fn.toString());
+        });
         nodeValidator = require("validator");
         promiseMock = require("./mock/promise-mock");
         tv4 = require("tv4");
         schema = require("../lib/schema")(fs, nodeValidator, promiseMock, tv4);
-
     });
     describe(".loadSchemaAsync()", () => {
-        it("loads a file successfully", (done) => {
-            fs.readFileAsync.andCallFake((fn) => {
-                if (fn == "./actualFile.json") {
-                    return promiseMock.resolve(schemaEmail);
-                }
-
-                return promiseMock.reject("Invalid file: " + fn.toString());
-            });
+        it("loads a schema and validates against it", (done) => {
             tv4.addSchema = jasmine.createSpy("tv4.addSchema").andCallThrough();
-            schema.loadSchemaAsync("./actualFile.json").then(() => {
+            schema.loadSchemaAsync("./email.json").then(() => {
+                expect(schema.validate("someone@example.net", "email")).toBe(true);
+                expect(schema.validate("someone", "email")).toBe(false);
             }).then(done, done);
         });
     });
     describe(".loadSchemaFolderAsync()", () => {
-        it("loads a file successfully", (done) => {
+        it("loads schemas and validates against them", (done) => {
             fs.readdirAsync.andCallFake((fn) => {
-                if (fn == "/folder/") {
+                if (fn.match("/folder/")) {
                     return promiseMock.resolve([
                         "email.json",
                         "number.json"
                     ]);
                 }
 
-                return promiseMock.reject("Invalid file: " + fn.toString());
-            });
-            fs.readFileAsync.andCallFake((fn) => {
-                if (fn == "/folder/email.json") {
-                    return promiseMock.resolve(schemaEmail);
-                }
-
-                if (fn == "/folder/number.json") {
-                    return promiseMock.resolve(schemaNumber);
-                }
-
-                return promiseMock.reject("Invalid file: " + fn.toString());
+                return promiseMock.reject("Invalid folder: " + fn.toString());
             });
             schema.loadSchemaFolderAsync("/folder/").then(() => {
-            }).then(done, done);
-        });
-    });
-    describe(".validate()", () => {
-        beforeEach(() => {
-            fs.readFileAsync.andCallFake((fn) => {
-                if (fn == "./email.json") {
-                    return promiseMock.resolve(schemaEmail);
-                }
-
-                return promiseMock.reject("Invalid file: " + fn.toString());
-            });
-        });
-        it("loads an email schema and validates email", (done) => {
-            schema.loadSchemaAsync("./email.json").then(() => {
-                expect(schema.validate("some.one@example.net", "email")).toBe(true);
-            }).then(done, done);
-        });
-        it("loads an email schema and does not validate email", (done) => {
-            schema.loadSchemaAsync("./email.json").then(() => {
-                expect(schema.validate("some.one$%$%", "email")).toEqual(false);
+                expect(schema.validate("someone@example.net", "email")).toBe(true);
+                expect(schema.validate("someone", "email")).toBe(false);
+                expect(schema.validate(5, "number")).toBe(true);
+                expect(schema.validate(2, "number")).toBe(false);
             }).then(done, done);
         });
     });
