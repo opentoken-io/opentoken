@@ -13,17 +13,21 @@ describe("AccountManager", () => {
         accountServiceFake = jasmine.createSpyObj("accountServiceFake", [
             "completeAsync",
             "getAsync",
+            "getDirectory",
             "initiateAsync"
         ]);
-        accountServiceFake.completeAsync = jasmine.createSpy("complete").andCallFake(() => {
-            return promiseMock.resolve(true);
+        accountServiceFake.completeAsync.andCallFake((directory, accountInfo) => {
+            return promiseMock.resolve(accountInfo);
         });
-        accountServiceFake.getAsync = jasmine.createSpy("get").andCallFake(() => {
+        accountServiceFake.getAsync.andCallFake(() => {
             return promiseMock.resolve({
                 mfaKey: "339r93939303093"
             });
         });
-        accountServiceFake.initiateAsync = jasmine.createSpy("initiate").andCallFake((accountId, accountInfo, options) => {
+        accountServiceFake.getDirectory.andCallFake(() => {
+            return promiseMock.resolve("/account/hashedAccountId");
+        });
+        accountServiceFake.initiateAsync.andCallFake((accountId, accountInfo, options) => {
             return promiseMock.resolve({
                 accountId: accountInfo.accountId,
                 email: accountInfo.email,
@@ -35,15 +39,11 @@ describe("AccountManager", () => {
             "generateSecretAsync",
             "verifyToken"
         ]);
-        hotpFake.generateSecretAsync = jasmine.createSpy("generateSecretAsync").andCallFake(() => {
+        hotpFake.generateSecretAsync.andCallFake(() => {
             return promiseMock.resolve("thisisasecrectcodefrommfa");
         });
-        hotpFake.verifyToken = jasmine.createSpy("verifyToken").andCallFake((key, token, opts) => {
-            if (token === "987654") {
-                return false;
-            }
-
-            return true;
+        hotpFake.verifyToken.andCallFake((key, token, opts) => {
+            return token !== "987654";
         });
         config = {
             account: {
@@ -52,12 +52,6 @@ describe("AccountManager", () => {
                 },
                 initiateLifetime: {
                     hours: 1
-                }
-            },
-            hotp: {
-                previous: {
-                    afterDrift: 1,
-                    beforeDrift: 1
                 }
             }
         };
@@ -110,7 +104,10 @@ describe("AccountManager", () => {
                 previousMfa: "098454",
                 password: "3439gajs933098fj3jfj90aj09fj9390a9023"
             }).then((result) => {
-                expect(result).toBe(true);
+                expect(result).toEqual({accountId: "aeifFeight3ighrFieigheilw5lfiek",
+                currentMfa: "123456",
+                previousMfa: "098454",
+                password: "3439gajs933098fj3jfj90aj09fj9390a9023"});
             }).then(done, done);
         });
         it("has an expired previous token", (done) => {

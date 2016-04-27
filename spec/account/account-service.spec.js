@@ -1,10 +1,10 @@
 "use strict";
 
 describe("AccountService", () => {
-    var accountService;
+    var accountService, storageFake, promiseMock;
 
     beforeEach(() => {
-        var AccountService, config, password, promiseMock, storageFake;
+        var AccountService, config, password;
 
         AccountService = require("../../lib/account/account-service");
         promiseMock = require("../mock/promise-mock");
@@ -13,15 +13,15 @@ describe("AccountService", () => {
             "getAsync",
             "putAsync"
         ]);
-        storageFake.configure = jasmine.createSpy("storageFake.configure").andCallFake(() => {
+        storageFake.configure.andCallFake(() => {
             return storageFake;
         });
-        storageFake.getAsync = jasmine.createSpy("storageFake.getAsync").andCallFake(() => {
+        storageFake.getAsync.andCallFake(() => {
             return promiseMock.resolve(
                 new Buffer('{"data": "thing"}', "binary")
             );
         });
-        storageFake.putAsync = jasmine.createSpy("storageFake.putAsync").andCallFake(() => {
+        storageFake.putAsync.andCallFake(() => {
             return promiseMock.resolve(true);
         });
         config = {
@@ -32,16 +32,16 @@ describe("AccountService", () => {
         password = jasmine.createSpyObj("password", [
             "hashContent"
         ]);
-        password.hashContent = jasmine.createSpy("password.hashContent").andCallFake(() => {
+        password.hashContent.andCallFake(() => {
             return "hashedContent";
         });
         accountService = new AccountService(config, password, storageFake);
     });
     describe(".completeAsync()", () => {
         it("puts the information successfully", (done) => {
-            accountService.accountFile = {
-                "email": "some.one@example.net"
-            };
+            storageFake.getAsync.andCallFake(() => {
+                return promiseMock.resolve('{"email": "some.one@example.net"}');
+            });
             accountService.completeAsync("directory", {
                 password: "somereallylonghashedpassword"
             }, {
