@@ -38,7 +38,7 @@
         "name": "OpenToken.io",
         "keySize": 128
     },
-    "password": {
+    "secureHash": {
         "hashAlgo": "sha256"
     },
     "server": {

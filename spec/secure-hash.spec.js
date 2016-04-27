@@ -8,11 +8,11 @@ describe("password", ()  => {
 
         crypto = require("crypto");
         config = {
-            password: {
+            secureHash: {
                 hashAlgo: "sha256"
             }
         };
-        password = require("../lib/password")(config, crypto);
+        password = require("../lib/secure-hash")(config, crypto);
     });
     it("hashes a passed in value", () => {
         expect(password.hashContent("rRTcBER_EiFUsRa34Hj5Zpok")).toBe("_cH_6uOc_gyL4-FvEsTWUj_YrCZD9NMmOl-2TT0d1NU=");
