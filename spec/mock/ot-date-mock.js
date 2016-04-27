@@ -16,6 +16,21 @@ function OtDateMock(d) {
     });
 
 
+
+    /**
+     * Adds time to another time.
+     *
+     * Does not actually add time, but returns the OtDate object as
+     * expected.
+     *
+     * @param {Object} spec
+     * @return {OtDate}
+     */
+    this.plus = jasmine.createSpy("plus").andCallFake((spec) => {
+        return this;
+    });
+
+
     /**
      * Converts a date to a Buffer that's 4 bytes long
      *

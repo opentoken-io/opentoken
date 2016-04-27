@@ -4,7 +4,7 @@ describe("storage/s3", () => {
     var awsSdkMock, promiseMock, s3;
 
     beforeEach(() => {
-        var s3File;
+        var S3;
 
         class S3Fake {
             constructor(params) {
@@ -23,7 +23,6 @@ describe("storage/s3", () => {
             }
         }
 
-        s3File = require("../../lib/storage/s3");
         promiseMock = require("../mock/promise-mock");
         awsSdkMock = {
             S3: S3Fake,
@@ -31,14 +30,15 @@ describe("storage/s3", () => {
                 region: null
             }
         };
-        s3 = new s3File(awsSdkMock, promiseMock);
+        S3 = require("../../lib/storage/s3")(awsSdkMock, promiseMock);
+        s3 = new S3();
     });
     describe("configure()", () => {
         beforeEach(() => {
             awsSdkMock.S3 = jasmine.createSpy("s3Mock");
         });
         it("passes in configuration options for all", () => {
-            expect(s3.aws.config.region).toBe("us-east-1");
+            expect(awsSdkMock.config.region).toBe("us-east-1");
             s3.transit();
             expect(awsSdkMock.S3).toHaveBeenCalledWith({
                 params: {
@@ -51,7 +51,7 @@ describe("storage/s3", () => {
                 region: "us-west-1",
                 bucket: "test-bucket"
             });
-            expect(s3.aws.config.region).toBe("us-west-1");
+            expect(awsSdkMock.config.region).toBe("us-west-1");
             s3.transit();
             expect(awsSdkMock.S3).toHaveBeenCalledWith({
                 params: {

@@ -15,7 +15,7 @@ describe("dependencies", () => {
     it("resolve a dependency which has methods to run", () => {
         var webServer;
 
-        webServer = dependencies.resolve("webServer");
-        expect(webServer.startServerAsync).toEqual(jasmine.any(Function));
+        webServer = dependencies.resolve("WebServer");
+        expect(webServer).toEqual(jasmine.any(Function));
     });
 });

@@ -1,4 +1,12 @@
 {
+    "account": {
+        "completeLifetime": {
+            "months": 6
+        },
+        "initiateLifetime": {
+            "hours": 1
+        }
+    },
     "debug": false,
     "encryption": {
         "primary": {
@@ -25,6 +33,13 @@
                 "iterations": 10000
             }
         }
+    },
+    "hotp": {
+        "name": "OpenToken.io",
+        "keySize": 128
+    },
+    "password": {
+        "hashAlgo": "sha256"
     },
     "server": {
         "baseUrl": "https://localhost:8080/",

@@ -1,7 +1,7 @@
 "use strict";
 
 describe("restMiddleware", () => {
-    var helmetMock, logger, restMiddleware, serverMock, restifyLinks;
+    var helmetMock, restMiddleware, serverMock, restifyLinks;
 
     /**
      * Tests the common middleware set up when calling restMiddleware.
@@ -20,10 +20,10 @@ describe("restMiddleware", () => {
     }
 
     beforeEach(() => {
-        var LoggerMock, RestMiddleware;
+        var loggerMock, RestMiddleware;
 
         RestMiddleware = require("../lib/rest-middleware");
-        LoggerMock = require("./mock/logger-mock");
+        loggerMock = require("./mock/logger-mock");
         helmetMock = jasmine.createSpyObj("helmetMock", [
             "frameguard",
             "hidePoweredBy",
@@ -37,8 +37,7 @@ describe("restMiddleware", () => {
             "use"
         ]);
         restifyLinks = jasmine.createSpy();
-        logger = new LoggerMock();
-        restMiddleware = new RestMiddleware(helmetMock, logger, restifyLinks);
+        restMiddleware = new RestMiddleware(helmetMock, loggerMock, restifyLinks);
     });
     it("calls restMiddleware without https", () => {
         restMiddleware({
