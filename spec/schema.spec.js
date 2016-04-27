@@ -1,10 +1,8 @@
 "use strict";
 
 describe("schema", () => {
-    var fs, promiseMock, schema, schemaEmail, schemaNumber, tv4
+    var fs, promiseMock, schema, tv4;
 
-    schemaEmail = new Buffer('{"id": "email", "type": "string", "format": "email"}', "binary");
-    schemaNumber = new Buffer('{"id": "number", "type": "number", "minimum": 5}', "binary");
     beforeEach(() => {
         var nodeValidator;
 
@@ -14,11 +12,19 @@ describe("schema", () => {
         ]);
         fs.readFileAsync.andCallFake((fn) => {
             if (fn.match("email.json")) {
-                return promiseMock.resolve(schemaEmail);
+                return promiseMock.resolve(new Buffer('{"id": "email", "type": "string", "format": "email"}', "binary"));
             }
 
             if (fn.match("number.json")) {
-                return promiseMock.resolve(schemaNumber);
+                return promiseMock.resolve(new Buffer('{"id": "number", "type": "number", "minimum": 5}', "binary"));
+            }
+
+            if (fn.match("email-no-id.json")) {
+                return promiseMock.resolve(new Buffer('{"type": "string", "format": "email"}', "binary"));
+            }
+
+            if (fn.match("email-parse-error.json")) {
+                return promiseMock.resolve(new Buffer('{"type: "string", "format": "email"}', "binary"));
             }
 
             return promiseMock.reject("Invalid file: " + fn.toString());
@@ -29,12 +35,23 @@ describe("schema", () => {
         schema = require("../lib/schema")(fs, nodeValidator, promiseMock, tv4);
     });
     describe(".loadSchemaAsync()", () => {
-        it("loads a schema and validates against it", (done) => {
+        beforeEach(() => {
             tv4.addSchema = jasmine.createSpy("tv4.addSchema").andCallThrough();
+        });
+        it("loads a schema and validates against it", (done) => {
             schema.loadSchemaAsync("./email.json").then(() => {
                 expect(schema.validate("someone@example.net", "email")).toBe(true);
                 expect(schema.validate("someone", "email")).toBe(false);
             }).then(done, done);
+        });
+        it("loads a schema not containing an id", (done) => {
+            jasmine.testPromiseFailure(schema.loadSchemaAsync("./email-no-id.json"), "Schema did not contain id: ./email-no-id.json", done);
+        });
+        it("loads a schema which cannot be parsed", (done) => {
+            jasmine.testPromiseFailure(schema.loadSchemaAsync("./email-parse-error.json"), "Unble to parse file: ./email-parse-error.json", done);
+        });
+         it("tries to a schema which is not present", (done) => {
+            jasmine.testPromiseFailure(schema.loadSchemaAsync("./email-not-there.json"), "Unble to parse file: ./email-not-there.json", done);
         });
     });
     describe(".loadSchemaFolderAsync()", () => {
