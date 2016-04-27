@@ -3,6 +3,12 @@
         "completeLifetime": {
             "months": 6
         },
+        "idHash": {
+            "algo": "sha256",
+            "hashLength": 24,
+            "iterations": 10000,
+            "salt": ""
+        },
         "initiateLifetime": {
             "hours": 1
         }
@@ -37,9 +43,6 @@
     "hotp": {
         "name": "OpenToken.io",
         "keySize": 128
-    },
-    "secureHash": {
-        "hashAlgo": "sha256"
     },
     "server": {
         "baseUrl": "https://localhost:8080/",
