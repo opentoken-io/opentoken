@@ -32,16 +32,15 @@ describe("schema", () => {
         nodeValidator = require("validator");
         promiseMock = require("./mock/promise-mock");
         tv4 = require("tv4");
+        tv4.addSchema = jasmine.createSpy("tv4.addSchema").andCallThrough();
         schema = require("../lib/schema")(fs, nodeValidator, promiseMock, tv4);
     });
     describe(".loadSchemaAsync()", () => {
-        beforeEach(() => {
-            tv4.addSchema = jasmine.createSpy("tv4.addSchema").andCallThrough();
-        });
         it("loads a schema and validates against it", (done) => {
             schema.loadSchemaAsync("./email.json").then(() => {
-                expect(schema.validate("someone@example.net", "email")).toBe(true);
-                expect(schema.validate("someone", "email")).toBe(false);
+                expect(() => {
+                    schema.validate("someone@example.net", "email");
+                }).not.toThrow();
             }).then(done, done);
         });
         it("loads a schema not containing an id", (done) => {
@@ -50,9 +49,10 @@ describe("schema", () => {
         it("loads a schema which cannot be parsed", (done) => {
             jasmine.testPromiseFailure(schema.loadSchemaAsync("./email-parse-error.json"), "Unble to parse file: ./email-parse-error.json", done);
         });
-         it("tries to a schema which is not present", (done) => {
+        it("tries to a schema which is not present", (done) => {
             jasmine.testPromiseFailure(schema.loadSchemaAsync("./email-not-there.json"), "Unble to parse file: ./email-not-there.json", done);
         });
+
     });
     describe(".loadSchemaFolderAsync()", () => {
         it("loads schemas and validates against them", (done) => {
@@ -67,11 +67,27 @@ describe("schema", () => {
                 return promiseMock.reject("Invalid folder: " + fn.toString());
             });
             schema.loadSchemaFolderAsync("/folder/").then(() => {
-                expect(schema.validate("someone@example.net", "email")).toBe(true);
-                expect(schema.validate("someone", "email")).toBe(false);
-                expect(schema.validate(5, "number")).toBe(true);
-                expect(schema.validate(2, "number")).toBe(false);
+                expect(() => {
+                    schema.validate("someone@example.net", "email");
+                }).not.toThrow();
+                expect(() => {
+                    schema.validate(5, "number");
+                }).not.toThrow();
             }).then(done, done);
         });
+    });
+    describe(".validate()", () => {
+        it("loads a schema and validates against it", (done) => {
+            schema.loadSchemaAsync("./email.json").then(() => {
+                expect(schema.validate("someone@example.net", "email")).toBe(true);
+                expect(schema.validate("someone", "email")).toBe(false);
+            }).then(done, done);
+        });
+        it("tries to validate against a non-present schema", () => {
+            expect(() => {
+                schema.validate("something", "notThere");
+            }).toThrow("Schema is not loaded: notThere");
+        });
+
     });
 });
