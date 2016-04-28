@@ -1,5 +1,6 @@
 {
     "account": {
+        "accountDir": "account/",
         "completeLifetime": {
             "months": 6
         },

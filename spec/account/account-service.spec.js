@@ -4,7 +4,7 @@ describe("AccountService", () => {
     var accountService, storageFake, promiseMock;
 
     beforeEach(() => {
-        var AccountService, config, password;
+        var AccountService, config, secureHash;
 
         AccountService = require("../../lib/account/account-service");
         promiseMock = require("../mock/promise-mock");
@@ -29,13 +29,13 @@ describe("AccountService", () => {
                 bucket: "some-place-wonderful"
             }
         };
-        password = jasmine.createSpyObj("password", [
-            "hashContent"
+        secureHash = jasmine.createSpyObj("secureHash", [
+            "hashAsync"
         ]);
-        password.hashContent.andCallFake(() => {
-            return "hashedContent";
+        secureHash.hashAsync.andCallFake(() => {
+            return promiseMock.resolve("hashedContent");
         });
-        accountService = new AccountService(config, password, storageFake);
+        accountService = new AccountService(config, secureHash, storageFake);
     });
     describe(".completeAsync()", () => {
         it("puts the information successfully", (done) => {
@@ -61,9 +61,18 @@ describe("AccountService", () => {
             }).then(done, done);
         });
     });
-    describe(".getDirectory()", () => {
-        it("gets the directory", () => {
-            expect(accountService.getDirectory("accountIdUnhashed")).toEqual("account/hashedContent");
+    describe(".getDirectoryAsync()", () => {
+        it("gets the directory", (done) => {
+            accountService.getDirectoryAsync("accountIdUnhashed").then((result) => {
+                expect(result).toBe("account/hashedContent");
+            }).then(done, done);
+        });
+        it("gets the directory with config", (done) => {
+            accountService.getDirectoryAsync("accountIdUnhashed", {
+                accountDir: "some/place/"
+            }).then((result) => {
+                expect(result).toBe("some/place/hashedContent");
+            }).then(done, done);
         });
     });
     describe(".initiateAsync()", (done) => {

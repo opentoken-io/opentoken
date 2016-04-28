@@ -13,7 +13,7 @@ describe("AccountManager", () => {
         accountServiceFake = jasmine.createSpyObj("accountServiceFake", [
             "completeAsync",
             "getAsync",
-            "getDirectory",
+            "getDirectoryAsync",
             "initiateAsync"
         ]);
         accountServiceFake.completeAsync.andCallFake((directory, accountInfo) => {
@@ -24,8 +24,8 @@ describe("AccountManager", () => {
                 mfaKey: "339r93939303093"
             });
         });
-        accountServiceFake.getDirectory.andCallFake(() => {
-            return promiseMock.resolve("/account/hashedAccountId");
+        accountServiceFake.getDirectoryAsync.andCallFake(() => {
+            return promiseMock.resolve("account/hashedAccountId");
         });
         accountServiceFake.initiateAsync.andCallFake((accountId, accountInfo, options) => {
             return promiseMock.resolve({
@@ -82,7 +82,8 @@ describe("AccountManager", () => {
                 previousMfa: "098454",
                 password: "3439gajs933098fj3jfj90aj09fj9390a9023"
             }).then((result) => {
-                expect(result).toEqual({accountId: "aeifFeight3ighrFieigheilw5lfiek",
+                expect(result).toEqual({
+                accountId: "aeifFeight3ighrFieigheilw5lfiek",
                 currentMfa: "123456",
                 previousMfa: "098454",
                 password: "3439gajs933098fj3jfj90aj09fj9390a9023"});
