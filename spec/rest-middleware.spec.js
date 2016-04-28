@@ -1,7 +1,7 @@
 "use strict";
 
 describe("restMiddleware", () => {
-    var helmetMock, restMiddleware, serverMock, restifyLinks;
+    var helmetMock, restMiddleware, serverMock, restifyMock, restifyLinks;
 
     /**
      * Tests the common middleware set up when calling restMiddleware.
@@ -9,14 +9,30 @@ describe("restMiddleware", () => {
      * needs to be tested there.
      */
     function expectNormalMiddlewareWasCalled () {
-        expect(helmetMock.frameguard).toHaveBeenCalled();
-        expect(helmetMock.ieNoOpen).toHaveBeenCalled();
-        expect(helmetMock.hidePoweredBy).toHaveBeenCalled();
-        expect(helmetMock.ieNoOpen).toHaveBeenCalled();
-        expect(helmetMock.noCache).toHaveBeenCalled();
-        expect(helmetMock.noSniff).toHaveBeenCalled();
-        expect(helmetMock.xssFilter).toHaveBeenCalled();
-        expect(restifyLinks).toHaveBeenCalled();
+        [
+            helmetMock.frameguard,
+            helmetMock.ieNoOpen,
+            helmetMock.hidePoweredBy,
+            helmetMock.noCache,
+            helmetMock.noSniff,
+            helmetMock.xssFilter,
+            restifyLinks,
+            restifyMock.CORS
+        ].forEach((spy) => {
+            expect(spy).toHaveBeenCalled();
+            expect(serverMock.use).toHaveBeenCalledWith(spy);
+        });
+    }
+
+    function mockMiddleware(name, methods) {
+        var middleware;
+
+        middleware = jasmine.createSpyObj(name, methods);
+        methods.forEach((methodName) => {
+            middleware[methodName].andReturn(middleware[methodName]);
+        });
+
+        return middleware;
     }
 
     beforeEach(() => {
@@ -24,7 +40,7 @@ describe("restMiddleware", () => {
 
         RestMiddleware = require("../lib/rest-middleware");
         loggerMock = require("./mock/logger-mock");
-        helmetMock = jasmine.createSpyObj("helmetMock", [
+        helmetMock = mockMiddleware("helmetMock", [
             "frameguard",
             "hidePoweredBy",
             "hsts",
@@ -36,8 +52,12 @@ describe("restMiddleware", () => {
         serverMock = jasmine.createSpyObj("serverMock", [
             "use"
         ]);
-        restifyLinks = jasmine.createSpy();
-        restMiddleware = new RestMiddleware(helmetMock, loggerMock, restifyLinks);
+        restifyMock = mockMiddleware("restifyMock", [
+            "CORS"
+        ]);
+        restifyLinks = jasmine.createSpy("restifyLinks");
+        restifyLinks.andReturn(restifyLinks);
+        restMiddleware = new RestMiddleware(helmetMock, loggerMock, restifyMock, restifyLinks);
     });
     it("calls restMiddleware without https", () => {
         restMiddleware({
