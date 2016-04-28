@@ -11,8 +11,18 @@ describe("secureHash", ()  => {
         base64 = require("../lib/base64");
         secureHash = require("../lib/secure-hash")(base64, crypto, promiseMock);
     });
-    it("hashes a passed in value", (done) => {
+    it("hashes a passed in string", (done) => {
         secureHash.hashAsync("rRTcBER_EiFUsRa34Hj5Zpok", {
+            algorithm: "sha256",
+            hashLength: 24,
+            iterations: 10000,
+            salt: "pinkFluffyUnicornsDancingOnRainbows"
+        }).then((result) => {
+            expect(result.toString("binary")).toBe("9GnOLZ_xAlfMA4C6DHsjNJJpsShI_TgR");
+        }).then(done, done);
+    });
+    it("hashes a passed in buffer", (done) => {
+        secureHash.hashAsync(new Buffer("rRTcBER_EiFUsRa34Hj5Zpok", "binary"), {
             algorithm: "sha256",
             hashLength: 24,
             iterations: 10000,
