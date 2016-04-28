@@ -18,7 +18,7 @@ describe("secureHash", ()  => {
             iterations: 10000,
             salt: "pinkFluffyUnicornsDancingOnRainbows"
         }).then((result) => {
-            expect(result.toString("binary")).toBe("9GnOLZ_xAlfMA4C6DHsjNJJpsShI_TgR");
+            expect(result).toBe("9GnOLZ_xAlfMA4C6DHsjNJJpsShI_TgR");
         }).then(done, done);
     });
     it("hashes a passed in buffer", (done) => {
@@ -28,12 +28,22 @@ describe("secureHash", ()  => {
             iterations: 10000,
             salt: "pinkFluffyUnicornsDancingOnRainbows"
         }).then((result) => {
-            expect(result.toString("binary")).toBe("9GnOLZ_xAlfMA4C6DHsjNJJpsShI_TgR");
+            expect(result).toBe("9GnOLZ_xAlfMA4C6DHsjNJJpsShI_TgR");
         }).then(done, done);
     });
+
+    /**
+     * Just grabbing the first 32 Bytes and last 32 Bytes to verify the string
+     * is what we are expecting as the actual length is very long.
+     */
     it("hashes without a config being passed in", (done) => {
         secureHash.hashAsync("rRTcBER_EiFUsRa34Hj5Zpok").then((result) => {
-            expect(result.toString("binary").length).toBe(683);
+            // First 32 Bytes
+            expect(result.substr(0, 32)).toBe("-IbPFNBgU7JvnlwV7IM_MR6Y9PaPd8gy");
+
+            // Last 32 Bytes
+            expect(result.substr(-32)).toBe("_IWAyIRNjJja-CQNMVfcnadCDICLIhng");
+            expect(result.length).toBe(683);
         }).then(done, done);
     });
     it("throws an error as there is nothing to hash", () => {
