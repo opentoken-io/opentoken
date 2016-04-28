@@ -36,7 +36,7 @@ describe("secureHash", ()  => {
             expect(result.toString("binary").length).toBe(683);
         }).then(done, done);
     });
-    it("throws and error as there is nothing to hash", () => {
+    it("throws an error as there is nothing to hash", () => {
         expect(() => {
             secureHash.hashAsync("");
         }).toThrow();
