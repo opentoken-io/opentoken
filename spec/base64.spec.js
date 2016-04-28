@@ -64,7 +64,12 @@ describe("base64", () => {
         var result;
 
         result = base64.encodeForUri(new Buffer("p5>T44d3?12Ui", "binary"));
-        expect(result).toEqual(jasmine.any(Buffer));
-        expect(result.toString("ascii")).toBe("cDU-VDQ0ZDM_MTJVaQ");
+        expect(result).toBe("cDU-VDQ0ZDM_MTJVaQ");
+    });
+    it("encodes a string for use in a URI", () => {
+        var result;
+
+        result = base64.encodeForUri("p5>T44d3?12Ui");
+        expect(result).toBe("cDU-VDQ0ZDM_MTJVaQ");
     });
 });

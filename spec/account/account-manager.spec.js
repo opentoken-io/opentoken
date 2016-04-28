@@ -13,19 +13,21 @@ describe("AccountManager", () => {
         accountServiceFake = jasmine.createSpyObj("accountServiceFake", [
             "completeAsync",
             "getAsync",
-            "getDirectory",
+            "getDirectoryAsync",
             "initiateAsync"
         ]);
         accountServiceFake.completeAsync.andCallFake((directory, accountInfo) => {
-            return promiseMock.resolve(accountInfo);
+            return promiseMock.resolve({
+                accountId: accountInfo.accountId
+            });
         });
         accountServiceFake.getAsync.andCallFake(() => {
             return promiseMock.resolve({
                 mfaKey: "339r93939303093"
             });
         });
-        accountServiceFake.getDirectory.andCallFake(() => {
-            return promiseMock.resolve("/account/hashedAccountId");
+        accountServiceFake.getDirectoryAsync.andCallFake(() => {
+            return promiseMock.resolve("account/hashedAccountId");
         });
         accountServiceFake.initiateAsync.andCallFake((accountId, accountInfo, options) => {
             return promiseMock.resolve({
@@ -82,10 +84,9 @@ describe("AccountManager", () => {
                 previousMfa: "098454",
                 password: "3439gajs933098fj3jfj90aj09fj9390a9023"
             }).then((result) => {
-                expect(result).toEqual({accountId: "aeifFeight3ighrFieigheilw5lfiek",
-                currentMfa: "123456",
-                previousMfa: "098454",
-                password: "3439gajs933098fj3jfj90aj09fj9390a9023"});
+                expect(result).toEqual({
+                    accountId: "aeifFeight3ighrFieigheilw5lfiek",
+                });
             }).then(done, done);
         });
         it("has an expired previous token", (done) => {

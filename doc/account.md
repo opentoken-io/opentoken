@@ -8,9 +8,22 @@ The `account` options in `config.json` allow you to set how long an account is v
 
 The object assigned to each account section is passed into the OtDate object to set the expires for each lifetime.
 
+The `idHash` property of `account` covers how the ids will be hashed when stored. This is passed into the secure hash method and then used when saving an account. **The `idHash` values must never change once set up.** If the values change a client or account holder will never be able to get back into their account.
+
+Also, you can find a list of available hashing methods in `lib/ciphers-and-hashes.js`.
+
+Where the account information is stored can be change by updating `accountDir`.
+
     "account": {
+        "accountDir": "account/",
         "completeLifetime": {
             "months": 6
+        },
+        "idHash": {
+            "algo": "sha256",
+            "hashLength": 24,
+            "iterations": 10000,
+            "salt": "Ucg4TTL1N7tt6GMw3W3wULgaf4lALKHOuM4SBnh0FocOr3ccLH9eXLneoDDOrMVZ"
         },
         "initiateLifetime": {
             "hours": 1
