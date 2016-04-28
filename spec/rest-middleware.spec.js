@@ -16,8 +16,8 @@ describe("restMiddleware", () => {
             helmetMock.noCache,
             helmetMock.noSniff,
             helmetMock.xssFilter,
-            restifyMock.CORS,
-            restifyLinks
+            restifyLinks,
+            restifyMock.CORS
         ].forEach((spy) => {
             expect(spy).toHaveBeenCalled();
             expect(serverMock.use).toHaveBeenCalledWith(spy);
