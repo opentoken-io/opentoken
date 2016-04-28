@@ -17,7 +17,9 @@ describe("AccountManager", () => {
             "initiateAsync"
         ]);
         accountServiceFake.completeAsync.andCallFake((directory, accountInfo) => {
-            return promiseMock.resolve(accountInfo);
+            return promiseMock.resolve({
+                accountId: accountInfo.accountId
+            });
         });
         accountServiceFake.getAsync.andCallFake(() => {
             return promiseMock.resolve({
@@ -83,10 +85,8 @@ describe("AccountManager", () => {
                 password: "3439gajs933098fj3jfj90aj09fj9390a9023"
             }).then((result) => {
                 expect(result).toEqual({
-                accountId: "aeifFeight3ighrFieigheilw5lfiek",
-                currentMfa: "123456",
-                previousMfa: "098454",
-                password: "3439gajs933098fj3jfj90aj09fj9390a9023"});
+                    accountId: "aeifFeight3ighrFieigheilw5lfiek",
+                });
             }).then(done, done);
         });
         it("has an expired previous token", (done) => {

@@ -1,10 +1,10 @@
 "use strict";
 
 describe("AccountService", () => {
-    var accountService, storageFake, promiseMock;
+    var accountService, storageFake, promiseMock, secureHash;
 
     beforeEach(() => {
-        var AccountService, config, secureHash;
+        var AccountService, config;
 
         AccountService = require("../../lib/account/account-service");
         promiseMock = require("../mock/promise-mock");
@@ -25,6 +25,15 @@ describe("AccountService", () => {
             return promiseMock.resolve(true);
         });
         config = {
+            account: {
+                accountDir: "some/place/",
+                idHash: {
+                    algo: "sha256",
+                    hashLength: 24,
+                    iterations: 10000,
+                    salt: "pinkFullyUnicornsDancingOnRainbows"
+                }
+            },
             storage: {
                 bucket: "some-place-wonderful"
             }
@@ -35,12 +44,13 @@ describe("AccountService", () => {
         secureHash.hashAsync.andCallFake(() => {
             return promiseMock.resolve("hashedContent");
         });
+
         accountService = new AccountService(config, secureHash, storageFake);
     });
     describe(".completeAsync()", () => {
         it("puts the information successfully", (done) => {
             storageFake.getAsync.andCallFake(() => {
-                return promiseMock.resolve('{"email": "some.one@example.net"}');
+                return promiseMock.resolve('{"accountId": "unhashedAccountId", "email": "some.one@example.net"}');
             });
             accountService.completeAsync("directory", {
                 password: "somereallylonghashedpassword"
@@ -48,8 +58,7 @@ describe("AccountService", () => {
                 expires: new Date()
             }).then((result) => {
                 expect(result).toEqual({
-                    email: "some.one@example.net",
-                    password: "somereallylonghashedpassword"
+                    accountId: "unhashedAccountId"
                 });
             }).then(done, done);
         });
@@ -64,14 +73,23 @@ describe("AccountService", () => {
     describe(".getDirectoryAsync()", () => {
         it("gets the directory", (done) => {
             accountService.getDirectoryAsync("accountIdUnhashed").then((result) => {
-                expect(result).toBe("account/hashedContent");
+                expect(result).toBe("some/place/hashedContent");
+                expect(secureHash.hashAsync).toHaveBeenCalledWith("accountIdUnhashed", {
+                    algo: "sha256",
+                    hashLength: 24,
+                    iterations: 10000,
+                    salt: "pinkFullyUnicornsDancingOnRainbows"
+                });
             }).then(done, done);
         });
-        it("gets the directory with config", (done) => {
-            accountService.getDirectoryAsync("accountIdUnhashed", {
-                accountDir: "some/place/"
-            }).then((result) => {
-                expect(result).toBe("some/place/hashedContent");
+        it ("gets a directiory without account options", (done) => {
+            var AccountService, accountServiceLocal;
+
+            AccountService = require("../../lib/account/account-service");
+            accountServiceLocal = new AccountService({}, secureHash, storageFake);
+            accountServiceLocal.getDirectoryAsync("accountIdUnhashed").then((result) => {
+                expect(result).toBe("account/hashedContent");
+                expect(secureHash.hashAsync).toHaveBeenCalledWith("accountIdUnhashed", {});
             }).then(done, done);
         });
     });
