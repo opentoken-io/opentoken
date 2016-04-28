@@ -23,7 +23,7 @@ Where the account information is stored can be change by updating `accountDir`.
             "algo": "sha256",
             "hashLength": 24,
             "iterations": 10000,
-            "salt": "pinkFluffyUnicornsDancingOnRainbows"
+            "salt": "Ucg4TTL1N7tt6GMw3W3wULgaf4lALKHOuM4SBnh0FocOr3ccLH9eXLneoDDOrMVZ"
         },
         "initiateLifetime": {
             "hours": 1

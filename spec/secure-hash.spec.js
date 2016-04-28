@@ -38,12 +38,8 @@ describe("secureHash", ()  => {
      */
     it("hashes without a config being passed in", (done) => {
         secureHash.hashAsync("rRTcBER_EiFUsRa34Hj5Zpok").then((result) => {
-            // First 32 Bytes
-            expect(result.substr(0, 32)).toBe("-IbPFNBgU7JvnlwV7IM_MR6Y9PaPd8gy");
-
-            // Last 32 Bytes
-            expect(result.substr(-32)).toBe("_IWAyIRNjJja-CQNMVfcnadCDICLIhng");
-            expect(result.length).toBe(683);
+            expect(result).toBe("-IbPFNBgU7JvnlwV7IM_MR6Y9PaPd8gyJP7xZ_RzHjo0lcejcbWFgQcbXJJ2e9n1");
+            expect(result.length).toBe(64);
         }).then(done, done);
     });
     it("throws an error as there is nothing to hash", () => {
