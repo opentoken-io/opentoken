@@ -1,9 +1,9 @@
 "use strict";
 
 describe("secureHash", ()  => {
-    var configToUse, crypto, secureHash;
+    var crypto, secureHash, secureHashConfig;
 
-    configToUse = {
+    secureHashConfig = {
         algorithm: "sha256",
         hashLength: 24,
         iterations: 10000,
@@ -66,14 +66,14 @@ describe("secureHash", ()  => {
         base64 = require("../lib/base64");
         secureHash = require("../lib/secure-hash")(base64, crypto, promiseMock);
     });
-    describe("secureHashAsync", () => {
+    describe("secureHashAsync()", () => {
         it("hashes a passed in string", (done) => {
-            secureHash.hashAsync("rRTcBER_EiFUsRa34Hj5Zpok", configToUse).then((result) => {
+            secureHash.hashAsync("rRTcBER_EiFUsRa34Hj5Zpok", secureHashConfig).then((result) => {
                 expect(result).toBe("9GnOLZ_xAlfMA4C6DHsjNJJpsShI_TgR");
             }).then(done, done);
         });
         it("hashes a passed in buffer", (done) => {
-            secureHash.hashAsync(new Buffer("rRTcBER_EiFUsRa34Hj5Zpok", "binary"), configToUse).then((result) => {
+            secureHash.hashAsync(new Buffer("rRTcBER_EiFUsRa34Hj5Zpok", "binary"), secureHashConfig).then((result) => {
                 expect(result).toBe("9GnOLZ_xAlfMA4C6DHsjNJJpsShI_TgR");
             }).then(done, done);
         });
@@ -134,7 +134,7 @@ describe("secureHash", ()  => {
             result = secureHash.compare("9GnOLZ_xAlfMA4C6DHsjNJJpsShI_Tg5", "9GnOLZ_xAlfMA4C6DHsjNJJpsShI_TgR");
             expect(result).toBe(false);
 
-            // Not testing time here as this is scenario is timed already.
+            // Not testing time here as this scenario is timed already.
         });
     });
 });
