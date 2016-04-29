@@ -1,7 +1,7 @@
 "use strict";
 
 describe("WebServer", () => {
-    var fs, loggerMock, middlewareProfiler, promiseMock, restify, restifyServer, restMiddleware, webServer;
+    var fs, loggerMock, middlewareProfiler, promiseMock, restify, restifyRouterMagicMock, restifyServer, restMiddleware, webServer;
 
     beforeEach(() => {
         var WebServer;
@@ -39,13 +39,16 @@ describe("WebServer", () => {
             "createServer"
         ]);
         restify.createServer.andReturn(restifyServer);
+        restifyRouterMagicMock = jasmine.createSpy("restifyRouterMagic").andCallFake((server, config, callback) => {
+            callback(null);
+        });
         restMiddleware = jasmine.createSpy("restMiddleware");
-        WebServer = require("../lib/web-server")(fs, loggerMock, MiddlewareProfilerMock, promiseMock, restify, restMiddleware);
+        WebServer = require("../lib/web-server")(fs, loggerMock, MiddlewareProfilerMock, promiseMock, restify, restifyRouterMagicMock, restMiddleware);
         webServer = new WebServer();
     });
     it("exposes known public methods", () => {
         expect(webServer.addMiddleware).toEqual(jasmine.any(Function));
-        expect(webServer.addRoute).toEqual(jasmine.any(Function));
+        expect(webServer.addRoutes).toEqual(jasmine.any(Function));
         expect(webServer.configure).toEqual(jasmine.any(Function));
         expect(webServer.startServerAsync).toEqual(jasmine.any(Function));
     });
@@ -82,23 +85,15 @@ describe("WebServer", () => {
             }).then(done, done);
         });
     });
-    describe(".addRoute()", () => {
-        it("assigns middleware to a route and a verb", (done) => {
-            function testFn() {}
-
+    describe(".addRoutes()", () => {
+        it("calls out to RestifyRouterMagic", (done) => {
             expect(restifyServer.get).not.toHaveBeenCalled();
-            webServer.addRoute("get", "/", testFn);
+            webServer.addRoutes("/routes");
             webServer.startServerAsync().then(() => {
-                expect(restifyServer.get).toHaveBeenCalledWith("/", testFn);
-            }).then(done, done);
-        });
-        it("lowercases methods and converts 'delete'", (done) => {
-            function testFn() {}
-
-            expect(restifyServer.get).not.toHaveBeenCalled();
-            webServer.addRoute("DELETE", "/", testFn);
-            webServer.startServerAsync().then(() => {
-                expect(restifyServer.del).toHaveBeenCalledWith("/", testFn);
+                expect(restifyRouterMagicMock).toHaveBeenCalled();
+                expect(restifyRouterMagicMock.mostRecentCall.args[1]).toEqual({
+                    routesPath: "/routes"
+                });
             }).then(done, done);
         });
     });
