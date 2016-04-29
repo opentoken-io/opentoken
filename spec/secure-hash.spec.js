@@ -133,6 +133,8 @@ describe("secureHash", ()  => {
 
             result = secureHash.compare("9GnOLZ_xAlfMA4C6DHsjNJJpsShI_Tg5", "9GnOLZ_xAlfMA4C6DHsjNJJpsShI_TgR");
             expect(result).toBe(false);
+
+            // Not testing time here as this is scenario is timed already.
         });
     });
 });
