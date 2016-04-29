@@ -1,6 +1,8 @@
+#!/usr/bin/env node
+
 "use strict";
 
-var ApiServer, config, container, logger;
+var config, container, logger;
 
 container = require("../lib/dependencies");
 
@@ -19,5 +21,5 @@ if (process.env.DEBUG) {
     config.debug = true;
 }
 
-ApiServer = container.resolve("apiServer");
-(new ApiServer()).startServerAsync();
+// Kick off the server through dependency injection
+container.resolve("apiServer")();
