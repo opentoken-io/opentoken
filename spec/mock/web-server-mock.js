@@ -13,12 +13,13 @@ class WebServerMock {
         this.config = config;
 
         [
-            "addRoute",
+            "addRoutes",
             "startServerAsync"
         ].forEach((methodName) => {
             this[methodName] = jasmine.createSpy(methodName);
         });
         this.startServerAsync.andReturn(promiseMock.resolve());
+        WebServerMock.mostRecentInstance = this;
     }
 }
 
