@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 "use strict";
 
-var against, bad, container, good, options, secureHash, size;
+var against, bad, container, good, goodSmall, options, secureHash, size;
 
 options = process.argv.slice(2);
 
@@ -24,15 +24,18 @@ against = new Buffer(size);
 against.fill(0x42);
 good = new Buffer(size);
 good.fill(0x42);
+goodSmall = new Buffer(1024);
+goodSmall.fill(0x42);
 bad = new Buffer(size);
 bad.fill(0x00);
 
 function runIterations(maxTimes) {
-    var badTimes, goodTimes, iterations, start, timeToRunFor;
+    var badTimes, goodTimes, goodSmallTimes, iterations, start, timeToRunFor;
 
     iterations = 0;
     while(iterations < maxTimes) {
         goodTimes = 0;
+        goodSmallTimes = 0;
         badTimes = 0;
         timeToRunFor = options[0];
 
@@ -45,7 +48,15 @@ function runIterations(maxTimes) {
             goodTimes += 1;
         }
 
-        console.log("  Times Good Hashes Ran: ", goodTimes);
+        console.log("          Times Good Hashes Ran: ", goodTimes);
+
+        start = process.hrtime();
+        while((process.hrtime()[0] - start[0]) < timeToRunFor) {
+            secureHash.compare(against, goodSmall);
+            goodTimes += 1;
+        }
+
+        console.log("  Times Smaller Good Hashes Ran: ", goodTimes);
 
         // run bad
         start = process.hrtime();
@@ -54,7 +65,7 @@ function runIterations(maxTimes) {
             badTimes += 1;
         }
 
-        console.log("   Times Bad Hashes Ran: ", badTimes);
+        console.log("           Times Bad Hashes Ran: ", badTimes);
 
         iterations += 1;
     }
