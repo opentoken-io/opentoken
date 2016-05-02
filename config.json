@@ -12,7 +12,8 @@
         },
         "initiateLifetime": {
             "hours": 1
-        }
+        },
+        "registrationDir": "registration/"
     },
     "debug": false,
     "encryption": {
