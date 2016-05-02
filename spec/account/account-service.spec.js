@@ -99,10 +99,7 @@ describe("AccountService", () => {
             accountServiceLocal = require("../../lib/account/account-service")({}, secureHash, StorageFake);
             accountServiceLocal.getRegistrationFileAsync("regIdUnhashed").then((result) => {
                 expect(result).toEqual({
-                    regDir: "registration/hashedContent",
-                    accountFile: {
-                        data: "thing"
-                    }
+                    data: "thing"
                 });
                 expect(secureHash.hashAsync).toHaveBeenCalledWith("regIdUnhashed", {});
             }).then(done, done);

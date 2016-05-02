@@ -22,7 +22,8 @@ describe("AccountManager", () => {
         accountServiceFake.getRegistrationFileAsync.andCallFake(() => {
             return promiseMock.resolve({
                 regId: "jb-oRdCgvdImImS4v1XSTYcE",
-                mfaKey: "thisisasecrectcodefrommfa"
+                mfaKey: "thisisasecrectcodefrommfa",
+                passwordSalt: "longkey"
             });
         });
         accountServiceFake.signupInitiateAsync.andCallFake((accountInfo, options) => {
@@ -61,6 +62,16 @@ describe("AccountManager", () => {
                     regId: jasmine.any(String)
                 });
                 expect(result.regId.length).toBe(24);
+            }).then(done, done);
+        });
+    });
+    describe(".signupConfirmAsync()", () => {
+        it("returns the information to complete registration", (done) => {
+            accountManager.signupConfirmAsync("aeifFeight3ighrFieigheilw5lfiek").then((result) => {
+                expect(result).toEqual({
+                    mfaKey: "thisisasecrectcodefrommfa",
+                    passwordSalt: "longkey"
+                });
             }).then(done, done);
         });
     });
