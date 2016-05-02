@@ -4,9 +4,8 @@ describe("AccountManager", () => {
     var accountManager, otDateMock;
 
     beforeEach(() => {
-        var AccountManager, accountServiceFake, config, hotpFake, promiseMock, randomMock;
+        var accountServiceFake, config, hotpFake, promiseMock, randomMock;
 
-        AccountManager = require("../../lib/account/account-manager");
         otDateMock = require("../mock/ot-date-mock");
         promiseMock = require("../mock/promise-mock");
         randomMock = require("../mock/random-mock");
