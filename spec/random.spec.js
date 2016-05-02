@@ -29,7 +29,7 @@ describe("random", () => {
             }).then(done, done);
         });
     });
-    describe("password", () => {
+    describe("passwordAsync", () => {
         [
             {
                 binLength: 24,
