@@ -25,7 +25,7 @@ random.randomizedAsync.andCallFake((size) => {
     buff.fill(0x42);
 
     return new Promise((resolve, reject) => {
-        resolve(buff);
+        resolve(buff.toString());
     });
 });
 

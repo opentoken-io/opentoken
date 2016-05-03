@@ -1,14 +1,11 @@
 "use strict";
 
 describe("AccountManager", () => {
-    var accountManager, otDateMock;
+    var accountManager, accountServiceFake, otDateMock, hotpFake, promiseMock, randomMock;
 
     beforeEach(() => {
-        var accountServiceFake, config, hotpFake, promiseMock, randomMock;
+        var config;
 
-        otDateMock = require("../mock/ot-date-mock");
-        promiseMock = require("../mock/promise-mock");
-        randomMock = require("../mock/random-mock");
         accountServiceFake = jasmine.createSpyObj("accountServiceFake", [
             "completeAsync",
             "getRegistrationFileAsync",
@@ -16,7 +13,7 @@ describe("AccountManager", () => {
         ]);
         accountServiceFake.completeAsync.andCallFake((accountInfo, options, regId) => {
             return promiseMock.resolve({
-                accountId: "aeifFeight3ighrFieigheilw5lfiek"
+                accountId: accountInfo. accountId
             });
         });
         accountServiceFake.getRegistrationFileAsync.andCallFake(() => {
@@ -28,18 +25,8 @@ describe("AccountManager", () => {
         });
         accountServiceFake.signupInitiateAsync.andCallFake((accountInfo, options) => {
             return promiseMock.resolve({
-                regId: "jb-oRdCgvdImImS4v1XSTYcE"
+                regId: accountInfo.regId
             });
-        });
-        hotpFake = jasmine.createSpyObj("hotpFake", [
-            "generateSecretAsync",
-            "verifyToken"
-        ]);
-        hotpFake.generateSecretAsync.andCallFake(() => {
-            return promiseMock.resolve("thisisasecrectcodefrommfa");
-        });
-        hotpFake.verifyToken.andCallFake((key, token, opts) => {
-            return token !== "987654";
         });
         config = {
             account: {
@@ -51,7 +38,20 @@ describe("AccountManager", () => {
                 }
             }
         };
-        accountManager = require("../../lib/account/account-manager")(accountServiceFake, config, hotpFake, otDateMock, randomMock, promiseMock);
+        hotpFake = jasmine.createSpyObj("hotpFake", [
+            "generateSecretAsync",
+            "verifyToken"
+        ]);
+        hotpFake.generateSecretAsync.andCallFake(() => {
+            return promiseMock.resolve("thisisasecrectcodefrommfa");
+        });
+        hotpFake.verifyToken.andCallFake((key, token, opts) => {
+            return token !== "987654";
+        });
+        otDateMock = require("../mock/ot-date-mock");
+        promiseMock = require("../mock/promise-mock");
+        randomMock = require("../mock/random-mock");
+        accountManager = require("../../lib/account/account-manager")(accountServiceFake, config, hotpFake, otDateMock, promiseMock, randomMock);
     });
     describe(".signupInitiationAsync()", () => {
         it("gets the registration id back", (done) => {
@@ -62,6 +62,28 @@ describe("AccountManager", () => {
                     regId: jasmine.any(String)
                 });
                 expect(result.regId.length).toBe(24);
+            }).then(done, done);
+        });
+        it("gets the registration id back using config options", (done) => {
+            var accountManagerLocal;
+
+            accountManagerLocal = require("../../lib/account/account-manager")(accountServiceFake, {
+                account: {
+                    registrationIdLength: 128,
+                    initiateLifetime: {
+                        hours: 1
+                    },
+                    passwordSaltLength: 256
+                }
+            }, hotpFake, otDateMock, promiseMock, randomMock);
+            accountManagerLocal.signupInitiationAsync({
+                email: "some.one@example.net"
+            }).then((result) => {
+                var args;
+                expect(result.regId.length).toBe(128);
+                args = accountServiceFake.signupInitiateAsync.mostRecentCall.args;
+                expect(args[0].regId.length).toBe(128);
+                expect(args[0].passwordSalt.length).toBe(256);
             }).then(done, done);
         });
     });
@@ -84,8 +106,29 @@ describe("AccountManager", () => {
                 password: "3439gajs933098fj3jfj90aj09fj9390a9023"
             }).then((result) => {
                 expect(result).toEqual({
-                    accountId: "aeifFeight3ighrFieigheilw5lfiek",
+                    accountId: jasmine.any(String),
                 });
+                expect(result.accountId.length).toBe(24);
+            }).then(done, done);
+        });
+        it("successfully completes using config options", (done) => {
+            var accountManagerLocal;
+
+            accountManagerLocal = require("../../lib/account/account-manager")(accountServiceFake, {
+                account: {
+                    accountIdLength: 128,
+                    "completeLifetime": {
+                        "months": 6
+                    },
+                }
+            }, hotpFake, otDateMock, promiseMock, randomMock);
+            accountManagerLocal.signupCompleteAsync({
+                regId: "aeifFeight3ighrFieigheilw5lfiek",
+                currentMfa: "123456",
+                previousMfa: "098454",
+                password: "3439gajs933098fj3jfj90aj09fj9390a9023"
+            }).then((result) => {
+                expect(result.accountId.length).toBe(128);
             }).then(done, done);
         });
         it("has an expired previous token", (done) => {

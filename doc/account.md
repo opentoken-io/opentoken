@@ -14,8 +14,13 @@ Also, you can find a list of available hashing methods in `lib/ciphers-and-hashe
 
 Where the account information is stored can be change by updating `accountDir`. Also where the registration files can be updated by changing `registrationDir`.
 
+The lengths of the IDs we use for account creation can be adjusted using `accountIdLength` and `registrationIdLength`.
+
+The `passwordSaltLength` is used to adjust the length of the password salt we generate for the account holder to create their password hash.
+
     "account": {
         "accountDir": "account/",
+        "accountIdLength": 24,
         "completeLifetime": {
             "months": 6
         },
@@ -28,7 +33,9 @@ Where the account information is stored can be change by updating `accountDir`. 
         "initiateLifetime": {
             "hours": 1
         },
-        "registrationDir": "registration/"
+        "passwordSaltLength": 128,
+        "registrationDir": "registration/",
+        "registrationIdLength": 24
     }
 
 
