@@ -101,7 +101,7 @@ describe("AccountService", () => {
                 expect(result).toEqual({
                     data: "thing"
                 });
-                expect(secureHash.hashAsync).toHaveBeenCalledWith("regIdUnhashed", {});
+                expect(secureHash.hashAsync).toHaveBeenCalledWith("regIdUnhashed", undefined);
             }).then(done, done);
         });
     });
