@@ -4,7 +4,7 @@ var random;
 
 random = jasmine.createSpyObj("random", [
     "bufferAsync",
-    "randomizedAsync"
+    "randomIdAsync"
 ]);
 
 random.bufferAsync.andCallFake((size) => {
@@ -18,7 +18,7 @@ random.bufferAsync.andCallFake((size) => {
     });
 });
 
-random.randomizedAsync.andCallFake((size) => {
+random.randomIdAsync.andCallFake((size) => {
     var buff;
 
     buff = new Buffer(size);

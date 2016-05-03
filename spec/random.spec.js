@@ -29,7 +29,7 @@ describe("random", () => {
             }).then(done, done);
         });
     });
-    describe("randomizedAsync", () => {
+    describe("randomIdAsync", () => {
         [
             {
                 binLength: 24,
@@ -53,12 +53,12 @@ describe("random", () => {
             }
         ].forEach((scenario) => {
             it("sends the right amount of binary data to base64: length " + scenario.desiredLength, (done) => {
-                random.randomizedAsync(scenario.desiredLength).then(() => {
+                random.randomIdAsync(scenario.desiredLength).then(() => {
                     expect(base64Mock.encode.mostRecentCall.args[0].length).toBe(scenario.binLength);
                 }).then(done, done);
             });
             it("replaced + and /: length " + scenario.desiredLength, () => {
-                random.randomizedAsync(scenario.desiredLength).then((pass) => {
+                random.randomIdAsync(scenario.desiredLength).then((pass) => {
                     expect(pass).toEqual(scenario.expected);
                 });
             });

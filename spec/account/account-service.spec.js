@@ -108,13 +108,12 @@ describe("AccountService", () => {
     describe(".signupInitiateAsync()", (done) => {
         it("gets the registration id", (done) => {
             accountService.signupInitiateAsync({
-                regId: "jb-oRdCgvdImImS4v1XSTYcE",
                 email: "some.one@example.net",
                 mfa: "somesecretcodehere",
                 salt: "someothersecretcodehere"
             }, {
                 expires: new Date()
-            }).then((result) => {
+            }, "jb-oRdCgvdImImS4v1XSTYcE").then((result) => {
                 expect(result).toEqual({
                     regId: "jb-oRdCgvdImImS4v1XSTYcE"
                 });

@@ -23,9 +23,9 @@ describe("AccountManager", () => {
                 passwordSalt: "longkey"
             });
         });
-        accountServiceFake.signupInitiateAsync.andCallFake((accountInfo, options) => {
+        accountServiceFake.signupInitiateAsync.andCallFake((accountInfo, options, regId) => {
             return promiseMock.resolve({
-                regId: accountInfo.regId
+                regId: regId
             });
         });
         config = {
@@ -82,8 +82,8 @@ describe("AccountManager", () => {
                 var args;
                 expect(result.regId.length).toBe(128);
                 args = accountServiceFake.signupInitiateAsync.mostRecentCall.args;
-                expect(args[0].regId.length).toBe(128);
                 expect(args[0].passwordSalt.length).toBe(256);
+                expect(args[2].length).toBe(128);
             }).then(done, done);
         });
     });

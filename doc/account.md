@@ -10,9 +10,9 @@ The object assigned to each account section is passed into the OtDate object to 
 
 The `idHash` property of `account` covers how the ids will be hashed when stored. This is passed into the secure hash method and then used when saving an account. **The `idHash` values must never change once set up.** If the values change a client or account holder will never be able to get back into their account.
 
-Also, you can find a list of available hashing methods in `lib/ciphers-and-hashes.js`.
+You can find a list of available hashing methods in `lib/ciphers-and-hashes.js`.
 
-Where the account information is stored can be change by updating `accountDir`. Also where the registration files can be updated by changing `registrationDir`.
+Where the account information is stored can be change by updating `accountDir`. The registration files can be updated by changing `registrationDir`. Ideally these would be different as we store temporary registration files during the sign up process in the `registrationDir`, and permanent files for the account in `accountDir` once sign up is complete. These cannot be local directories as they will be passed to the storage mechanism to handle.
 
 The lengths of the IDs we use for account creation can be adjusted using `accountIdLength` and `registrationIdLength`.
 
@@ -42,14 +42,14 @@ The `passwordSaltLength` is used to adjust the length of the password salt we ge
 Initiating an Account
 ---------------------
 
-The first action for an account is `initiate`. This sets up a few pieces of data needed to properly generate and track an account. We generate a `regId`, `mfaKey`, and `passwordSalt`. An Email address must be passed in. These are then passed back to the user to store on their own and will be used to generate their password.
+The first action for an account is `initiate`. This sets up a few pieces of data needed to properly generate and track an account. We generate a `regId`, `mfaKey`, and `passwordSalt`. An email address must be passed in. These are then passed back to the user to store on their own and will be used to generate their password.
 
 This will save the information to a file named after the hash of the `regId` in the `registrationDir` location. This registration file will be deleted upons successfully creating and account.
 
 Confirming an Account
 ---------------------
 
-The next action is to confirm an account. This requires the user to hit the URL using the `unhased regId`. We will compare it's valid by comparing the hashes then return the `mfaKey` and `passwordSalt` so they can proceed to the next step.
+The next action is to confirm an account. This requires the user to hit the URL using the `regId`. We will compare it's valid by comparing the hashes then return the `mfaKey` and `passwordSalt` so they can proceed to the next step.
 
 Completing an Account
 ---------------------
