@@ -1,6 +1,12 @@
 Strength and Numbers
 ====================
 
+There are a lot of questions from people wondering how secure the encryption is or exactly what is meant when we say things are "hard to guess".
+
+
+Numbers
+-------
+
 Encryption deals with numbers that are very big.  So big, in fact, that humans have a hard time understanding just how large they are.  They get so big that one must use scientific notation to represent them!  In order to help put things into a human's perspective, here are some large numbers and a rough equivalent.
 
 I'm using "E" instead of "×10^" notation.  The number after the E is the number of places the decimal should be moved if you want a human representable number.
@@ -16,6 +22,20 @@ I'm using "E" instead of "×10^" notation.  The number after the E is the number
 * 1.33E50:  Approximation for the number of atoms in the Earth.
 
 * 4E78 - 4E82: Estimate for the number of atoms in the observable universe.
+
+
+Random Tokens
+-------------
+
+Account IDs, tokens and other randomly generated things on the system generate a secure hash of a particular length.  By default we use 24 random bytes of information, which translates into 32 bytes of Base64 encoded data.  Trying to guess a valid account is very hard.  In 24 bytes there are 192 bits (24 * 8 = 192).  All of them have random values (0 or 1).  That means there are 2^192 possible acounts.  Roughly 6.2E57 accounts are possible.  That's more than one account for each atom on a million Earths.
+
+Token IDs are similarly random.  Each of the 6.2E57 accounts can store 6.2E57 tokens when we generate the token IDs.
+
+The reason these figures are important is because we encrypt data with the real account ID and the token ID.  Even we can not read your data until the moment you are requesting it!  Keeping it safe from everyone, including us, is very important.
+
+
+Encryption Strength
+-------------------
 
 Now let's figure out some ballpark estimates for encryption.  As of right now, computers can generate some 2.5E7 (250 million) MD5 hashes per second.  When you build a specialized computer, it can work out 1.8E11 (180 billion) per second.  We've figured out some timing of attacks for [another project](https://github.com/tests-always-included/password-strength/blob/master/doc/strength-levels.md).  In comparison, my machine can calculate approximately 133,000 hashes per second for 1024 bytes of random data using one core using standard hashing libraries.  So, for the sake of argument, let us assume a specialized machine and highly optimized code could crack 1.4E6 (1.4 million) times faster than mine.
 
