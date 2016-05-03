@@ -44,16 +44,16 @@ Initiating an Account
 
 The first action for an account is `initiate`. This sets up a few pieces of data needed to properly generate and track an account. We generate a `regId`, `mfaKey`, and `passwordSalt`. An email address must be passed in. These are then passed back to the user to store on their own and will be used to generate their password.
 
-This will save the information to a file named after the hash of the `regId` in the `registrationDir` location. This registration file will be deleted upons successfully creating and account.
+This will save the information to a file named after the hash of the `regId` in the `registrationDir` location. This registration file will be deleted upons successfully creating an account.
 
 Confirming an Account
 ---------------------
 
-The next action is to confirm an account. This requires the user to hit the URL using the `regId`. We will compare it's valid by comparing the hashes then return the `mfaKey` and `passwordSalt` so they can proceed to the next step.
+The next action is to confirm an account. This requires the user to access the URL using the `regId` we gave them. We will then compare it's valid by comparing the hashes then return the `mfaKey` and `passwordSalt` so they can proceed to the next step.
 
 Completing an Account
 ---------------------
 
-To complte an account, the client will need to pass in a hashed `password`, the `regId` which we gave them previously as well a `currentMfa` code and `previousMfa` code. This will allow us to find the registration file using the `regId` hashing it and looking it up in storage. Getting the `mfaKey` off the account we are able to then validate the user using the MFA codes they passed in.
+To complete an account, the client will need to pass in a hashed `password`, the `regId` which we gave them previously as well a `currentMfa` code and `previousMfa` code. This will allow us to find the registration file using the hashed `regId` and looking it up in storage. Getting the `mfaKey` off the account we are able to then validate the user using the MFA codes they passed in.
 
-If the account validates, we create the account file from the registration file, remove the `regId` as it's no longer needed, added the `password` to it, and generate an `accountId`. The file is then saved under the `accountDir` using the hashed `accountId` as the file name. Only the `accountId` is sent back to the client.
+If the account validates, we create the account file from the registration file, add the `password` to it, and generate an `accountId`. The file is then saved under the `accountDir` using the hashed `accountId` as the file name. Only the `accountId` is sent back to the client.
