@@ -7,7 +7,6 @@ describe("AccountService", () => {
         var config;
 
         promiseMock = require("../mock/promise-mock");
-
         StorageFake = class StorageFake {
             constructor () {
                 this.configure = jasmine.createSpy().andCallFake(() => {
@@ -36,7 +35,6 @@ describe("AccountService", () => {
                 });
             }
         };
-
         config = {
             account: {
                 accountDir: "account/",
@@ -58,7 +56,6 @@ describe("AccountService", () => {
         secureHash.hashAsync.andCallFake(() => {
             return promiseMock.resolve("hashedContent");
         });
-
         accountService = require("../../lib/account/account-service")(config, secureHash, StorageFake);
     });
     describe(".completeAsync()", () => {
@@ -92,7 +89,6 @@ describe("AccountService", () => {
                 });
             }).then(done, done);
         });
-
         it ("gets a registration file without config options", (done) => {
             var accountServiceLocal;
 
