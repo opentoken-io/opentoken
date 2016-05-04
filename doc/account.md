@@ -57,3 +57,22 @@ Completing an Account
 To complete an account, the client will need to pass in a hashed `password`, the `regId` which we gave them previously as well a `currentMfa` code and `previousMfa` code. This will allow us to find the registration file using the hashed `regId` and looking it up in storage. Getting the `mfaKey` off the account we are able to then validate the user using the MFA codes they passed in.
 
 If the account validates, we create the account file from the registration file, add the `password` to it, and generate an `accountId`. The file is then saved under the `accountDir` using the hashed `accountId` as the file name. Only the `accountId` is sent back to the client.
+
+Passwords
+---------
+
+Passwords are handled on the clients side. We should never see an unhashed password, unless of course the client sends one in to use, but we won't store that anywhere except their encrpyted account file.
+
+Passwords should be hashed along with the `passwordSalt` we provided them during account signup.
+
+```
+    hash(password + passwordSalt)
+```
+
+When sending the password in for authentication, the password should be hashed again and then hashed with the challenge the applictation sent them.
+
+```
+    hash(hash(hashedPassword) + challenge)
+```
+
+The hashing of the password is primarily up to the client, as we do nothing with the password except save it in their account file. But the hashing of the challenge and then subsequent hashing after that will be set in `config.json` and will utilize `pbkdf2` on both sides to maintain a consistent login paradigm.
