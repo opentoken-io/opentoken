@@ -12,7 +12,7 @@ The `idHash` property of `account` covers how the ids will be hashed when stored
 
 You can find a list of available hashing methods in `lib/ciphers-and-hashes.js`.
 
-Where the account information is stored can be change by updating `accountDir`. The registration files can be updated by changing `registrationDir`. Ideally these would be different as we store temporary registration files during the sign up process in the `registrationDir`, and permanent files for the account in `accountDir` once sign up is complete. These cannot be local directories as they will be passed to the storage mechanism to handle.
+Where the account information is stored can be change by updating `accountDir`. The registration files can be updated by changing `registrationDir`. Ideally these would be different as we store temporary registration files during the sign up process in the `registrationDir`, and permanent files for the account in `accountDir` once sign up is complete. These cannot be local directories as they will be passed to the storage engine to handle.
 
 The lengths of the IDs we use for account creation can be adjusted using `accountIdLength` and `registrationIdLength`.
 
