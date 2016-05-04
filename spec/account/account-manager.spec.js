@@ -1,10 +1,10 @@
 "use strict";
 
 describe("AccountManager", () => {
-    var accountManager, accountServiceFake, otDateMock, hotpFake, promiseMock, randomMock;
+    var accountServiceFake, create;
 
     beforeEach(() => {
-        var config;
+        var hotpFake, otDateMock, promiseMock, randomMock;
 
         accountServiceFake = jasmine.createSpyObj("accountServiceFake", [
             "completeAsync",
@@ -28,16 +28,6 @@ describe("AccountManager", () => {
                 regId: regId
             });
         });
-        config = {
-            account: {
-                completeLifetime: {
-                    months: 6
-                },
-                initiateLifetime: {
-                    hours: 1
-                }
-            }
-        };
         hotpFake = jasmine.createSpyObj("hotpFake", [
             "generateSecretAsync",
             "verifyToken"
@@ -51,10 +41,22 @@ describe("AccountManager", () => {
         otDateMock = require("../mock/ot-date-mock");
         promiseMock = require("../mock/promise-mock");
         randomMock = require("../mock/random-mock");
-        accountManager = require("../../lib/account/account-manager")(accountServiceFake, config, hotpFake, otDateMock, promiseMock, randomMock);
+        create = (config) => {
+            return require("../../lib/account/account-manager")(accountServiceFake, config, hotpFake, otDateMock, promiseMock, randomMock);
+        };
     });
     describe(".signupInitiationAsync()", () => {
         it("gets the registration id back", (done) => {
+            var accountManager;
+
+            accountManager = create({
+                account: {
+                    initiateLifetime: {
+                        hours: 1
+                    }
+                }
+            });
+
             accountManager.signupInitiationAsync({
                 email: "some.one@example.net"
             }).then((result) => {
@@ -65,9 +67,9 @@ describe("AccountManager", () => {
             }).then(done, done);
         });
         it("gets the registration id back using config options", (done) => {
-            var accountManagerLocal;
+            var accountManager;
 
-            accountManagerLocal = require("../../lib/account/account-manager")(accountServiceFake, {
+            accountManager = create({
                 account: {
                     registrationIdLength: 128,
                     initiateLifetime: {
@@ -75,8 +77,8 @@ describe("AccountManager", () => {
                     },
                     passwordSaltLength: 256
                 }
-            }, hotpFake, otDateMock, promiseMock, randomMock);
-            accountManagerLocal.signupInitiationAsync({
+            });
+            accountManager.signupInitiationAsync({
                 email: "some.one@example.net"
             }).then((result) => {
                 var args;
@@ -89,6 +91,9 @@ describe("AccountManager", () => {
     });
     describe(".signupConfirmAsync()", () => {
         it("returns the information to complete registration", (done) => {
+            var accountManager;
+
+            accountManager = create({});
             accountManager.signupConfirmAsync("aeifFeight3ighrFieigheilw5lfiek").then((result) => {
                 expect(result).toEqual({
                     mfaKey: "thisisasecrectcodefrommfa",
@@ -99,6 +104,15 @@ describe("AccountManager", () => {
     });
     describe(".signupCompleteAsync()", () => {
         it("successfully completes", (done) => {
+            var accountManager;
+
+            accountManager = create({
+                account: {
+                    completeLifetime: {
+                        months: 6
+                    }
+                }
+            });
             accountManager.signupCompleteAsync({
                 regId: "aeifFeight3ighrFieigheilw5lfiek",
                 currentMfa: "123456",
@@ -112,17 +126,17 @@ describe("AccountManager", () => {
             }).then(done, done);
         });
         it("successfully completes using config options", (done) => {
-            var accountManagerLocal;
+            var accountManager;
 
-            accountManagerLocal = require("../../lib/account/account-manager")(accountServiceFake, {
+            accountManager = create({
                 account: {
                     accountIdLength: 128,
-                    "completeLifetime": {
-                        "months": 6
-                    },
+                    completeLifetime: {
+                        months: 6
+                    }
                 }
-            }, hotpFake, otDateMock, promiseMock, randomMock);
-            accountManagerLocal.signupCompleteAsync({
+            });
+            accountManager.signupCompleteAsync({
                 regId: "aeifFeight3ighrFieigheilw5lfiek",
                 currentMfa: "123456",
                 previousMfa: "098454",
@@ -132,6 +146,9 @@ describe("AccountManager", () => {
             }).then(done, done);
         });
         it("has an expired previous token", (done) => {
+            var accountManager;
+
+            accountManager = create({});
             jasmine.testPromiseFailure(accountManager.signupCompleteAsync({
                 regId: "aeifFeight3ighrFieigheilw5lfiek",
                 currentMfa: "123456",
@@ -140,6 +157,9 @@ describe("AccountManager", () => {
             }), "Previous MFA Token did not validate", done);
         });
         it("has an expired current token", (done) => {
+            var accountManager;
+
+            accountManager = create({});
             jasmine.testPromiseFailure(accountManager.signupCompleteAsync({
                 regId: "aeifFeight3ighrFieigheilw5lfiek",
                 currentMfa: "987654",

@@ -1,40 +1,13 @@
 "use strict";
 
 describe("AccountService", () => {
-    var accountService, promiseMock, secureHash, StorageFake;
+    var accountService, promiseMock, secureHash, StorageMock;
 
     beforeEach(() => {
         var config;
 
         promiseMock = require("../mock/promise-mock");
-        StorageFake = class StorageFake {
-            constructor () {
-                this.configure = jasmine.createSpy().andCallFake(() => {
-                    return this;
-                });
-                this.delAsync = jasmine.createSpy().andCallFake((directory) => {
-                    return promiseMock.resolve(true);
-                });
-                this.getAsync = jasmine.createSpy().andCallFake((directory) => {
-                    var dataToReturn;
-
-                    if (directory.match("registration")) {
-                        dataToReturn = '{"data": "thing"}';
-                    }
-
-                    if (directory.match("some/place/someIdhere")) {
-                        dataToReturn = '{"accountId": "unhashedAccountId", "email": "some.one@example.net"}';
-                    }
-
-                    return promiseMock.resolve(
-                        new Buffer(dataToReturn, "binary")
-                    );
-                });
-                this.putAsync = jasmine.createSpy().andCallFake(() => {
-                    return promiseMock.resolve(true);
-                });
-            }
-        };
+        StorageMock = require("../mock/storage-mock");
         config = {
             account: {
                 accountDir: "account/",
@@ -56,7 +29,7 @@ describe("AccountService", () => {
         secureHash.hashAsync.andCallFake(() => {
             return promiseMock.resolve("hashedContent");
         });
-        accountService = require("../../lib/account/account-service")(config, secureHash, StorageFake);
+        accountService = require("../../lib/account/account-service")(config, secureHash, StorageMock);
     });
     describe(".completeAsync()", () => {
         it("puts the information successfully", (done) => {
@@ -92,7 +65,7 @@ describe("AccountService", () => {
         it ("gets a registration file without config options", (done) => {
             var accountServiceLocal;
 
-            accountServiceLocal = require("../../lib/account/account-service")({}, secureHash, StorageFake);
+            accountServiceLocal = require("../../lib/account/account-service")({}, secureHash, StorageMock);
             accountServiceLocal.getRegistrationFileAsync("regIdUnhashed").then((result) => {
                 expect(result).toEqual({
                     data: "thing"
