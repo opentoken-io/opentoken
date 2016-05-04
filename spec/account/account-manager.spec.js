@@ -68,7 +68,7 @@ describe("AccountManager", () => {
                 expect(args[2].length).toBe(128);
             }).then(done, done);
         });
-        it("fails without registrationIdLength and passwordSaltLength set", (done) => {
+        it("fails without registrationIdLength and passwordSaltLength set", () => {
             var accountManager;
 
             accountManager = create({
@@ -78,9 +78,11 @@ describe("AccountManager", () => {
                     }
                 }
             });
-            jasmine.testPromiseFailure(accountManager.signupInitiationAsync({
-                email: "some.one@example.net"
-            }), done);
+            expect(() => {
+                accountManager.signupInitiationAsync({
+                    email: "some.one@example.net"
+                });
+            }).toThrow("must start with number, buffer, array or string");
         });
     });
     describe(".signupConfirmAsync()", () => {
@@ -162,7 +164,7 @@ describe("AccountManager", () => {
                 currentMfa: "123456",
                 previousMfa: "098454",
                 password: "3439gajs933098fj3jfj90aj09fj9390a9023"
-            }), done);
+            }), "TypeError: must start with number, buffer, array or string", done);
         });
     });
 });

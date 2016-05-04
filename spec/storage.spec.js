@@ -11,7 +11,7 @@ describe("storage", () => {
             return require("../lib/storage")(config, containerMock);
         };
     });
-    it("finds a storage engine", () => {
+    it("finds a storage engine using configuartion option", () => {
         expect(() => {
             create({
                 storage: {
@@ -21,19 +21,19 @@ describe("storage", () => {
         }).not.toThrow();
         expect(containerMock.call).toHaveBeenCalled();
     });
-    it("has no config options", () => {
+    it("throws an error without configuration options set", () => {
         expect(() => {
             create({});
         }).toThrow("Storage Engine not set");
     });
-    it("has no config options for storage engine", () => {
+    it("throws an error without storage configuartion option for engine", () => {
         expect(() => {
             create({
                 storage: {}
             });
         }).toThrow("Storage Engine not set");
     });
-    it("has config option for non-existent engine", () => {
+    it("throwns an error for an engine which does not exist", () => {
         expect(() => {
             create({
                 storage: {

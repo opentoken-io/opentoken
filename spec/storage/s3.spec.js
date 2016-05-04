@@ -25,7 +25,6 @@ describe("storage/s3", () => {
                 });
             }
         }
-
         promiseMock = require("../mock/promise-mock");
         awsSdkMock = {
             S3: S3Fake,
@@ -35,22 +34,35 @@ describe("storage/s3", () => {
         };
         s3 = require("../../lib/storage/s3")(awsSdkMock, {
             storage: {
-                bucket: "test-bucket",
-                region: "us-east-1"
+                s3: {
+                    bucket: "test-bucket",
+                    region: "us-east-1"
+                }
             }
         }, promiseMock);
+    });
+    describe(".configure()", () => {
+        it("sets up the settings", () => {
+            awsSdkMock.S3 = jasmine.createSpy("awsSdkMock.S3");
+            expect(awsSdkMock.config.region).toBe("us-east-1");
+            s3.transit();
+            expect(awsSdkMock.S3).toHaveBeenCalledWith({
+                params: {
+                    Bucket: "test-bucket"
+                }
+            });
+
+
+            // Calling transit again to make sure we didn't call S3 again.
+            s3.transit();
+            expect(awsSdkMock.S3.calls.length).toBe(1);
+        });
     });
     describe(".delAsync()", (done) => {
         it("deletes a file", () => {
             s3.delAsync("afile").then((val) => {
                 expect(val).toEqual({
                     Key: "afile"
-                });
-                expect(awsSdkMock.config.region).toBe("us-east-1");
-                expect(awsSdkMock.S3).toHaveBeenCalledWith({
-                    params: {
-                        Bucket: "test-bucket"
-                    }
                 });
             }).then(done, done);
         });
@@ -70,7 +82,7 @@ describe("storage/s3", () => {
                 });
             }).then(done, done);
         });
-        it("passes in a prefix", (done) => {
+        it("get list by passing in a prefix", (done) => {
             s3.listAsync("accounts").then((val) => {
                 expect(val).toEqual({
                     Prefix: "accounts"
@@ -79,7 +91,7 @@ describe("storage/s3", () => {
         });
     });
     describe(".putAsync()", () => {
-        it("passes in contents as a string", (done) => {
+        it("puts to s3 with content as a string", (done) => {
             s3.putAsync("string", "this is a string").then((val) => {
                 expect(val).toEqual({
                     Body: jasmine.any(Buffer),
@@ -89,7 +101,7 @@ describe("storage/s3", () => {
                 });
             }).then(done, done);
         });
-        it("passes in contents as a buffer", (done) => {
+        it("puts to s3 with contents as a buffer", (done) => {
             s3.putAsync("buffer", new Buffer("this is a buffer", "binary")).then((val) => {
                 expect(val).toEqual({
                     Body: jasmine.any(Buffer),
@@ -99,7 +111,7 @@ describe("storage/s3", () => {
                 });
             }).then(done, done);
         });
-        it("passes in options", (done) => {
+        it("puts to s3 with options", (done) => {
             s3.putAsync("options", "file contents", {
                 contentType: "text/plain",
                 expires: "a date"
@@ -113,7 +125,7 @@ describe("storage/s3", () => {
                 });
             }).then(done, done);
         });
-        it("passes in content type option", (done) => {
+        it("puts to s3 with content type option", (done) => {
             s3.putAsync("options", "file contents", {
                 contentType: "text/plain"
             }).then((val) => {
@@ -126,7 +138,7 @@ describe("storage/s3", () => {
                 });
             }).then(done, done);
         });
-        it("passes in expires option", (done) => {
+        it("puts to s3 with expires option", (done) => {
             s3.putAsync("options", "file contents", {
                 expires: "a date"
             }).then((val) => {

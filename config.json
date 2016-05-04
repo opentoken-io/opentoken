@@ -57,8 +57,10 @@
         "proxyProtocol": false
     },
     "storage": {
-        "bucket": "",
         "engine": "s3",
-        "region": "us-east-1"
+        "s3": {
+            "bucket": "",
+            "region": "us-east-1"
+        }
     }
 }
