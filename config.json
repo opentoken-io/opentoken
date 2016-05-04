@@ -58,6 +58,7 @@
     },
     "storage": {
         "bucket": "",
-        "region": ""
+        "engine": "s3",
+        "region": "us-east-1"
     }
 }

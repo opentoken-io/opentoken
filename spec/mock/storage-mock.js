@@ -41,4 +41,4 @@ class StorageMock {
     }
 };
 
-module.exports = StorageMock;
+module.exports = new StorageMock();

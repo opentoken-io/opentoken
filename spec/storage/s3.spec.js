@@ -4,12 +4,15 @@ describe("storage/s3", () => {
     var awsSdkMock, promiseMock, s3;
 
     beforeEach(() => {
-        var S3;
-
         class S3Fake {
             constructor(params) {
                 this.params = params;
                 this.getObjectAsync = jasmine.createSpy("getObjectAsync");
+                this.getObjectAsync.andCallFake(() => {
+                    return promiseMock.resolve({
+                        Body: new Buffer("this is a buffer", "binary")
+                    });
+                });
                 [
                     "deleteObjectAsync",
                     "listObjectsAsync",
@@ -30,63 +33,36 @@ describe("storage/s3", () => {
                 region: null
             }
         };
-        S3 = require("../../lib/storage/s3")(awsSdkMock, promiseMock);
-        s3 = new S3();
+        s3 = require("../../lib/storage/s3")(awsSdkMock, {
+            storage: {
+                bucket: "test-bucket",
+                region: "us-east-1"
+            }
+        }, promiseMock);
     });
-    describe("configure()", () => {
-        beforeEach(() => {
-            awsSdkMock.S3 = jasmine.createSpy("s3Mock");
-        });
-        it("passes in configuration options for all", () => {
-            expect(awsSdkMock.config.region).toBe("us-east-1");
-            s3.transit();
-            expect(awsSdkMock.S3).toHaveBeenCalledWith({
-                params: {
-                    Bucket: null
-                }
-            });
-        });
-        it("passes in configuration options for all", () => {
-            s3.configure({
-                region: "us-west-1",
-                bucket: "test-bucket"
-            });
-            expect(awsSdkMock.config.region).toBe("us-west-1");
-            s3.transit();
-            expect(awsSdkMock.S3).toHaveBeenCalledWith({
-                params: {
-                    Bucket: "test-bucket"
-                }
-            });
-        });
-    });
-    describe("del()", (done) => {
+    describe(".delAsync()", (done) => {
         it("deletes a file", () => {
             s3.delAsync("afile").then((val) => {
                 expect(val).toEqual({
                     Key: "afile"
                 });
+                expect(awsSdkMock.config.region).toBe("us-east-1");
+                expect(awsSdkMock.S3).toHaveBeenCalledWith({
+                    params: {
+                        Bucket: "test-bucket"
+                    }
+                });
             }).then(done, done);
         });
     });
-    describe("get()", () => {
-        beforeEach(() => {
-            var transit;
-
-            transit = s3.transit();
-            transit.getObjectAsync.andCallFake(() => {
-                return promiseMock.resolve({
-                    Body: new Buffer("this is a buffer", "binary")
-                });
-            });
-        });
+    describe(".getAsync()", () => {
         it("gets an object back", (done) => {
             s3.getAsync("afile").then((val) => {
                 expect(val).toEqual(jasmine.any(Buffer));
             }).then(done, done);
         });
     });
-    describe("list()", () => {
+    describe(".listAsync()", () => {
         it("gets top level list", (done) => {
             s3.listAsync().then((val) => {
                 expect(val).toEqual({
@@ -102,7 +78,7 @@ describe("storage/s3", () => {
             }).then(done, done);
         });
     });
-    describe("put()", () => {
+    describe(".putAsync()", () => {
         it("passes in contents as a string", (done) => {
             s3.putAsync("string", "this is a string").then((val) => {
                 expect(val).toEqual({
