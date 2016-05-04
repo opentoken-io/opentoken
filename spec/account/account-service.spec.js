@@ -47,6 +47,7 @@ describe("AccountService", () => {
                 expect(result).toEqual({
                     accountId: "unhashedAccountId"
                 });
+                expect(storageMock.delAsync).toHaveBeenCalledWith("account/hashedContent");
             }).then(done, done);
         });
     });
