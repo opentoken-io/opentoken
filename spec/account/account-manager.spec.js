@@ -46,26 +46,6 @@ describe("AccountManager", () => {
         };
     });
     describe(".signupInitiationAsync()", () => {
-        it("gets the registration id back", (done) => {
-            var accountManager;
-
-            accountManager = create({
-                account: {
-                    initiateLifetime: {
-                        hours: 1
-                    }
-                }
-            });
-
-            accountManager.signupInitiationAsync({
-                email: "some.one@example.net"
-            }).then((result) => {
-                expect(result).toEqual({
-                    regId: jasmine.any(String)
-                });
-                expect(result.regId.length).toBe(24);
-            }).then(done, done);
-        });
         it("gets the registration id back using config options", (done) => {
             var accountManager;
 
@@ -88,6 +68,20 @@ describe("AccountManager", () => {
                 expect(args[2].length).toBe(128);
             }).then(done, done);
         });
+        it("fails without registrationIdLength and passwordSaltLength set", (done) => {
+            var accountManager;
+
+            accountManager = create({
+                account: {
+                    initiateLifetime: {
+                        hours: 1
+                    }
+                }
+            });
+            jasmine.testPromiseFailure(accountManager.signupInitiationAsync({
+                email: "some.one@example.net"
+            }), done);
+        });
     });
     describe(".signupConfirmAsync()", () => {
         it("returns the information to complete registration", (done) => {
@@ -103,28 +97,6 @@ describe("AccountManager", () => {
         });
     });
     describe(".signupCompleteAsync()", () => {
-        it("successfully completes", (done) => {
-            var accountManager;
-
-            accountManager = create({
-                account: {
-                    completeLifetime: {
-                        months: 6
-                    }
-                }
-            });
-            accountManager.signupCompleteAsync({
-                regId: "aeifFeight3ighrFieigheilw5lfiek",
-                currentMfa: "123456",
-                previousMfa: "098454",
-                password: "3439gajs933098fj3jfj90aj09fj9390a9023"
-            }).then((result) => {
-                expect(result).toEqual({
-                    accountId: jasmine.any(String),
-                });
-                expect(result.accountId.length).toBe(24);
-            }).then(done, done);
-        });
         it("successfully completes using config options", (done) => {
             var accountManager;
 
@@ -148,7 +120,11 @@ describe("AccountManager", () => {
         it("has an expired previous token", (done) => {
             var accountManager;
 
-            accountManager = create({});
+            accountManager = create({
+                account: {
+                    accountIdLength: 24
+                }
+            });
             jasmine.testPromiseFailure(accountManager.signupCompleteAsync({
                 regId: "aeifFeight3ighrFieigheilw5lfiek",
                 currentMfa: "123456",
@@ -159,13 +135,34 @@ describe("AccountManager", () => {
         it("has an expired current token", (done) => {
             var accountManager;
 
-            accountManager = create({});
+            accountManager = create({
+                account: {
+                    accountIdLength: 24
+                }
+            });
             jasmine.testPromiseFailure(accountManager.signupCompleteAsync({
                 regId: "aeifFeight3ighrFieigheilw5lfiek",
                 currentMfa: "987654",
                 previousMfa: "123456",
                 password: "3439gajs933098fj3jfj90aj09fj9390a9023"
             }), "Current MFA Token did not validate", done);
+        });
+        it("fails without accountIdLength set", (done) => {
+            var accountManager;
+
+            accountManager = create({
+                account: {
+                    completeLifetime: {
+                        months: 6
+                    }
+                }
+            });
+            jasmine.testPromiseFailure(accountManager.signupCompleteAsync({
+                regId: "aeifFeight3ighrFieigheilw5lfiek",
+                currentMfa: "123456",
+                previousMfa: "098454",
+                password: "3439gajs933098fj3jfj90aj09fj9390a9023"
+            }), done);
         });
     });
 });

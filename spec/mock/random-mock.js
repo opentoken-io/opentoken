@@ -19,6 +19,12 @@ random.bufferAsync.andCallFake((size) => {
 });
 
 random.randomIdAsync.andCallFake((size) => {
+    if (! size) {
+        return new Promise((resolve, reject) => {
+            reject();
+        });
+    }
+
     var buff;
 
     buff = new Buffer(size);
