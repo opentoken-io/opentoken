@@ -1,10 +1,10 @@
 "use strict";
 
 describe("AccountManager", () => {
-    var accountServiceFake, create;
+    var accountServiceFake, create, defaultConfig;
 
     beforeEach(() => {
-        var defaultConfig, hotpFake, otDateMock, promiseMock, randomMock;
+        var hotpFake, otDateMock, promiseMock, randomMock;
 
         accountServiceFake = jasmine.createSpyObj("accountServiceFake", [
             "completeAsync",
@@ -73,16 +73,22 @@ describe("AccountManager", () => {
                 expect(args[2].length).toBe(128);
             }).then(done, done);
         });
-        it("fails without registrationIdLength and passwordSaltLength set", () => {
+        it("fails without registrationIdLength set", () => {
             var accountManager;
 
-            accountManager = create({
-                account: {
-                    initiateLifetime: {
-                        hours: 1
-                    }
-                }
-            });
+            delete defaultConfig.account.registrationIdLength;
+            accountManager = create();
+            expect(() => {
+                accountManager.signupInitiationAsync({
+                    email: "some.one@example.net"
+                });
+            }).toThrow("must start with number, buffer, array or string");
+        });
+        it("fails without passwordSaltLength set", () => {
+            var accountManager;
+
+            delete defaultConfig.account.passwordSaltLength;
+            accountManager = create();
             expect(() => {
                 accountManager.signupInitiationAsync({
                     email: "some.one@example.net"
@@ -94,7 +100,7 @@ describe("AccountManager", () => {
         it("returns the information to complete registration", (done) => {
             var accountManager;
 
-            accountManager = create({});
+            accountManager = create();
             accountManager.signupConfirmAsync("aeifFeight3ighrFieigheilw5lfiek").then((result) => {
                 expect(result).toEqual({
                     mfaKey: "thisisasecrectcodefrommfa",
@@ -142,13 +148,8 @@ describe("AccountManager", () => {
         it("fails without accountIdLength set", (done) => {
             var accountManager;
 
-            accountManager = create({
-                account: {
-                    completeLifetime: {
-                        months: 6
-                    }
-                }
-            });
+            delete defaultConfig.account.accountIdLength;
+            accountManager = create();
             jasmine.testPromiseFailure(accountManager.signupCompleteAsync({
                 regId: "aeifFeight3ighrFieigheilw5lfiek",
                 currentMfa: "123456",
