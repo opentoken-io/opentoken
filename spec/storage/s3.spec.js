@@ -42,7 +42,7 @@ describe("storage/s3", () => {
         }, promiseMock);
     });
     describe(".configure()", () => {
-        it("sets up the settings", () => {
+        it("sets up the S3 object", () => {
             awsSdkMock.S3 = jasmine.createSpy("awsSdkMock.S3");
             expect(awsSdkMock.config.region).toBe("us-east-1");
             s3.transit();
@@ -51,9 +51,12 @@ describe("storage/s3", () => {
                     Bucket: "test-bucket"
                 }
             });
-
-
-            // Calling transit again to make sure we didn't call S3 again.
+        });
+    });
+    describe(".transit()", () => {
+        it("should only make (call) the S3 object once", () => {
+            awsSdkMock.S3 = jasmine.createSpy("awsSdkMock.S3");
+            s3.transit();
             s3.transit();
             expect(awsSdkMock.S3.calls.length).toBe(1);
         });
