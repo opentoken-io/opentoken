@@ -4,7 +4,7 @@ describe("AccountManager", () => {
     var accountServiceFake, create;
 
     beforeEach(() => {
-        var hotpFake, otDateMock, promiseMock, randomMock;
+        var defaultConfig, hotpFake, otDateMock, promiseMock, randomMock;
 
         accountServiceFake = jasmine.createSpyObj("accountServiceFake", [
             "completeAsync",
@@ -41,23 +41,28 @@ describe("AccountManager", () => {
         otDateMock = require("../mock/ot-date-mock");
         promiseMock = require("../mock/promise-mock");
         randomMock = require("../mock/random-mock");
+        defaultConfig = {
+            account: {
+                accountIdLength: 128,
+                completeLifetime: {
+                    months: 6
+                },
+                initiateLifetime: {
+                    hours: 1
+                },
+                passwordSaltLength: 256,
+                registrationIdLength: 128,
+            }
+        };
         create = (config) => {
-            return require("../../lib/account/account-manager")(accountServiceFake, config, hotpFake, otDateMock, promiseMock, randomMock);
+            return require("../../lib/account/account-manager")(accountServiceFake, config || defaultConfig, hotpFake, otDateMock, promiseMock, randomMock);
         };
     });
     describe(".signupInitiationAsync()", () => {
         it("gets the registration id back using config options", (done) => {
             var accountManager;
 
-            accountManager = create({
-                account: {
-                    registrationIdLength: 128,
-                    initiateLifetime: {
-                        hours: 1
-                    },
-                    passwordSaltLength: 256
-                }
-            });
+            accountManager = create();
             accountManager.signupInitiationAsync({
                 email: "some.one@example.net"
             }).then((result) => {
@@ -102,14 +107,7 @@ describe("AccountManager", () => {
         it("successfully completes using config options", (done) => {
             var accountManager;
 
-            accountManager = create({
-                account: {
-                    accountIdLength: 128,
-                    completeLifetime: {
-                        months: 6
-                    }
-                }
-            });
+            accountManager = create();
             accountManager.signupCompleteAsync({
                 regId: "aeifFeight3ighrFieigheilw5lfiek",
                 currentMfa: "123456",
@@ -122,11 +120,7 @@ describe("AccountManager", () => {
         it("has an expired previous token", (done) => {
             var accountManager;
 
-            accountManager = create({
-                account: {
-                    accountIdLength: 24
-                }
-            });
+            accountManager = create();
             jasmine.testPromiseFailure(accountManager.signupCompleteAsync({
                 regId: "aeifFeight3ighrFieigheilw5lfiek",
                 currentMfa: "123456",
@@ -137,11 +131,7 @@ describe("AccountManager", () => {
         it("has an expired current token", (done) => {
             var accountManager;
 
-            accountManager = create({
-                account: {
-                    accountIdLength: 24
-                }
-            });
+            accountManager = create();
             jasmine.testPromiseFailure(accountManager.signupCompleteAsync({
                 regId: "aeifFeight3ighrFieigheilw5lfiek",
                 currentMfa: "987654",
