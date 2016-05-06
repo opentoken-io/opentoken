@@ -1,16 +1,24 @@
 "use strict";
 
 describe("schema", () => {
-    var fs, promiseMock, schema, tv4;
+    var globMock, schema;
 
     beforeEach(() => {
-        var nodeValidator;
+        var fs, nodeValidator, promiseMock, tv4;
 
-        fs = jasmine.createSpyObj("fs", [
-            "readdirAsync",
-            "readFileAsync"
-        ]);
-        fs.readFileAsync.andCallFake((fn) => {
+        fs = require("fs");
+        globMock = jasmine.createSpy("globMock");
+        nodeValidator = require("validator");
+        promiseMock = require("./mock/promise-mock");
+        tv4 = require("tv4");
+        tv4.addSchema = jasmine.createSpy("tv4.addSchema").andCallThrough();
+        schema = require("../lib/schema")(fs, globMock, nodeValidator, promiseMock, tv4);
+
+        /**
+         * Has to come after we've set up the factory because it doesn't exist till
+         * we've initialized it.
+         */
+        fs.readFileAsync = jasmine.createSpy("fs.readFileAsync").andCallFake((fn) => {
             if (fn.match("email.json")) {
                 return promiseMock.resolve(new Buffer('{"id": "email", "type": "string", "format": "email"}', "binary"));
             }
@@ -29,11 +37,6 @@ describe("schema", () => {
 
             return promiseMock.reject("Invalid file: " + fn.toString());
         });
-        nodeValidator = require("validator");
-        promiseMock = require("./mock/promise-mock");
-        tv4 = require("tv4");
-        tv4.addSchema = jasmine.createSpy("tv4.addSchema").andCallThrough();
-        schema = require("../lib/schema")(fs, nodeValidator, promiseMock, tv4);
     });
     describe(".loadSchemaAsync()", () => {
         it("loads a schema and validates against it", (done) => {
@@ -47,26 +50,26 @@ describe("schema", () => {
             jasmine.testPromiseFailure(schema.loadSchemaAsync("./email-no-id.json"), "Schema did not contain id: ./email-no-id.json", done);
         });
         it("loads a schema which cannot be parsed", (done) => {
-            jasmine.testPromiseFailure(schema.loadSchemaAsync("./email-parse-error.json"), "Unble to parse file: ./email-parse-error.json", done);
+            jasmine.testPromiseFailure(schema.loadSchemaAsync("./email-parse-error.json"), "Unable to parse file: ./email-parse-error.json", done);
         });
         it("tries to a schema which is not present", (done) => {
-            jasmine.testPromiseFailure(schema.loadSchemaAsync("./email-not-there.json"), "Unble to parse file: ./email-not-there.json", done);
+            jasmine.testPromiseFailure(schema.loadSchemaAsync("./email-not-there.json"), "Unable to parse file: ./email-not-there.json", done);
         });
-
     });
     describe(".loadSchemaFolderAsync()", () => {
-        it("loads schemas and validates against them", (done) => {
-            fs.readdirAsync.andCallFake((fn) => {
-                if (fn.match("/folder/")) {
-                    return promiseMock.resolve([
-                        "email.json",
-                        "number.json"
-                    ]);
-                }
-
-                return promiseMock.reject("Invalid folder: " + fn.toString());
+        it("loads schemas in folder and validates against them", (done) => {
+            globMock.andCallFake((pattern, options, callback) => {
+                expect(pattern).toBe("./folder/**/*.js");
+                expect(options).toEqual({
+                    strict: true,
+                    nodir: true
+                });
+                callback(null, [
+                    "/folder/email.json",
+                    "/folder/folder/number.json"
+                ]);
             });
-            schema.loadSchemaFolderAsync("/folder/").then(() => {
+            schema.loadSchemaFolderAsync("./folder/**/*.js").then(() => {
                 expect(() => {
                     schema.validate("someone@example.net", "email");
                 }).not.toThrow();
@@ -88,6 +91,5 @@ describe("schema", () => {
                 schema.validate("something", "notThere");
             }).toThrow("Schema is not loaded: notThere");
         });
-
     });
 });
