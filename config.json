@@ -2,6 +2,11 @@
     "account": {
         "accountDir": "account/",
         "accountIdLength": 24,
+        "challengeDir": "/login/",
+        "challengeIdLength": 24,
+        "challengeLifetime": {
+            "minutes": 15
+        },
         "completeLifetime": {
             "months": 6
         },
