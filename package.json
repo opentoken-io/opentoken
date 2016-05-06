@@ -41,7 +41,7 @@
         "2fa": "^0.1.2",
         "aws-sdk": "^2.3.3",
         "bluebird": "^3.3.4",
-        "dizzy": "^1.0.3",
+        "dizzy": "^2.0.0",
         "findhit-proxywrap": "^0.3.11",
         "glob": "^7.0.3",
         "helmet": "^1.3.0",
