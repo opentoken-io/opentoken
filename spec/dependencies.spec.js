@@ -1,21 +1,21 @@
 "use strict";
 
 describe("dependencies", () => {
-    var dependencies;
+    var container;
 
     beforeEach(() => {
-        dependencies = require("../lib/dependencies");
+        container = require("../lib/dependencies");
     });
     it("returns an object", () => {
-        expect(dependencies).toEqual(jasmine.any(Object));
+        expect(container).toEqual(jasmine.any(Object));
     });
     it("resolves a dependency", () => {
-        expect(dependencies.resolve("config")).toEqual(jasmine.any(Object));
+        expect(container.resolve("config")).toEqual(jasmine.any(Object));
     });
     it("resolve a dependency which has methods to run", () => {
         var webServer;
 
-        webServer = dependencies.resolve("WebServer");
+        webServer = container.resolve("WebServer");
         expect(webServer).toEqual(jasmine.any(Function));
     });
 });
