@@ -18,14 +18,21 @@ describe("secureHash", ()  => {
         secureHash = require("../lib/secure-hash")(base64, crypto, promiseMock);
     });
     describe("secureHashAsync()", () => {
-        it("hashes a passed in string", (done) => {
-            secureHash.hashAsync("rRTcBER_EiFUsRa34Hj5Zpok", secureHashConfig).then((result) => {
-                expect(result).toBe("9GnOLZ_xAlfMA4C6DHsjNJJpsShI_TgR");
+        it("hashes a passed in string encoding for URI", (done) => {
+            secureHashConfig.hashLength = 23;
+            secureHash.hashAsync("p5>T44d3?12Ui", secureHashConfig).then((result) => {
+                expect(result).toBe("bXJ1_lwcLc-8tElhLodLArAqeviypWg");
+            }).then(done, done);
+        });
+        it("hashes a passed in string without encoding for URI", (done) => {
+            secureHashConfig.hashLength = 23;
+            secureHash.hashAsync("p5>T44d3?12Ui", secureHashConfig, true).then((result) => {
+                expect(result).toBe("bXJ1/lwcLc+8tElhLodLArAqeviypWg=");
             }).then(done, done);
         });
         it("hashes a passed in buffer", (done) => {
             secureHash.hashAsync(new Buffer("rRTcBER_EiFUsRa34Hj5Zpok", "binary"), secureHashConfig).then((result) => {
-                expect(result).toBe("9GnOLZ_xAlfMA4C6DHsjNJJpsShI_TgR");
+                expect(result).toBe("9GnOLZ_xAlfMA4C6DHsjNJJpsShI_Tg");
             }).then(done, done);
         });
         it("hashes without a config being passed in", (done) => {
