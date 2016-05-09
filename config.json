@@ -2,11 +2,6 @@
     "account": {
         "accountDir": "account/",
         "accountIdLength": 24,
-        "challengeDir": "/login/",
-        "challengeIdLength": 24,
-        "challengeLifetime": {
-            "minutes": 15
-        },
         "completeLifetime": {
             "months": 6
         },
@@ -15,6 +10,14 @@
             "hashLength": 24,
             "iterations": 10000,
             "salt": ""
+        },
+        "initiateLifetime": {
+            "hours": 1
+        },
+        "loginDir": "/login/",
+        "loginIdLength": 24,
+        "loginLifetime": {
+            "minutes": 15
         },
         "passwordHash": {
             "primary": {
@@ -35,9 +38,6 @@
                 "iterations": 10000,
                 "salt": ""
             }
-        },
-        "initiateLifetime": {
-            "hours": 1
         },
         "passwordSaltLength": 128,
         "registrationDir": "registration/",
@@ -84,7 +84,7 @@
     "storage": {
         "engine": "s3",
         "s3": {
-            "bucket": "",
+            "bucket": "opentoken-io-test-s3",
             "region": "us-east-1"
         }
     }
