@@ -1,19 +1,50 @@
 "use strict";
 
 describe("AccountManager", () => {
-    var accountServiceFake, create, defaultConfig;
+    var accountServiceFake, create, defaultConfig, promiseMock;
 
     beforeEach(() => {
-        var hotpFake, otDateMock, promiseMock, randomMock;
+        var hotpFake, otDateMock, randomMock, secureHash;
 
         accountServiceFake = jasmine.createSpyObj("accountServiceFake", [
             "completeAsync",
+            "deleteLoginFileAsync",
+            "getAccountFileAsync",
+            "getLoginFileAsync",
             "getRegistrationFileAsync",
+            "putLoginFileAsync",
             "signupInitiateAsync"
         ]);
         accountServiceFake.completeAsync.andCallFake((accountInfo, options, regId) => {
             return promiseMock.resolve({
                 accountId: accountInfo. accountId
+            });
+        });
+        accountServiceFake.deleteLoginFileAsync.andCallFake((accountId) => {
+            if (accountId.match("noDelete")) {
+                return promiseMock.reject();
+            }
+
+            return promiseMock.resolve(true);
+        });
+        accountServiceFake.getLoginFileAsync.andCallFake((accountId, loginId) => {
+            return promiseMock.resolve({
+                challengeId: "unhashedChallengeId",
+                salt: "unhashedLoginSalt",
+                accountId: accountId
+            });
+        });
+        accountServiceFake.getAccountFileAsync.andCallFake((accountId) => {
+            var suffix = "";
+
+            if (accountId.match("noMatch")) {
+                suffix = "noMatch";
+            }
+
+            return promiseMock.resolve({
+                email: "some.one@example.net",
+                mfaKey: "thisisasecrectcodefrommfa",
+                password: "accountPassword" + suffix
             });
         });
         accountServiceFake.getRegistrationFileAsync.andCallFake(() => {
@@ -22,6 +53,9 @@ describe("AccountManager", () => {
                 mfaKey: "thisisasecrectcodefrommfa",
                 passwordSalt: "longkey"
             });
+        });
+        accountServiceFake.putLoginFileAsync.andCallFake(() => {
+            return promiseMock.resolve(true);
         });
         accountServiceFake.signupInitiateAsync.andCallFake((accountInfo, options, regId) => {
             return promiseMock.resolve({
@@ -41,6 +75,7 @@ describe("AccountManager", () => {
         otDateMock = require("../mock/ot-date-mock");
         promiseMock = require("../mock/promise-mock");
         randomMock = require("../mock/random-mock");
+        secureHash = require("../mock/secure-hash-mock");
         defaultConfig = {
             account: {
                 accountIdLength: 128,
@@ -50,13 +85,83 @@ describe("AccountManager", () => {
                 initiateLifetime: {
                     hours: 1
                 },
+                loginIdLength: 24,
+                loginLifetime: {
+                    minutes: 15
+                },
+                passwordHash: {
+                    primary: {
+                        algo: "sha256",
+                        hashLength: 24,
+                        iterations: 10000,
+                        salt: ""
+                    },
+                    secondary: {}
+                },
                 passwordSaltLength: 256,
                 registrationIdLength: 128,
             }
         };
         create = (config) => {
-            return require("../../lib/account/account-manager")(accountServiceFake, config || defaultConfig, hotpFake, otDateMock, promiseMock, randomMock);
+            return require("../../lib/account/account-manager")(accountServiceFake, config || defaultConfig, hotpFake, otDateMock, promiseMock, randomMock, secureHash);
         };
+    });
+    describe(".loginCompleteAsync()", () => {
+        it("returns the challenge and salt needed to log in", (done) => {
+            var accountManager;
+
+            accountManager = create();
+            accountManager.loginCompleteAsync("hashedAccountId", "unhashedLoginId" , {
+                password: "PVBL+vYFf085tr4n4RBz9VFOyaVjiWB6",
+                currentMfa: "123456"
+            }).then((result) => {
+                expect(result).toBe(true);
+            }).then(done, done);
+        });
+        it("does not have matching hashes", (done) => {
+            var accountManager;
+
+            accountManager = create();
+            jasmine.testPromiseFailure(accountManager.loginCompleteAsync("hashedAccountId_noMatch", "unhashedLoginId" , {
+                password: "PVBL+vYFf085tr4n4RBz9VFOyaVjiWB6",
+                currentMfa: "123456"
+            }), "Password hashes do not match", done);
+        });
+        it("does not have a valid MFA token", (done) => {
+            var accountManager;
+
+            accountManager = create();
+            jasmine.testPromiseFailure(accountManager.loginCompleteAsync("hashedAccountId", "unhashedLoginId" , {
+                password: "PVBL+vYFf085tr4n4RBz9VFOyaVjiWB6",
+                currentMfa: "987654"
+            }), "Current MFA Token did not validate", done);
+        });
+        it("does not delete properly", (done) => {
+            var accountManager;
+
+            accountManager = create();
+            jasmine.testPromiseFailure(accountManager.loginCompleteAsync("hashedAccountId_noDelete", "unhashedLoginId" , {
+                password: "PVBL+vYFf085tr4n4RBz9VFOyaVjiWB6",
+                currentMfa: "123456"
+            }), done);
+        });
+    });
+    describe(".loginInitiationAsync()", () => {
+        it("returns", (done) => {
+            var accountManager;
+
+            accountManager = create();
+            accountManager.loginInitiationAsync("hashedAccountId", {
+                accountId: "unhashedAccountId"
+            }).then((result) => {
+                expect(result).toEqual({
+                    challengeId: jasmine.any(String),
+                    salt: jasmine.any(String)
+                });
+                expect(result.challengeId.length).toBe(24);
+                expect(result.salt.length).toBe(256);
+            }).then(done, done);
+        });
     });
     describe(".signupInitiationAsync()", () => {
         it("gets the registration id back using config options", (done) => {
@@ -104,7 +209,9 @@ describe("AccountManager", () => {
             accountManager.signupConfirmAsync("aeifFeight3ighrFieigheilw5lfiek").then((result) => {
                 expect(result).toEqual({
                     mfaKey: "thisisasecrectcodefrommfa",
-                    passwordSalt: "longkey"
+                    passwordSalt: "longkey",
+                    pbkdf: jasmine.any(Object),
+                    encoding: "base64"
                 });
             }).then(done, done);
         });
