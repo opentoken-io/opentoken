@@ -21,6 +21,10 @@ class StorageMock {
         this.getAsync.andCallFake((directory) => {
             var dataToReturn;
 
+            if (directory.match("account")) {
+                dataToReturn = '{"data": "thing"}';
+            }
+
             if (directory.match("registration")) {
                 dataToReturn = '{"data": "thing"}';
             }
