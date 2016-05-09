@@ -1,10 +1,10 @@
 "use strict";
 
 describe("AccountManager", () => {
-    var accountServiceFake, create, defaultConfig, promiseMock;
+    var accountServiceFake, create, defaultConfig, otDateMock, promiseMock;
 
     beforeEach(() => {
-        var hotpFake, otDateMock, randomMock, secureHash;
+        var hotpFake, randomMock, secureHash;
 
         accountServiceFake = jasmine.createSpyObj("accountServiceFake", [
             "completeAsync",
@@ -106,6 +106,37 @@ describe("AccountManager", () => {
             return require("../../lib/account/account-manager")(accountServiceFake, defaultConfig, hotpFake, otDateMock, promiseMock, randomMock, secureHash);
         };
     });
+    describe(".keyExpiration()", () => {
+        /**
+         * This is an internal function so using a method
+         * which can be called from outside the module to test.
+         */
+        it("successfully creates a key", (done) => {
+            var accountManager;
+
+            accountManager = create();
+            accountManager.loginInitiationAsync("hashedAccountId", {
+                accountId: "unhashedAccountId"
+            }).then((result) => {
+                var dateArg;
+
+                dateArg = accountServiceFake.putLoginFileAsync.mostRecentCall.args;
+                expect(dateArg[2]).toEqual({
+                    expires: jasmine.any(Object)
+                });
+            }).then(done, done);
+        });
+        it("successfully creates a key", (done) => {
+            var accountManager;
+
+            delete(defaultConfig.account.loginLifetime);
+            accountManager = create();
+            jasmine.testPromiseFailure(accountManager.loginInitiationAsync("hashedAccountId", {
+                accountId: "unhashedAccountId"
+            }), "Lifetime for key was not found", done);
+        });
+
+    });
     describe(".loginCompleteAsync()", () => {
         it("returns the challenge and salt needed to log in", (done) => {
             var accountManager;
@@ -147,7 +178,7 @@ describe("AccountManager", () => {
         });
     });
     describe(".loginInitiationAsync()", () => {
-        it("returns", (done) => {
+        it("successfully creates a login", (done) => {
             var accountManager;
 
             accountManager = create();
@@ -161,6 +192,14 @@ describe("AccountManager", () => {
                 expect(result.challengeId.length).toBe(24);
                 expect(result.salt.length).toBe(256);
             }).then(done, done);
+        });
+        it("throws from not having matching hashes", (done) => {
+            var accountManager;
+
+            accountManager = create();
+            jasmine.testPromiseFailure(accountManager.loginInitiationAsync("hashedAccountId", {
+                accountId: "unhashedAccountId_noMatch"
+            }), "Account hashes do not match", done);
         });
     });
     describe(".signupInitiationAsync()", () => {
