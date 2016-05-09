@@ -102,8 +102,8 @@ describe("AccountManager", () => {
                 registrationIdLength: 128,
             }
         };
-        create = (config) => {
-            return require("../../lib/account/account-manager")(accountServiceFake, config || defaultConfig, hotpFake, otDateMock, promiseMock, randomMock, secureHash);
+        create = () => {
+            return require("../../lib/account/account-manager")(accountServiceFake, defaultConfig, hotpFake, otDateMock, promiseMock, randomMock, secureHash);
         };
     });
     describe(".loginCompleteAsync()", () => {
