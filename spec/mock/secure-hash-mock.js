@@ -4,8 +4,12 @@ var secureHash;
 
 secureHash = jasmine.createSpyObj("secureHash", [
     "compare",
-    "hashAsync"
+    "hashAsync",
+    "simpleHashAsync"
 ]);
+secureHash.simpleHashAsync.andCallFake(() => {
+    return "fasdfasfasdfasd";
+});
 secureHash.compare.andCallFake((hashA, hashB) => {
     if (hashA.length == 20 || hashB.length == 20) {
         return false;

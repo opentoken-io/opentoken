@@ -66,4 +66,12 @@ describe("secureHash", ()  => {
             expect(result).toBe(false);
         });
     });
+    describe("secureHashSimpleHashAsync()", () => {
+        it("creates successfully", () => {
+            var result;
+
+            result = secureHash.simpleHashAsync("DpaKz8S7x8nHX1x5h8arrukZhM4WlLzcrEBeB4ko4hBb6M5K", "sha512");
+            expect(result.length).toBe(88);
+        });
+    });
 });
