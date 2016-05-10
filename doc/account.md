@@ -1,8 +1,7 @@
 Account
 =======
 
-Configuration
--------------
+## Configuration
 
 The `account` options in `config.json` allow you to set how long an account is viable at times during it's lifespan. There are current only settings for `initiate` and `complete`. We want the lifetime for an initial account creation to be short so we can clean up accounts which haven't been completed and won't have numerous files sitting in storage. Also we set a `complete` account to 6 months; to comply with PCI standards.
 
@@ -12,11 +11,15 @@ The `idHash` property of `account` covers how the ids will be hashed when stored
 
 You can find a list of available hashing methods in `lib/ciphers-and-hashes.js`.
 
-Where the account information is stored can be change by updating `accountDir`. The registration files can be updated by changing `registrationDir`. Ideally these would be different as we store temporary registration files during the sign up process in the `registrationDir`, and permanent files for the account in `accountDir` once sign up is complete. These cannot be local directories as they will be passed to [storage] to handle.
-
 The lengths of the IDs we use for account creation can be adjusted using `accountIdLength` and `registrationIdLength`.
 
+There are several ways of managing how login information is created. Using `loginDir` will change where the login file is created. *This must be have a leading and ending slash.* Changing how long the id for login is changed using `loginIdLength`. Lastly how long the login file stays on the server is managed by `loginLifetime`. This should be relatively short as these login files should not stay around too long so we can fight against time attacks.
+
+The `passwordHash` section contains how the  passwords will be hashed when creating a password and logging in. This contains the same information as `idHash` as we use the same technique to hash the passwords just with different properties. The salt will be filled in when sent to the client. **These settings should not be changed after being set up.**
+
 The `passwordSaltLength` is used to adjust the length of the password salt we generate for the account holder to create their password hash.
+
+Where the account information is stored can be change by updating `accountDir`. The registration files can be updated by changing `registrationDir`. Ideally these would be different as we store temporary registration files during the sign up process in the `registrationDir`, and permanent files for the account in `accountDir` once sign up is complete. These cannot be local directories as they will be passed to [storage] to handle.
 
     "account": {
         "accountDir": "account/",
@@ -33,30 +36,54 @@ The `passwordSaltLength` is used to adjust the length of the password salt we ge
         "initiateLifetime": {
             "hours": 1
         },
+        "loginDir": "/login/",
+        "loginIdLength": 24,
+        "loginLifetime": {
+            "minutes": 15
+        },
+        passwordHash: {
+            "algo": "sha512",
+            "hashLength": 48,
+            "iterations": 100000,
+            "salt": ""
+        },
         "passwordSaltLength": 128,
         "registrationDir": "registration/",
         "registrationIdLength": 24
     }
 
+## Signing Up
 
-Initiating an Account
----------------------
+### Initiating an Account
+
 
 The first action for an account is `initiate`. This sets up a few pieces of data needed to properly generate and track an account. We generate a `regId`, `mfaKey`, and `passwordSalt`. An email address must be passed in. These are then passed back to the user to store on their own and will be used to generate their password.
 
 Information will be saved to a file named after the hash of the `regId` in the `registrationDir` [storage] location. This registration file will be deleted upon successful creation of an account file.
 
-Confirming an Account
----------------------
+### Confirming an Account
 
 The next action is to confirm an account. This requires the user to access the URL using the `regId` we gave them. We will then compare it's valid by comparing the hashes then return the `mfaKey` and `passwordSalt` so they can proceed to the next step.
 
-Completing an Account
----------------------
+### Completing an Account
 
 To complete an account, the client will need to pass in a hashed `password`, the `regId` which we gave them previously as well as a `currentMfa` code and `previousMfa` code. This will allow us to find the registration file using the hashed `regId` and looking it up in [storage]. Getting the `mfaKey` off the account we are able to then validate the user using the MFA codes they passed in.
 
 If the account validates, we create the account file from the registration file, add the `password` to it, and generate an `accountId`. The file is then saved under the `accountDir` using the hashed `accountId` as the file name. Only the `accountId` is sent back to the client.
+
+## Logging In
+
+Logging into OpenToken.io is a two step process, involving sending information for the client to create a password hash and OpenToken.io validating.
+
+### Initiating a Login
+
+The client will call into the application using the hashed account id and the `accountId`. This creates and login file containing the `challengeId`, and a `salt` to use for logging in. This file also contains the `accountId`.This file is then sent to [storage].
+
+Information will then be sent to the client for them to create the password for logging in. This contains the `salt` which was just created for the challenge, as well as the `hash` we are expecting them to use once they have created a password hash the same was they did for confirming signup. We also send back the data used when the password was created.
+
+### Completing a Login
+
+Once the password is created on the client side and passed back to OpenToken.io, the original password sent to use is looked up using the login file containing the `accountId`. Using the original `password` and `passwordSalt` from the file, the application then hashes it the same way using the same data the client used and then compares the hashes. If they match, we authorize the [multifactor authentication](hotp.md) token sent in. If that is valid the login is complete.
 
 Passwords
 ---------
