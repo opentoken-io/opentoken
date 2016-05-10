@@ -93,12 +93,10 @@ describe("AccountManager", () => {
                     minutes: 15
                 },
                 passwordHash: {
-                    primary: {
-                        algo: "sha512",
-                        hashLength: 48,
-                        iterations: 100000,
-                        salt: ""
-                    }
+                    algo: "sha512",
+                    hashLength: 48,
+                    iterations: 100000,
+                    salt: ""
                 },
                 passwordSaltLength: 256,
                 registrationIdLength: 128,
