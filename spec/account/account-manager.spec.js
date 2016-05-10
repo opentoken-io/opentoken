@@ -135,7 +135,6 @@ describe("AccountManager", () => {
                 accountId: "unhashedAccountId"
             }), "Lifetime for key was not found", done);
         });
-
     });
     describe(".loginCompleteAsync()", () => {
         it("returns the challenge and salt needed to log in", (done) => {
