@@ -5,9 +5,9 @@ var secureHash;
 secureHash = jasmine.createSpyObj("secureHash", [
     "compare",
     "hashAsync",
-    "simpleHashAsync"
+    "simpleHash"
 ]);
-secureHash.simpleHashAsync.andCallFake(() => {
+secureHash.simpleHash.andCallFake(() => {
     return "fasdfasfasdfasd";
 });
 secureHash.compare.andCallFake((hashA, hashB) => {
