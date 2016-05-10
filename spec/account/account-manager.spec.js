@@ -44,7 +44,8 @@ describe("AccountManager", () => {
             return promiseMock.resolve({
                 email: "some.one@example.net",
                 mfaKey: "thisisasecrectcodefrommfa",
-                password: "accountPassword" + suffix
+                password: "accountPassword" + suffix,
+                passwordSalt: "34343434343"
             });
         });
         accountServiceFake.getRegistrationFileAsync.andCallFake(() => {
@@ -87,17 +88,12 @@ describe("AccountManager", () => {
                     hours: 1
                 },
                 loginIdLength: 24,
+                loginHash: "sha512",
                 loginLifetime: {
                     minutes: 15
                 },
                 passwordHash: {
                     primary: {
-                        algo: "sha512",
-                        hashLength: 48,
-                        iterations: 100000,
-                        salt: ""
-                    },
-                    secondary: {
                         algo: "sha512",
                         hashLength: 48,
                         iterations: 100000,
@@ -194,12 +190,11 @@ describe("AccountManager", () => {
                 expect(result).toEqual({
                     pbkdf: jasmine.any(Object),
                     challenge: {
-                        challengeId: jasmine.any(String),
-                        salt: jasmine.any(String)
+                        salt: jasmine.any(String),
+                        hash: "sha512"
                     },
                     encoding: "base64"
                 });
-                expect(result.challenge.challengeId.length).toBe(24);
                 expect(result.challenge.salt.length).toBe(256);
             }).then(done, done);
         });
@@ -258,7 +253,6 @@ describe("AccountManager", () => {
             accountManager.signupConfirmAsync("aeifFeight3ighrFieigheilw5lfiek").then((result) => {
                 expect(result).toEqual({
                     mfaKey: "thisisasecrectcodefrommfa",
-                    passwordSalt: "longkey",
                     pbkdf: jasmine.any(Object),
                     encoding: "base64"
                 });

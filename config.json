@@ -15,18 +15,13 @@
             "hours": 1
         },
         "loginDir": "/login/",
+        "loginHash": "sha512",
         "loginIdLength": 24,
         "loginLifetime": {
             "minutes": 15
         },
         "passwordHash": {
             "primary": {
-                "algo": "sha512",
-                "hashLength": 48,
-                "iterations": 100000,
-                "salt": ""
-            },
-            "secondary": {
                 "algo": "sha512",
                 "hashLength": 48,
                 "iterations": 100000,
