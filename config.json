@@ -21,21 +21,15 @@
         },
         "passwordHash": {
             "primary": {
-                "algo": "sha256",
-                "hashLength": 24,
-                "iterations": 10000,
+                "algo": "sha512",
+                "hashLength": 48,
+                "iterations": 100000,
                 "salt": ""
             },
             "secondary": {
-                "algo": "sha256",
-                "hashLength": 24,
-                "iterations": 10000,
-                "salt": ""
-            },
-            "tertiary": {
-                "algo": "sha256",
-                "hashLength": 24,
-                "iterations": 10000,
+                "algo": "sha512",
+                "hashLength": 48,
+                "iterations": 100000,
                 "salt": ""
             }
         },

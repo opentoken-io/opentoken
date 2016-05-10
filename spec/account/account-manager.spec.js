@@ -4,7 +4,7 @@ describe("AccountManager", () => {
     var accountServiceFake, create, defaultConfig, otDateMock, promiseMock;
 
     beforeEach(() => {
-        var hotpFake, randomMock, secureHash;
+        var base64, hotpFake, randomMock, secureHash;
 
         accountServiceFake = jasmine.createSpyObj("accountServiceFake", [
             "completeAsync",
@@ -62,6 +62,7 @@ describe("AccountManager", () => {
                 regId: regId
             });
         });
+        base64 = require("../../lib/base64");
         hotpFake = jasmine.createSpyObj("hotpFake", [
             "generateSecretAsync",
             "verifyToken"
@@ -91,19 +92,24 @@ describe("AccountManager", () => {
                 },
                 passwordHash: {
                     primary: {
-                        algo: "sha256",
-                        hashLength: 24,
-                        iterations: 10000,
+                        algo: "sha512",
+                        hashLength: 48,
+                        iterations: 100000,
                         salt: ""
                     },
-                    secondary: {}
+                    secondary: {
+                        algo: "sha512",
+                        hashLength: 48,
+                        iterations: 100000,
+                        salt: ""
+                    }
                 },
                 passwordSaltLength: 256,
                 registrationIdLength: 128,
             }
         };
         create = () => {
-            return require("../../lib/account/account-manager")(accountServiceFake, defaultConfig, hotpFake, otDateMock, promiseMock, randomMock, secureHash);
+            return require("../../lib/account/account-manager")(accountServiceFake, base64, defaultConfig, hotpFake, otDateMock, promiseMock, randomMock, secureHash);
         };
     });
     describe(".keyExpiration()", () => {
@@ -154,7 +160,7 @@ describe("AccountManager", () => {
 
             accountManager = create();
             jasmine.testPromiseFailure(accountManager.loginCompleteAsync("hashedAccountId_noMatch", "unhashedLoginId" , {
-                password: "PVBL+vYFf085tr4n4RBz9VFOyaVjiWB6",
+                password: "hashedPassword",
                 currentMfa: "123456"
             }), "Password hashes do not match", done);
         });
@@ -186,11 +192,15 @@ describe("AccountManager", () => {
                 accountId: "unhashedAccountId"
             }).then((result) => {
                 expect(result).toEqual({
-                    challengeId: jasmine.any(String),
-                    salt: jasmine.any(String)
+                    pbkdf: jasmine.any(Object),
+                    challenge: {
+                        challengeId: jasmine.any(String),
+                        salt: jasmine.any(String)
+                    },
+                    encoding: "base64"
                 });
-                expect(result.challengeId.length).toBe(24);
-                expect(result.salt.length).toBe(256);
+                expect(result.challenge.challengeId.length).toBe(24);
+                expect(result.challenge.salt.length).toBe(256);
             }).then(done, done);
         });
         it("throws from not having matching hashes", (done) => {
@@ -198,7 +208,7 @@ describe("AccountManager", () => {
 
             accountManager = create();
             jasmine.testPromiseFailure(accountManager.loginInitiationAsync("hashedAccountId", {
-                accountId: "unhashedAccountId_noMatch"
+                accountId: "unhashAccount"
             }), "Account hashes do not match", done);
         });
     });
