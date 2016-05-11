@@ -12,6 +12,7 @@ describe("AccountManager", () => {
             "getAccountFileAsync",
             "getLoginFileAsync",
             "getRegistrationFileAsync",
+            "hashPasswordAsync",
             "putLoginFileAsync",
             "signupInitiateAsync"
         ]);
@@ -27,25 +28,39 @@ describe("AccountManager", () => {
 
             return promiseMock.resolve(true);
         });
+        accountServiceFake.hashPasswordAsync.andCallFake((data) => {
+            return promiseMock.resolve(data);
+        });
         accountServiceFake.getLoginFileAsync.andCallFake((accountId, loginId) => {
+            var suffix;
+
+            suffix = "";
+
+            if (accountId.match("noMatch")) {
+                suffix = "_noMatch";
+            }
+
             return promiseMock.resolve({
                 challengeId: "unhashedChallengeId",
                 salt: "unhashedLoginSalt",
-                accountId: accountId
+                accountId: accountId,
+                secureHash: "accountPassword" + suffix
             });
         });
         accountServiceFake.getAccountFileAsync.andCallFake((accountId) => {
-            var suffix = "";
+            var suffix;
+
+            suffix = "";
 
             if (accountId.match("noMatch")) {
-                suffix = "noMatch";
+                suffix = "_noMatch";
             }
 
             return promiseMock.resolve({
                 email: "some.one@example.net",
                 mfaKey: "thisisasecrectcodefrommfa",
                 password: "accountPassword" + suffix,
-                passwordSalt: "34343434343"
+                passwordSalt: "longkey"
             });
         });
         accountServiceFake.getRegistrationFileAsync.andCallFake(() => {
@@ -88,15 +103,18 @@ describe("AccountManager", () => {
                     hours: 1
                 },
                 loginIdLength: 24,
-                loginHash: "sha512",
                 loginLifetime: {
                     minutes: 15
                 },
-                passwordHash: {
+                challenge: {
+                    algo: "sha512",
+                    saltLength: 128
+                },
+                secureHash: {
                     algo: "sha512",
                     hashLength: 48,
                     iterations: 100000,
-                    salt: ""
+                    saltLength: 256
                 },
                 passwordSaltLength: 256,
                 registrationIdLength: 128,
@@ -142,7 +160,7 @@ describe("AccountManager", () => {
 
             accountManager = create();
             accountManager.loginCompleteAsync("hashedAccountId", "unhashedLoginId" , {
-                password: "PVBL+vYFf085tr4n4RBz9VFOyaVjiWB6",
+                password: "accountPassword",
                 currentMfa: "123456"
             }).then((result) => {
                 expect(result).toBe(true);
@@ -153,7 +171,7 @@ describe("AccountManager", () => {
 
             accountManager = create();
             jasmine.testPromiseFailure(accountManager.loginCompleteAsync("hashedAccountId_noMatch", "unhashedLoginId" , {
-                password: "hashedPassword",
+                password: "accountPassword_noMatch",
                 currentMfa: "123456"
             }), "Password hashes do not match", done);
         });
@@ -162,7 +180,7 @@ describe("AccountManager", () => {
 
             accountManager = create();
             jasmine.testPromiseFailure(accountManager.loginCompleteAsync("hashedAccountId", "unhashedLoginId" , {
-                password: "PVBL+vYFf085tr4n4RBz9VFOyaVjiWB6",
+                password: "accountPassword",
                 currentMfa: "987654"
             }), "Current MFA Token did not validate", done);
         });
@@ -171,7 +189,7 @@ describe("AccountManager", () => {
 
             accountManager = create();
             jasmine.testPromiseFailure(accountManager.loginCompleteAsync("hashedAccountId_noDelete", "unhashedLoginId" , {
-                password: "PVBL+vYFf085tr4n4RBz9VFOyaVjiWB6",
+                password: "accountPassword",
                 currentMfa: "123456"
             }), done);
         });
@@ -185,14 +203,18 @@ describe("AccountManager", () => {
                 accountId: "unhashedAccountId"
             }).then((result) => {
                 expect(result).toEqual({
-                    pbkdf: jasmine.any(Object),
+                    pbkdf2: jasmine.any(Object),
                     challenge: {
                         salt: jasmine.any(String),
                         hash: "sha512"
                     },
-                    encoding: "base64"
+                    encoding: "base64",
+                    mfa: [
+                        "hotp"
+                    ],
+                    passwordSalt: "longkey"
                 });
-                expect(result.challenge.salt.length).toBe(256);
+                expect(result.challenge.salt.length).toBe(128);
             }).then(done, done);
         });
         it("throws from not having matching hashes", (done) => {
@@ -200,7 +222,7 @@ describe("AccountManager", () => {
 
             accountManager = create();
             jasmine.testPromiseFailure(accountManager.loginInitiationAsync("hashedAccountId", {
-                accountId: "unhashAccount"
+                accountId: "unhashAccount_noMatch"
             }), "Account hashes do not match", done);
         });
     });
@@ -250,8 +272,12 @@ describe("AccountManager", () => {
             accountManager.signupConfirmAsync("aeifFeight3ighrFieigheilw5lfiek").then((result) => {
                 expect(result).toEqual({
                     mfaKey: "thisisasecrectcodefrommfa",
-                    pbkdf: jasmine.any(Object),
-                    encoding: "base64"
+                    pbkdf2: jasmine.any(Object),
+                    encoding: "base64",
+                    mfa: [
+                        "hotp"
+                    ],
+                    passwordSalt: "longkey"
                 });
             }).then(done, done);
         });

@@ -1,7 +1,8 @@
 Account
 =======
 
-## Configuration
+Configuration
+-------------
 
 The `account` options in `config.json` allow you to set how long an account is viable at times during it's lifespan. There are current only settings for `initiate` and `complete`. We want the lifetime for an initial account creation to be short so we can clean up accounts which haven't been completed and won't have numerous files sitting in storage. Also we set a `complete` account to 6 months; to comply with PCI standards.
 
@@ -52,7 +53,8 @@ Where the account information is stored can be change by updating `accountDir`. 
         "registrationIdLength": 24
     }
 
-## Signing Up
+Signing Up
+----------
 
 ### Initiating an Account
 
@@ -71,19 +73,20 @@ To complete an account, the client will need to pass in a hashed `password`, the
 
 If the account validates, we create the account file from the registration file, add the `password` to it, and generate an `accountId`. The file is then saved under the `accountDir` using the hashed `accountId` as the file name. Only the `accountId` is sent back to the client.
 
-## Logging In
+Logging In
+----------
 
-Logging into OpenToken.io is a two step process, involving sending information for the client to create a password hash and OpenToken.io validating.
+Logging into OpenToken.io is a two step process, involving sending information for the client to create a secure hash from their password and OpenToken.io validating once it's sent in.
 
 ### Initiating a Login
 
-The client will call into the application using the hashed account id and the `accountId`. This creates and login file containing the `challengeId`, and a `salt` to use for logging in. This file also contains the `accountId`.This file is then sent to [storage].
+The client will call into the application using their hashed account id with the `accountId` in the data. A random `loginId` and `salt` will be created. Using the `accountId`, retrieving the file containing the client information a `secureHash` will also be dervived from the `salt` we just created and parameters which will be sent to the client to create the same `secureHash` we will save in a login file. A short expiration is made as well from the current time. This expiration should be short. This information will be saved using a hash of the `loginId` we created in a directory under the hashed `accountId`.
 
 Information will then be sent to the client for them to create the password for logging in. This contains the `salt` which was just created for the challenge, as well as the `hash` we are expecting them to use once they have created a password hash the same was they did for confirming signup. We also send back the data used when the password was created.
 
 ### Completing a Login
 
-Once the password is created on the client side and passed back to OpenToken.io, the original password sent to use is looked up using the login file containing the `accountId`. Using the original `password` and `passwordSalt` from the file, the application then hashes it the same way using the same data the client used and then compares the hashes. If they match, we authorize the [multifactor authentication](hotp.md) token sent in. If that is valid the login is complete.
+Once the password is created on the client side and passed back to OpenToken.io, the hashed password saved in the login file is compared to the hashed password which was sent to use, if they match, we then see if the `currentMfa` is valid using the [multifactor authentication](hotp.md) token sent in. If that is valid the login is complete.
 
 Passwords
 ---------

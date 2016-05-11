@@ -2,25 +2,35 @@
 
 var secureHash;
 
+function createSecureHashAsync (hashMe) {
+    return new Promise((resolve, reject) => {
+        resolve(hashMe + "_hashed");
+    });
+}
+
 secureHash = jasmine.createSpyObj("secureHash", [
     "compare",
-    "hashAsync",
-    "simpleHash"
+    "createHash",
+    "secureHashEncodedAsync",
+    "secureHashEncodedUriAsync"
 ]);
-secureHash.simpleHash.andCallFake((thing) => {
-    return thing;
-});
 secureHash.compare.andCallFake((hashA, hashB) => {
-    if (hashA.length == 20 || hashB.length == 20) {
+    if (hashA.match("noMatch") || hashB.match("noMatch")) {
         return false;
     }
 
     return true;
 });
-secureHash.hashAsync.andCallFake((hashMe) => {
-    return new Promise((resolve, reject) => {
-        resolve(hashMe + "_hashed");
-    });
+secureHash.createHash.andCallFake((data) => {
+    return data;
+});
+secureHash.secureHashEncodedAsync.andCallFake((hashMe) => {
+    return createSecureHashAsync(hashMe);
+
+});
+secureHash.secureHashEncodedUriAsync.andCallFake((hashMe) => {
+    return createSecureHashAsync(hashMe);
+
 });
 
 module.exports = secureHash;

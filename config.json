@@ -7,7 +7,7 @@
         },
         "idHash": {
             "algo": "sha256",
-            "hashLength": 24,
+            "bytes": 24,
             "iterations": 10000,
             "salt": ""
         },
@@ -15,18 +15,22 @@
             "hours": 1
         },
         "loginDir": "/login/",
-        "loginHash": "sha512",
         "loginIdLength": 24,
         "loginLifetime": {
             "minutes": 15
         },
-        "passwordHash": {
+        "challenge": {
             "algo": "sha512",
-            "hashLength": 48,
-            "iterations": 100000,
-            "salt": ""
+            "saltLength": 128
         },
         "passwordSaltLength": 128,
+        "secureHash": {
+            "algo": "sha512",
+            "bytes": 48,
+            "derivation": "pbkdf2",
+            "iterations": 100000,
+            "saltLength": 64
+        },
         "registrationDir": "registration/",
         "registrationIdLength": 24
     },
@@ -71,7 +75,7 @@
     "storage": {
         "engine": "s3",
         "s3": {
-            "bucket": "opentoken-io-test-s3",
+            "bucket": "",
             "region": "us-east-1"
         }
     }

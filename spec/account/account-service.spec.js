@@ -1,19 +1,30 @@
 "use strict";
 
 describe("AccountService", () => {
-    var accountService, create, defaultConfig, promiseMock, secureHash, storageMock;
+    var create, defaultConfig, promiseMock, secureHashMock, storageMock;
 
     beforeEach(() => {
         promiseMock = require("../mock/promise-mock");
+        secureHashMock = require("../mock/secure-hash-mock");
         storageMock = require("../mock/storage-mock");
         defaultConfig = {
             account: {
                 accountDir: "account/",
+                challenge: {
+                    algo: "sha512",
+                    saltLength: 128
+                },
                 idHash: {
                     algo: "sha256",
                     hashLength: 24,
                     iterations: 10000,
                     salt: "pinkFullyUnicornsDancingOnRainbows"
+                },
+                secureHash: {
+                    algo: "sha512",
+                    hashLength: 48,
+                    iterations: 100000,
+                    saltLength: 256
                 },
                 loginDir: "/login/",
                 registrationDir: "registration/"
@@ -22,17 +33,10 @@ describe("AccountService", () => {
                 bucket: "some-place-wonderful"
             }
         };
-        secureHash = jasmine.createSpyObj("secureHash", [
-            "hashAsync"
-        ]);
-        secureHash.hashAsync.andCallFake(() => {
-            return promiseMock.resolve("hashedContent");
-        });
         create = () => {
-            return accountService = require("../../lib/account/account-service")(defaultConfig, promiseMock, secureHash, storageMock);
+            return require("../../lib/account/account-service")(defaultConfig, promiseMock, secureHashMock, storageMock);
         };
     });
-
     describe(".completeAsync()", () => {
         it("puts the information successfully", (done) => {
             var accountService;
@@ -48,21 +52,21 @@ describe("AccountService", () => {
                 password: "somereallylonghashedpassword"
             }, {
                 expires: new Date()
-            }, "somethinghere").then((result) => {
+            }, "regId").then((result) => {
                 expect(result).toEqual({
                     accountId: "unhashedAccountId"
                 });
-                expect(storageMock.delAsync).toHaveBeenCalledWith("registration/hashedContent");
+               expect(storageMock.delAsync.mostRecentCall.args[0]).toBe("registration/regId_hashed");
             }).then(done, done);
         });
     });
     describe(".deleteLoginFileAsync()", () => {
-        it("does something", (done) => {
+        it("deletes the login file", (done) => {
             var accountService;
 
             accountService = create();
             accountService.deleteLoginFileAsync("hashedAccountId", "unhashedLoginId").then(() => {
-                expect(storageMock.delAsync).toHaveBeenCalledWith("account/hashedAccountId/login/hashedContent");
+                expect(storageMock.delAsync.mostRecentCall.args[0]).toBe("account/hashedAccountId/login/unhashedLoginId_hashed");
             }).then(done, done);
         });
     });
@@ -76,7 +80,7 @@ describe("AccountService", () => {
 
             accountService = create();
             accountService.deleteLoginFileAsync("hashedAccountId", "unhashedLoginId").then(() => {
-                expect(storageMock.delAsync).toHaveBeenCalledWith("account/hashedAccountId/login/hashedContent");
+                expect(storageMock.delAsync.mostRecentCall.args[0]).toBe("account/hashedAccountId/login/unhashedLoginId_hashed");
             }).then(done, done);
         });
         it("creates a login key", (done) => {
@@ -104,7 +108,7 @@ describe("AccountService", () => {
             accountService = create();
             accountService.getRegistrationFileAsync("regIdUnhashed").then((result) => {
                 expect(result).toEqual(jasmine.any(Object));
-                expect(secureHash.hashAsync).toHaveBeenCalledWith("regIdUnhashed", {
+                expect(secureHashMock.secureHashEncodedUriAsync).toHaveBeenCalledWith("regIdUnhashed", {
                     algo: "sha256",
                     hashLength: 24,
                     iterations: 10000,
@@ -121,7 +125,7 @@ describe("AccountService", () => {
                 expect(result).toEqual({
                     data: "thing"
                 });
-                expect(secureHash.hashAsync).toHaveBeenCalledWith("regIdUnhashed", undefined);
+                expect(secureHashMock.secureHashEncodedUriAsync).toHaveBeenCalledWith("regIdUnhashed", undefined);
             }).then(done, done);
         });
     });
@@ -134,6 +138,18 @@ describe("AccountService", () => {
                 expect(result).toEqual(jasmine.any(Object));
             }).then(done, done);
         });
+    });
+    describe(".hashPasswordAsync()", () => {
+        it("successfully hashes a password", (done) => {
+            var accountService;
+
+            accountService = create();
+            accountService.hashPasswordAsync("unhashedAccountId", "passwordSalt").then((result) => {
+                expect(secureHashMock.secureHashEncodedAsync).toHaveBeenCalled();
+                expect(secureHashMock.createHash).toHaveBeenCalled();
+            }).then(done, done);
+        });
+
     });
     describe(".putLoginFileAsync()", () => {
         it("gets an account file", (done) => {

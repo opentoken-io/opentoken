@@ -15,7 +15,7 @@ class StorageMock {
         });
         this.delAsync.andCallFake((directory) => {
             return new Promise((resolve, reject) => {
-                resolve(true);
+                resolve();
             });
         });
         this.getAsync.andCallFake((directory) => {
