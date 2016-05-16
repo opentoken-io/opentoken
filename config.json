@@ -1,6 +1,7 @@
 {
     "account": {
         "accountDir": "account/",
+        "accountIdLength": 24,
         "completeLifetime": {
             "months": 6
         },
@@ -12,7 +13,10 @@
         },
         "initiateLifetime": {
             "hours": 1
-        }
+        },
+        "passwordSaltLength": 128,
+        "registrationDir": "registration/",
+        "registrationIdLength": 24
     },
     "debug": false,
     "encryption": {
@@ -59,7 +63,10 @@
         "proxyProtocol": false
     },
     "storage": {
-        "bucket": "",
-        "region": ""
+        "engine": "s3",
+        "s3": {
+            "bucket": "",
+            "region": "us-east-1"
+        }
     }
 }

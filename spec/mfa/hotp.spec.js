@@ -4,9 +4,8 @@ describe("HOTP", () => {
     var hotp, twofaMock, promiseMock;
 
     beforeEach(() => {
-        var config, Hotp;
+        var config;
 
-        Hotp = require("../../lib/mfa/hotp");
         config = {
             hotp: {
                 keySize: 256
@@ -35,7 +34,7 @@ describe("HOTP", () => {
                 "data:image/png;base64,iVBORw0KGgoA....5CYII="
             );
         });
-        hotp = new Hotp(config, twofaMock, promiseMock);
+        hotp = require("../../lib/mfa/hotp")(config, twofaMock, promiseMock);
     });
     describe(".generateSecretAsync()", () => {
         it("returns a key with 256 length set in config", (done) => {
@@ -45,8 +44,10 @@ describe("HOTP", () => {
             }).then(done, done);
         });
         it("returns a key without config value set", (done) => {
-            hotp.config.hotp = {};
-            hotp.generateSecretAsync().then((result) => {
+            var hotpLocal;
+
+            hotpLocal = require("../../lib/mfa/hotp")({}, twofaMock, promiseMock);
+            hotpLocal.generateSecretAsync().then((result) => {
                 expect(result).toBe("thisIsAReallyLongKeyForMFA");
                 expect(twofaMock.generateKeyAsync).toHaveBeenCalledWith(128);
             }).then(done, done);
@@ -66,8 +67,14 @@ describe("HOTP", () => {
             }).then(done, done);
         });
         it("has a different application name", (done) => {
-            hotp.config.hotp.name = "opentoken.io alternate name";
-            hotp.generateQrCodeAsync("secretKey").then((result) => {
+            var hotpLocal;
+
+            hotpLocal = require("../../lib/mfa/hotp")({
+                hotp: {
+                    name: "opentoken.io alternate name"
+                }
+            }, twofaMock, promiseMock);
+            hotpLocal.generateQrCodeAsync("secretKey").then((result) => {
                 expect(twofaMock.generateGoogleQRAsync).toHaveBeenCalledWith("opentoken.io alternate name", "", "secretKey");
             }).then(done, done);
         });
