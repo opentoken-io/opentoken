@@ -1,0 +1,66 @@
+{
+    "id": "definitions",
+    "datePlus": {
+        "additionalProperties": false,
+        "minProperties": 1,
+        "properties": {
+            "hours": {
+                "type": "integer"
+            },
+            "minutes": {
+                "type": "integer"
+            },
+            "months": {
+                "type": "integer"
+            },
+            "seconds": {
+                "type": "integer"
+            },
+            "years": {
+                "type": "integer"
+            }
+        },
+        "type": "object"
+    },
+    "encryptProperties": {
+        "additionalProperties": false,
+        "properties": {
+            "algo": {
+                "type": "string"
+            },
+            "digest": {
+                "type": "string"
+            },
+            "iterations": {
+                "type": "integer"
+            }
+        },
+        "required": [
+            "algo",
+            "digest",
+            "iterations"
+        ],
+        "type": "object"
+    },
+    "encryptType": {
+        "additionalProperties": false,
+        "properties": {
+            "cipher": {
+               "$ref": "#/encryptProperties"
+            },
+            "hmac": {
+                "$ref": "#/encryptProperties"
+            }
+        },
+        "required": [
+            "cipher",
+            "hmac"
+        ],
+        "type": "object"
+    },
+    "mfa": {
+        "maxLength": 6,
+        "minLength": 6,
+        "type": "string"
+    }
+}
