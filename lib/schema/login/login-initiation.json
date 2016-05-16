@@ -1,0 +1,12 @@
+{
+    "id": "login-initiation",
+    "type": "object",
+    "properties": {
+        "accountId": {
+            "type": "string"
+        }
+    },
+    "required": [
+       "accountId"
+    ]
+}

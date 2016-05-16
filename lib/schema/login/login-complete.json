@@ -1,0 +1,18 @@
+{
+    "id": "login-complete",
+    "type": "object",
+    "properties": {
+        "currentMfa": {
+            "maxLength": 6,
+            "minLength": 6,
+            "type": "string"
+        },
+        "password": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "currentMfa",
+        "password"
+    ]
+}

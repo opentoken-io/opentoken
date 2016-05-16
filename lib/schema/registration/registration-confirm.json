@@ -1,0 +1,13 @@
+{
+    "additionalProperties": false,
+    "id": "registration-confirm",
+    "type": "object",
+    "properties": {
+        "regId": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "regId"
+    ]
+}
