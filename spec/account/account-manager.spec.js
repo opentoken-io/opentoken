@@ -144,15 +144,6 @@ describe("AccountManager", () => {
                 });
             }).then(done, done);
         });
-        it("successfully creates a key", (done) => {
-            var accountManager;
-
-            delete(defaultConfig.account.loginLifetime);
-            accountManager = create();
-            jasmine.testPromiseFailure(accountManager.loginInitiationAsync("hashedAccountId", {
-                accountId: "unhashedAccountId"
-            }), "Lifetime for key was not found", done);
-        });
     });
     describe(".loginCompleteAsync()", () => {
         it("returns the challenge and salt needed to log in", (done) => {

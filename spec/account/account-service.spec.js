@@ -83,13 +83,6 @@ describe("AccountService", () => {
                 expect(storageMock.delAsync.mostRecentCall.args[0]).toBe("account/hashedAccountId/login/unhashedLoginId_hashed");
             }).then(done, done);
         });
-        it("creates a login key", (done) => {
-            var accountService;
-
-            delete defaultConfig.account.loginDir;
-            accountService = create();
-            jasmine.testPromiseFailure(accountService.deleteLoginFileAsync("hashedAccountId", "unhashedLoginId"), " Missing configuration options to create login key", done);
-        });
     });
     describe(".getAccountFileAsync()", () => {
         it("gets an account file", (done) => {
@@ -114,18 +107,6 @@ describe("AccountService", () => {
                     iterations: 10000,
                     salt: "pinkFullyUnicornsDancingOnRainbows"
                 });
-            }).then(done, done);
-        });
-        it ("gets a registration file without config options", (done) => {
-            var accountService;
-
-            defaultConfig = {};
-            accountService = create();
-            accountService.getRegistrationFileAsync("regIdUnhashed").then((result) => {
-                expect(result).toEqual({
-                    data: "thing"
-                });
-                expect(secureHashMock.secureHashEncodedUriAsync).toHaveBeenCalledWith("regIdUnhashed", undefined);
             }).then(done, done);
         });
     });
