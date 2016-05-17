@@ -49,6 +49,7 @@
         "name": "OpenToken.io",
         "keySize": 128
     },
+    "schemaPath": "./schema",
     "server": {
         "baseUrl": "https://localhost:8080/",
         "name": "OpenToken.io",
@@ -59,7 +60,7 @@
     "storage": {
         "engine": "s3",
         "s3": {
-            "bucket": "",
+            "bucket": "fill-this-in",
             "region": "us-east-1"
         }
     }

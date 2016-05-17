@@ -1,0 +1,46 @@
+{
+    "type": "object",
+    "properties": {
+        "primary": {
+            "$ref": "#/_encryption-cipher-hmac"
+        },
+        "secondary": {
+            "$ref": "#/_encryption-cipher-hmac"
+        }
+    },
+    "_encryption-cipher-hmac": {
+        "type": "object",
+        "properties": {
+            "cipher": {
+                "type": "object",
+                "properties": {
+                    "algo": {
+                        "$ref": "encryption-method"
+                    },
+                    "digest": {
+                        "$ref": "hash-method"
+                    },
+                    "iterations": {
+                        "type": "integer",
+                        "minimum": 1000
+                    }
+                }
+            },
+            "hmac": {
+                "type": "object",
+                "properties": {
+                    "algo": {
+                        "$ref": "hash-method"
+                    },
+                    "digest": {
+                        "$ref": "hash-method"
+                    },
+                    "iterations": {
+                        "type": "integer",
+                        "minimum": 1000
+                    }
+                }
+            }
+        }
+    }
+}
