@@ -14,9 +14,7 @@ You can find a list of available hashing methods in `lib/ciphers-and-hashes.js`.
 
 The lengths of the IDs we use for account creation can be adjusted using `accountIdLength` and `registrationIdLength`.
 
-There are several ways of managing how login information is created. Using `loginDir` will change where the login file is created. *This must be have a leading and ending slash.* Changing how long the id for login is changed using `loginIdLength`. Lastly how long the login file stays on the server is managed by `loginLifetime`. This should be relatively short as these login files should not stay around too long so we can fight against time attacks.
-
-The `passwordHash` section contains how the  passwords will be hashed when creating a password and logging in. This contains the same information as `idHash` as we use the same technique to hash the passwords just with different properties. The salt will be filled in when sent to the client. **These settings should not be changed after being set up.**
+The `passwordHash` section contains how the  passwords will be hashed when creating a password and logging in. This contains the same information as `idHash` as we use the same technique to hash the passwords just with different properties. The salt will be filled in when sent to the client. The settings as they currently are are saved with the account record to allow the system to check the hash when it comes in in the case of the settings being changed after a client has created their password.
 
 The `passwordSaltLength` is used to adjust the length of the password salt we generate for the account holder to create their password hash.
 
@@ -31,26 +29,36 @@ Where the account information is stored can be change by updating `accountDir`. 
         "idHash": {
             "algo": "sha256",
             "hashLength": 24,
-            "iterations": 10000,
-            "salt": "Ucg4TTL1N7tt6GMw3W3wULgaf4lALKHOuM4SBnh0FocOr3ccLH9eXLneoDDOrMVZ"
+            "iterations": 10000
         },
         "initiateLifetime": {
             "hours": 1
+        },
+
+        "passwordHash": {
+            "algo": "sha512",
+            "hashLength": 48,
+            "iterations": 100000
+        },
+        "passwordSaltLength": 128,
+        "registrationDir": "registration/",
+        "registrationIdLength": 24
+    }
+
+The `login` section in `config.json` controls how the client is able to login to the system. There are several ways of managing how login information is created. Using `loginDir` will change where the login file is created. Changing how long the id for login is changed using `loginIdLength`. Lastly how long the login file stays on the server is managed by `loginLifetime`. This should be relatively short as these login files should not stay around too long so we can fight against time attacks.
+
+The `challenge` section controls how long the salt should be for the challenge and which algorithm to use when hashing the salt and hashed password together.
+
+    "login": {
+        "challenge": {
+            "algo": "sha512",
+            "saltLength": 128
         },
         "loginDir": "/login/",
         "loginIdLength": 24,
         "loginLifetime": {
             "minutes": 15
-        },
-        passwordHash: {
-            "algo": "sha512",
-            "hashLength": 48,
-            "iterations": 100000,
-            "salt": ""
-        },
-        "passwordSaltLength": 128,
-        "registrationDir": "registration/",
-        "registrationIdLength": 24
+        }
     }
 
 Signing Up
@@ -80,9 +88,9 @@ Logging into OpenToken.io is a two step process, involving sending information f
 
 ### Initiating a Login
 
-The client will call into the application using their hashed account id with the `accountId` in the data. A random `loginId` and `salt` will be created. Using the `accountId`, retrieving the file containing the client information a `secureHash` will also be dervived from the `salt` we just created and parameters which will be sent to the client to create the same `secureHash` we will save in a login file. A short expiration is made as well from the current time. This expiration should be short. This information will be saved using a hash of the `loginId` we created in a directory under the hashed `accountId`.
+The client will call into the application using their hashed account id with the `accountId` in the data sent. The system generates a random `loginId` and `salt` to be sent back to the client. Using the `accountId`, retrieving the file containing the client information, a `secureHash` will be dervived from the `salt` we just created and parameters. This information is sent to the client to create the same `secureHash` we saved in the login file. An expiration of the file is created and set into the file. This should be quick to deter illicit tries to login. This information will be saved using a hash of the `loginId` we created in a directory under the hashed `accountId`.
 
-Information will then be sent to the client for them to create the password for logging in. This contains the `salt` which was just created for the challenge, as well as the `hash` we are expecting them to use once they have created a password hash the same was they did for confirming signup. We also send back the data used when the password was created.
+Information will then be sent to the client for them to create the secure hash for logging in. This contains the `salt` which was just created for the challenge, as well as the `algo` we are expecting them to use once they have created a password hash the same was they did for confirming signup. We also send back the data used when the password was created.
 
 ### Completing a Login
 
