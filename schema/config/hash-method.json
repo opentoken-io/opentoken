@@ -1,0 +1,16 @@
+{
+    "type": "string",
+    "enum": [
+        "md4",
+        "md5",
+        "mdc2",
+        "ripemd",
+        "sha",
+        "sha1",
+        "sha224",
+        "sha256",
+        "sha384",
+        "sha512",
+        "whirlpool"
+    ]
+}

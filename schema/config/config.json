@@ -1,0 +1,26 @@
+{
+    "type": "object",
+    "properties": {
+        "account": {
+            "$ref": "account"
+        },
+        "debug": {
+            "type": "boolean"
+        },
+        "encryption": {
+            "$ref": "encryption"
+        },
+        "hotp": {
+            "$ref": "hotp"
+        },
+        "schemaPath": {
+            "$ref": "schema-path"
+        },
+        "server": {
+            "$ref": "server"
+        },
+        "storage": {
+            "$ref": "storage"
+        }
+    }
+}
