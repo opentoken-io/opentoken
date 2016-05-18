@@ -27,7 +27,7 @@ I'm using "E" instead of "×10^" notation.  The number after the E is the number
 Random Tokens
 -------------
 
-Account IDs, tokens and other randomly generated things on the system generate a secure hash of a particular length.  By default we use 24 random bytes of information, which translates into 32 bytes of Base64 encoded data.  Trying to guess one of these generated identifiers is very hard.  In 24 bytes there are 192 bits (24 * 8 = 192).  All of them have random values (0 or 1).  That means there are 2^192 possible acounts.  Roughly 6.2E57 accounts are possible.  That's more than one account for each atom on a million Earths.
+Account IDs, tokens and other randomly generated things on the system generate a secure hash of a particular length.  By default we use 24 random bytes of information, which translates into 32 bytes of Base64 encoded data.  Trying to guess one of these generated identifiers is very hard.  In 24 bytes there are 192 bits (24 * 8 = 192).  All of them have random values (0 or 1).  That means there are 2^192 possible accounts.  Roughly 6.2E57 accounts are possible.  That's more than one account for each atom on a million Earths.
 
 Token IDs are similarly random.  Each of the 6.2E57 accounts can store 6.2E57 tokens when we generate the token IDs.
 
