@@ -1,6 +1,6 @@
 "use strict";
 
-describe("HOTP", () => {
+describe("mfa/hotp", () => {
     var hotp, twofaMock, promiseMock;
 
     beforeEach(() => {
@@ -11,7 +11,7 @@ describe("HOTP", () => {
                 keySize: 256
             }
         };
-        promiseMock = require("../mock/promise-mock");
+        promiseMock = require("../../mock/promise-mock");
         twofaMock = jasmine.createSpyObj("twofaMock", [
             "generateKeyAsync",
             "generateGoogleQRAsync",
@@ -34,7 +34,7 @@ describe("HOTP", () => {
                 "data:image/png;base64,iVBORw0KGgoA....5CYII="
             );
         });
-        hotp = require("../../lib/mfa/hotp")(config, twofaMock, promiseMock);
+        hotp = require("../../../lib/mfa/hotp")(config, twofaMock, promiseMock);
     });
     describe(".generateSecretAsync()", () => {
         it("returns a key with 256 length set in config", (done) => {
@@ -46,7 +46,7 @@ describe("HOTP", () => {
         it("returns a key without config value set", (done) => {
             var hotpLocal;
 
-            hotpLocal = require("../../lib/mfa/hotp")({}, twofaMock, promiseMock);
+            hotpLocal = require("../../../lib/mfa/hotp")({}, twofaMock, promiseMock);
             hotpLocal.generateSecretAsync().then((result) => {
                 expect(result).toBe("thisIsAReallyLongKeyForMFA");
                 expect(twofaMock.generateKeyAsync).toHaveBeenCalledWith(128);
@@ -69,12 +69,12 @@ describe("HOTP", () => {
         it("has a different application name", (done) => {
             var hotpLocal;
 
-            hotpLocal = require("../../lib/mfa/hotp")({
+            hotpLocal = require("../../../lib/mfa/hotp")({
                 hotp: {
                     name: "opentoken.io alternate name"
                 }
             }, twofaMock, promiseMock);
-            hotpLocal.generateQrCodeAsync("secretKey").then((result) => {
+            hotpLocal.generateQrCodeAsync("secretKey").then(() => {
                 expect(twofaMock.generateGoogleQRAsync).toHaveBeenCalledWith("opentoken.io alternate name", "", "secretKey");
             }).then(done, done);
         });

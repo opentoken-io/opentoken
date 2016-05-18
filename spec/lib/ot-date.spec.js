@@ -17,7 +17,7 @@ describe("OtDate", () => {
         var moment;
 
         moment = require("moment");
-        otDate = require("../lib/ot-date")(moment);
+        otDate = require("../../lib/ot-date")(moment);
     });
     describe("fromDate() & toDate()", () => {
         it("gets an OtDate object back from a custom date/time", () => {

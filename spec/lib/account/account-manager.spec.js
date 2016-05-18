@@ -11,7 +11,7 @@ describe("AccountManager", () => {
             "getRegistrationFileAsync",
             "signupInitiateAsync"
         ]);
-        accountServiceFake.completeAsync.andCallFake((accountInfo, options, regId) => {
+        accountServiceFake.completeAsync.andCallFake((accountInfo) => {
             return promiseMock.resolve({
                 accountId: accountInfo. accountId
             });
@@ -35,12 +35,12 @@ describe("AccountManager", () => {
         hotpFake.generateSecretAsync.andCallFake(() => {
             return promiseMock.resolve("thisisasecrectcodefrommfa");
         });
-        hotpFake.verifyToken.andCallFake((key, token, opts) => {
+        hotpFake.verifyToken.andCallFake((key, token) => {
             return token !== "987654";
         });
-        otDateMock = require("../mock/ot-date-mock");
-        promiseMock = require("../mock/promise-mock");
-        randomMock = require("../mock/random-mock");
+        otDateMock = require("../../mock/ot-date-mock");
+        promiseMock = require("../../mock/promise-mock");
+        randomMock = require("../../mock/random-mock");
         defaultConfig = {
             account: {
                 accountIdLength: 128,
@@ -51,11 +51,11 @@ describe("AccountManager", () => {
                     hours: 1
                 },
                 passwordSaltLength: 256,
-                registrationIdLength: 128,
+                registrationIdLength: 128
             }
         };
         create = (config) => {
-            return require("../../lib/account/account-manager")(accountServiceFake, config || defaultConfig, hotpFake, otDateMock, promiseMock, randomMock);
+            return require("../../../lib/account/account-manager")(accountServiceFake, config || defaultConfig, hotpFake, otDateMock, promiseMock, randomMock);
         };
     });
     describe(".signupInitiationAsync()", () => {

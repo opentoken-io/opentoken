@@ -4,7 +4,7 @@ describe("dependencies", () => {
     var container;
 
     beforeEach(() => {
-        container = require("../lib/dependencies");
+        container = require("../../lib/dependencies");
     });
     it("returns an object", () => {
         expect(container).toEqual(jasmine.any(Object));

@@ -9,10 +9,10 @@ describe("schema", () => {
         fs = require("fs");
         globMock = jasmine.createSpy("globMock");
         nodeValidator = require("validator");
-        promiseMock = require("./mock/promise-mock");
+        promiseMock = require("../mock/promise-mock");
         tv4 = require("tv4");
         tv4.addSchema = jasmine.createSpy("tv4.addSchema").andCallThrough();
-        schema = require("../lib/schema")(fs, globMock, nodeValidator, promiseMock, tv4);
+        schema = require("../../lib/schema")(fs, globMock, nodeValidator, promiseMock, tv4);
 
         /**
          * Has to come after we've set up the factory because it doesn't exist till

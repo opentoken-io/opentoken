@@ -4,7 +4,7 @@ describe("base64", () => {
     var base64;
 
     beforeEach(() => {
-        base64 = require("../lib/base64")();
+        base64 = require("../../lib/base64")();
     });
     [
         {
