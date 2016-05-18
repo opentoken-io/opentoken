@@ -158,7 +158,7 @@ describe("AccountManager", () => {
 
             accountManager = create();
             accountManager.loginCompleteAsync("hashedAccountId", "unhashedLoginId" , {
-                password: "accountPassword",
+                secureHash: "accountPassword",
                 currentMfa: "123456"
             }).then((result) => {
                 expect(result).toBe(true);
@@ -169,7 +169,7 @@ describe("AccountManager", () => {
 
             accountManager = create();
             jasmine.testPromiseFailure(accountManager.loginCompleteAsync("hashedAccountId_noMatch", "unhashedLoginId" , {
-                password: "accountPassword_noMatch",
+                secureHash: "accountPassword_noMatch",
                 currentMfa: "123456"
             }), "Password hashes do not match", done);
         });
@@ -178,7 +178,7 @@ describe("AccountManager", () => {
 
             accountManager = create();
             jasmine.testPromiseFailure(accountManager.loginCompleteAsync("hashedAccountId", "unhashedLoginId" , {
-                password: "accountPassword",
+                secureHash: "accountPassword",
                 currentMfa: "987654"
             }), "Current MFA Token did not validate", done);
         });
@@ -187,7 +187,7 @@ describe("AccountManager", () => {
 
             accountManager = create();
             jasmine.testPromiseFailure(accountManager.loginCompleteAsync("hashedAccountId_noDelete", "unhashedLoginId" , {
-                password: "accountPassword",
+                secureHash: "accountPassword",
                 currentMfa: "123456"
             }), done);
         });
