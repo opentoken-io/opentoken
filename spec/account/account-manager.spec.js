@@ -1,40 +1,31 @@
 "use strict";
 
 describe("AccountManager", () => {
-    var accountManager, otDateMock;
+    var accountServiceFake, create, defaultConfig;
 
     beforeEach(() => {
-        var AccountManager, accountServiceFake, config, hotpFake, promiseMock, randomMock;
+        var hotpFake, otDateMock, promiseMock, randomMock;
 
-        AccountManager = require("../../lib/account/account-manager");
-        otDateMock = require("../mock/ot-date-mock");
-        promiseMock = require("../mock/promise-mock");
-        randomMock = require("../mock/random-mock");
         accountServiceFake = jasmine.createSpyObj("accountServiceFake", [
             "completeAsync",
-            "getAsync",
-            "getDirectoryAsync",
-            "initiateAsync"
+            "getRegistrationFileAsync",
+            "signupInitiateAsync"
         ]);
-        accountServiceFake.completeAsync.andCallFake((directory, accountInfo) => {
+        accountServiceFake.completeAsync.andCallFake((accountInfo, options, regId) => {
             return promiseMock.resolve({
-                accountId: accountInfo.accountId
+                accountId: accountInfo. accountId
             });
         });
-        accountServiceFake.getAsync.andCallFake(() => {
+        accountServiceFake.getRegistrationFileAsync.andCallFake(() => {
             return promiseMock.resolve({
-                mfaKey: "339r93939303093"
+                regId: "jb-oRdCgvdImImS4v1XSTYcE",
+                mfaKey: "thisisasecrectcodefrommfa",
+                passwordSalt: "longkey"
             });
         });
-        accountServiceFake.getDirectoryAsync.andCallFake(() => {
-            return promiseMock.resolve("account/hashedAccountId");
-        });
-        accountServiceFake.initiateAsync.andCallFake((accountId, accountInfo, options) => {
+        accountServiceFake.signupInitiateAsync.andCallFake((accountInfo, options, regId) => {
             return promiseMock.resolve({
-                accountId: accountInfo.accountId,
-                email: accountInfo.email,
-                mfaKey: accountInfo.mfaKey,
-                salt: accountInfo.salt
+                regId: regId
             });
         });
         hotpFake = jasmine.createSpyObj("hotpFake", [
@@ -47,79 +38,124 @@ describe("AccountManager", () => {
         hotpFake.verifyToken.andCallFake((key, token, opts) => {
             return token !== "987654";
         });
-        config = {
+        otDateMock = require("../mock/ot-date-mock");
+        promiseMock = require("../mock/promise-mock");
+        randomMock = require("../mock/random-mock");
+        defaultConfig = {
             account: {
+                accountIdLength: 128,
                 completeLifetime: {
                     months: 6
                 },
                 initiateLifetime: {
                     hours: 1
-                }
+                },
+                passwordSaltLength: 256,
+                registrationIdLength: 128,
             }
         };
-        accountManager = new AccountManager(accountServiceFake, config, hotpFake, otDateMock, randomMock, promiseMock);
+        create = (config) => {
+            return require("../../lib/account/account-manager")(accountServiceFake, config || defaultConfig, hotpFake, otDateMock, promiseMock, randomMock);
+        };
     });
-    describe(".initiate()", () => {
-        it("gets an object back from service", (done) => {
-            accountManager.initiateAsync({
+    describe(".signupInitiationAsync()", () => {
+        it("gets the registration id back using config options", (done) => {
+            var accountManager;
+
+            accountManager = create();
+            accountManager.signupInitiationAsync({
                 email: "some.one@example.net"
             }).then((result) => {
-                expect(result).toEqual({
-                    accountId: jasmine.any(Buffer),
-                    email: "some.one@example.net",
-                    mfaKey: "thisisasecrectcodefrommfa",
-                    salt: jasmine.any(Buffer)
-                });
-                expect(result.accountId.length).toBe(24);
-                expect(result.salt.length).toBe(128);
+                var args;
+                expect(result.regId.length).toBe(128);
+                args = accountServiceFake.signupInitiateAsync.mostRecentCall.args;
+                expect(args[0].passwordSalt.length).toBe(256);
+                expect(args[2].length).toBe(128);
+            }).then(done, done);
+        });
+        it("fails without registrationIdLength set", () => {
+            var accountManager;
 
+            delete defaultConfig.account.registrationIdLength;
+            accountManager = create();
+            expect(() => {
+                accountManager.signupInitiationAsync({
+                    email: "some.one@example.net"
+                });
+            }).toThrow("must start with number, buffer, array or string");
+        });
+        it("fails without passwordSaltLength set", () => {
+            var accountManager;
+
+            delete defaultConfig.account.passwordSaltLength;
+            accountManager = create();
+            expect(() => {
+                accountManager.signupInitiationAsync({
+                    email: "some.one@example.net"
+                });
+            }).toThrow("must start with number, buffer, array or string");
+        });
+    });
+    describe(".signupConfirmAsync()", () => {
+        it("returns the information to complete registration", (done) => {
+            var accountManager;
+
+            accountManager = create();
+            accountManager.signupConfirmAsync("aeifFeight3ighrFieigheilw5lfiek").then((result) => {
+                expect(result).toEqual({
+                    mfaKey: "thisisasecrectcodefrommfa",
+                    passwordSalt: "longkey"
+                });
             }).then(done, done);
         });
     });
-    describe(".completeAsync()", () => {
-        it("successfully completes", (done) => {
-            accountManager.completeAsync({
-                accountId: "aeifFeight3ighrFieigheilw5lfiek",
+    describe(".signupCompleteAsync()", () => {
+        it("successfully completes using config options", (done) => {
+            var accountManager;
+
+            accountManager = create();
+            accountManager.signupCompleteAsync({
+                regId: "aeifFeight3ighrFieigheilw5lfiek",
                 currentMfa: "123456",
                 previousMfa: "098454",
                 password: "3439gajs933098fj3jfj90aj09fj9390a9023"
             }).then((result) => {
-                expect(result).toEqual({
-                    accountId: "aeifFeight3ighrFieigheilw5lfiek",
-                });
+                expect(result.accountId.length).toBe(128);
             }).then(done, done);
         });
         it("has an expired previous token", (done) => {
-            jasmine.testPromiseFailure(accountManager.completeAsync({
-                accountId: "aeifFeight3ighrFieigheilw5lfiek",
+            var accountManager;
+
+            accountManager = create();
+            jasmine.testPromiseFailure(accountManager.signupCompleteAsync({
+                regId: "aeifFeight3ighrFieigheilw5lfiek",
                 currentMfa: "123456",
                 previousMfa: "987654",
                 password: "3439gajs933098fj3jfj90aj09fj9390a9023"
             }), "Previous MFA Token did not validate", done);
         });
         it("has an expired current token", (done) => {
-            jasmine.testPromiseFailure(accountManager.completeAsync({
-                accountId: "aeifFeight3ighrFieigheilw5lfiek",
+            var accountManager;
+
+            accountManager = create();
+            jasmine.testPromiseFailure(accountManager.signupCompleteAsync({
+                regId: "aeifFeight3ighrFieigheilw5lfiek",
                 currentMfa: "987654",
                 previousMfa: "123456",
                 password: "3439gajs933098fj3jfj90aj09fj9390a9023"
             }), "Current MFA Token did not validate", done);
         });
-        it("does not have previous mfa information", (done) => {
-            /**
-             * Kind of forcing the test of the previous not validating
-             * when missing the hotp previous information,
-             * but since we mock up other calls this represents what we
-             * should get back when we don't have the previous information
-             * as it would try to verify the previous as current.
-             */
-            accountManager.config.hotp = {};
-            jasmine.testPromiseFailure(accountManager.completeAsync({
-                accountId: "aeifFeight3ighrFieigheilw5lfiek",
-                currentMfa: "123457",
-                previousMfa: "987654",
+        it("fails without accountIdLength set", (done) => {
+            var accountManager;
+
+            delete defaultConfig.account.accountIdLength;
+            accountManager = create();
+            jasmine.testPromiseFailure(accountManager.signupCompleteAsync({
+                regId: "aeifFeight3ighrFieigheilw5lfiek",
+                currentMfa: "123456",
+                previousMfa: "098454",
                 password: "3439gajs933098fj3jfj90aj09fj9390a9023"
-            }), "Previous MFA Token did not validate", done);
+            }), "TypeError: must start with number, buffer, array or string", done);
         });
     });
 });

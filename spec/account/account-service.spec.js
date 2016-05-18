@@ -1,32 +1,17 @@
 "use strict";
 
 describe("AccountService", () => {
-    var accountService, storageFake, promiseMock, secureHash;
+    var accountService, promiseMock, secureHash, storageMock;
 
     beforeEach(() => {
-        var AccountService, config;
+        var config;
 
-        AccountService = require("../../lib/account/account-service");
         promiseMock = require("../mock/promise-mock");
-        storageFake = jasmine.createSpyObj("storageFake", [
-            "configure",
-            "getAsync",
-            "putAsync"
-        ]);
-        storageFake.configure.andCallFake(() => {
-            return storageFake;
-        });
-        storageFake.getAsync.andCallFake(() => {
-            return promiseMock.resolve(
-                new Buffer('{"data": "thing"}', "binary")
-            );
-        });
-        storageFake.putAsync.andCallFake(() => {
-            return promiseMock.resolve(true);
-        });
+        storageMock = require("../mock/storage-mock");
         config = {
             account: {
-                accountDir: "some/place/",
+                accountDir: "account/",
+                registrationDir: "registration/",
                 idHash: {
                     algo: "sha256",
                     hashLength: 24,
@@ -44,37 +29,33 @@ describe("AccountService", () => {
         secureHash.hashAsync.andCallFake(() => {
             return promiseMock.resolve("hashedContent");
         });
-
-        accountService = new AccountService(config, secureHash, storageFake);
+        accountService = require("../../lib/account/account-service")(config, secureHash, storageMock);
     });
     describe(".completeAsync()", () => {
         it("puts the information successfully", (done) => {
-            storageFake.getAsync.andCallFake(() => {
-                return promiseMock.resolve('{"accountId": "unhashedAccountId", "email": "some.one@example.net"}');
+            accountService.getRegistrationFileAsync = jasmine.createSpy().andCallFake((directory) => {
+                return promiseMock.resolve(
+                    new Buffer('{"data": "thing"}', "binary")
+                );
             });
-            accountService.completeAsync("directory", {
+            accountService.completeAsync({
+                accountId: "unhashedAccountId",
                 password: "somereallylonghashedpassword"
             }, {
                 expires: new Date()
-            }).then((result) => {
+            }, "somethinghere").then((result) => {
                 expect(result).toEqual({
                     accountId: "unhashedAccountId"
                 });
+                expect(storageMock.delAsync).toHaveBeenCalledWith("registration/hashedContent");
             }).then(done, done);
         });
     });
-    describe(".getAsync()", () => {
-        it("gets a file", (done) => {
-            accountService.getAsync("fdfasdfa").then((result) => {
+    describe(".getRegistrationFileAsync()", () => {
+        it("gets a registration file with config options", (done) => {
+            accountService.getRegistrationFileAsync("regIdUnhashed").then((result) => {
                 expect(result).toEqual(jasmine.any(Object));
-            }).then(done, done);
-        });
-    });
-    describe(".getDirectoryAsync()", () => {
-        it("gets the directory", (done) => {
-            accountService.getDirectoryAsync("accountIdUnhashed").then((result) => {
-                expect(result).toBe("some/place/hashedContent");
-                expect(secureHash.hashAsync).toHaveBeenCalledWith("accountIdUnhashed", {
+                expect(secureHash.hashAsync).toHaveBeenCalledWith("regIdUnhashed", {
                     algo: "sha256",
                     hashLength: 24,
                     iterations: 10000,
@@ -82,32 +63,29 @@ describe("AccountService", () => {
                 });
             }).then(done, done);
         });
-        it ("gets a directiory without account options", (done) => {
-            var AccountService, accountServiceLocal;
+        it ("gets a registration file without config options", (done) => {
+            var accountServiceLocal;
 
-            AccountService = require("../../lib/account/account-service");
-            accountServiceLocal = new AccountService({}, secureHash, storageFake);
-            accountServiceLocal.getDirectoryAsync("accountIdUnhashed").then((result) => {
-                expect(result).toBe("account/hashedContent");
-                expect(secureHash.hashAsync).toHaveBeenCalledWith("accountIdUnhashed", {});
+            accountServiceLocal = require("../../lib/account/account-service")({}, secureHash, storageMock);
+            accountServiceLocal.getRegistrationFileAsync("regIdUnhashed").then((result) => {
+                expect(result).toEqual({
+                    data: "thing"
+                });
+                expect(secureHash.hashAsync).toHaveBeenCalledWith("regIdUnhashed", undefined);
             }).then(done, done);
         });
     });
-    describe(".initiateAsync()", (done) => {
-        it("gets back what was put in", (done) => {
-            accountService.initiateAsync("fasdfa", {
-                accountId: "fasdfa",
+    describe(".signupInitiateAsync()", (done) => {
+        it("gets the registration id", (done) => {
+            accountService.signupInitiateAsync({
                 email: "some.one@example.net",
                 mfa: "somesecretcodehere",
                 salt: "someothersecretcodehere"
             }, {
                 expires: new Date()
-            }).then((result) => {
+            }, "jb-oRdCgvdImImS4v1XSTYcE").then((result) => {
                 expect(result).toEqual({
-                    accountId: "fasdfa",
-                    email: "some.one@example.net",
-                    mfa: "somesecretcodehere",
-                    salt: "someothersecretcodehere"
+                    regId: "jb-oRdCgvdImImS4v1XSTYcE"
                 });
             }).then(done, done);
         });
