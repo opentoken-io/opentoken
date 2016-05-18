@@ -84,7 +84,6 @@ describe("AccountManager", () => {
                 regId: regId
             });
         });
-        base64 = require("../../lib/base64");
         hotpFake = jasmine.createSpyObj("hotpFake", [
             "generateSecretAsync",
             "verifyToken"
@@ -108,7 +107,6 @@ describe("AccountManager", () => {
                 initiateLifetime: {
                     hours: 1
                 },
-
                 secureHash: {
                     algo: "sha512",
                     hashLength: 48,
@@ -130,7 +128,7 @@ describe("AccountManager", () => {
             }
         };
         create = () => {
-            return require("../../lib/account/account-manager")(accountServiceFake, base64, defaultConfig, hotpFake, otDateMock, promiseMock, randomMock, secureHash);
+            return require("../../lib/account/account-manager")(accountServiceFake, defaultConfig, hotpFake, otDateMock, promiseMock, randomMock, secureHash);
         };
     });
     describe(".keyExpiration()", () => {

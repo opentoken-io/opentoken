@@ -1,15 +1,4 @@
 {
-    "login": {
-        "loginDir": "/login/",
-        "loginIdLength": 24,
-        "loginLifetime": {
-            "minutes": 15
-        },
-        "challenge": {
-            "algo": "sha512",
-            "saltLength": 128
-        }
-    },
     "account": {
         "accountDir": "account/",
         "accountIdLength": 24,
@@ -64,6 +53,17 @@
     "hotp": {
         "name": "OpenToken.io",
         "keySize": 128
+    },
+    "login": {
+        "loginDir": "/login/",
+        "loginIdLength": 24,
+        "loginLifetime": {
+            "minutes": 15
+        },
+        "challenge": {
+            "algo": "sha512",
+            "saltLength": 128
+        }
     },
     "server": {
         "baseUrl": "https://localhost:8080/",
