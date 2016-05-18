@@ -30,4 +30,4 @@ nbproject/
 /coverage/
 /node_modules/
 npm-debug.log
-
+encryption.key

@@ -25,6 +25,6 @@ describe("ApiServer", () => {
     });
     it("sets up a route", () => {
         apiServerFactory({}, WebServerMock);
-        expect(WebServerMock.mostRecentInstance.addRoutes).toHaveBeenCalledWith("./routes");
+        expect(WebServerMock.mostRecentInstance.addRoutes).toHaveBeenCalledWith("./route");
     });
 });

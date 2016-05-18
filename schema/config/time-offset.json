@@ -1,0 +1,24 @@
+{
+    "type": "object",
+    "description": "How a time offset is represented",
+    "properties": {
+        "years": {
+            "type": "integer"
+        },
+        "months": {
+            "type": "integer"
+        },
+        "days": {
+            "type": "integer"
+        },
+        "hours": {
+            "type": "integer"
+        },
+        "seconds": {
+            "type": "integer"
+        },
+        "milliseconds": {
+            "type": "integer"
+        }
+    }
+}

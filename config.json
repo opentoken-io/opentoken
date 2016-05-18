@@ -65,6 +65,13 @@
             "saltLength": 128
         }
     },
+    "record": {
+        "expirationMaximum": {
+            "months": 6
+        },
+        "encryptionKeyFile": "encryption.key"
+    },
+    "schemaPath": "./schema",
     "server": {
         "baseUrl": "https://localhost:8080/",
         "name": "OpenToken.io",
@@ -75,7 +82,7 @@
     "storage": {
         "engine": "s3",
         "s3": {
-            "bucket": "",
+            "bucket": "fill-this-in",
             "region": "us-east-1"
         }
     }
