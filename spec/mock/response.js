@@ -1,3 +1,5 @@
+"use strict";
+
 var response;
 
 response = jasmine.createSpyObj("response", [

@@ -1,3 +1,5 @@
+"use strict";
+
 module.exports = () => {
     return {
         get: function (req, res, next) {

@@ -1,3 +1,5 @@
+"use strict";
+
 describe("route: /", () => {
     var factory;
 
