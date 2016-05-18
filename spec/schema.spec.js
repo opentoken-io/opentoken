@@ -4,45 +4,59 @@ describe("schema", () => {
     var globMock, schema;
 
     beforeEach(() => {
-        var fs, nodeValidator, promiseMock, tv4;
+        var fs, promiseMock, tv4, validator;
 
         fs = require("fs");
         globMock = jasmine.createSpy("globMock");
-        nodeValidator = require("validator");
+        validator = require("validator");
         promiseMock = require("./mock/promise-mock");
         tv4 = require("tv4");
         tv4.addSchema = jasmine.createSpy("tv4.addSchema").andCallThrough();
-        schema = require("../lib/schema")(fs, globMock, nodeValidator, promiseMock, tv4);
+        fs.readFile = jasmine.createSpy("fs.readFile").andCallFake((fn, callback) => {
+            function done(obj) {
+                if (typeof obj !== "string") {
+                    obj = JSON.stringify(obj);
+                }
 
-        /**
-         * Has to come after we've set up the factory because it doesn't exist till
-         * we've initialized it.
-         */
-        fs.readFileAsync = jasmine.createSpy("fs.readFileAsync").andCallFake((fn) => {
+                callback(null, new Buffer(obj, "binary"));
+            }
+
             if (fn.match("email.json")) {
                 // No id in this file
-                return promiseMock.resolve(new Buffer("{\"type\": \"string\", \"format\": \"email\"}", "binary"));
+                return done({
+                    type: "string",
+                    format: "email"
+                });
             }
 
             if (fn.match("number.json")) {
                 // ID in this file
-                return promiseMock.resolve(new Buffer("{\"id\": \"/folder/folder/number\", \"type\": \"number\", \"minimum\": 5}", "binary"));
-            }
-
-            if (fn.match("email-no-id.json")) {
-                return promiseMock.resolve(new Buffer("{\"type\": \"string\", \"format\": \"email\"}", "binary"));
+                return done({
+                    id: "/folder/folder/number",
+                    type: "number",
+                    minimum: 5
+                });
             }
 
             if (fn.match("email-parse-error.json")) {
-                return promiseMock.resolve(new Buffer("{\"type: \"string\", \"format\": \"email\"}", "binary"));
+                return done("{\"type: \"string\", \"format\": \"email\"}");
             }
 
             if (fn.match("missing-one.json")) {
-                return promiseMock.resolve(new Buffer("{\"type\": \"object\", \"properties\": {\"a\":{\"$ref\": \"/other-schema\"}}}", "binary"));
+                return done({
+                    type: "object",
+                    properties: {
+                        a: {
+                            "$ref": "/other-schema"
+                        }
+                    }
+                });
             }
 
-            return promiseMock.reject("Invalid file: " + fn.toString());
+            callback(new Error("Invalid file: " + fn.toString()));
         });
+
+        schema = require("../lib/schema")(fs, globMock, promiseMock, tv4, validator);
     });
     describe(".getMissingSchemas()", () => {
         it("reports on missing schemas", (done) => {
@@ -63,9 +77,6 @@ describe("schema", () => {
         });
         it("rejects the promise when a schema has the wrong ID", (done) => {
             jasmine.testPromiseFailure(schema.loadSchemaAsync("./a/b/c/d/number.json", "./"), "Schema had wrong ID", done);
-        });
-        it("loads a schema without an an id", (done) => {
-            schema.loadSchemaAsync("./email-no-id.json", "./").then(done, done);
         });
         it("loads a schema which cannot be parsed", (done) => {
             jasmine.testPromiseFailure(schema.loadSchemaAsync("./email-parse-error.json", "./"), "Unable to parse file: ./email-parse-error.json", done);
