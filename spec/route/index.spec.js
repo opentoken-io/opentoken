@@ -1,0 +1,33 @@
+describe("route: /", () => {
+    var factory;
+
+    beforeEach(() => {
+        factory = require("../../route/");
+    });
+    it("exports a factory", () => {
+        expect(factory).toEqual(jasmine.any(Function));
+    });
+    describe("factory results", () => {
+        var route, req, res;
+
+        beforeEach(() => {
+            route = factory();
+            req = require("../mock/request");
+            res = require("../mock/response");
+        });
+        it("has only a GET method", () => {
+            expect(Object.keys(route)).toEqual([
+                "get"
+            ]);
+        });
+        describe("GET", () => {
+            it("does testing-only actions", (done) => {
+                route.get(req, res, () => {
+                    expect(res.contentType).toBe("text/plain");
+                    expect(res.send).toHaveBeenCalled();
+                    done();
+                });
+            });
+        });
+    });
+});
