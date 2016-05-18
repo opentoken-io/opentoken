@@ -49,6 +49,12 @@
         "name": "OpenToken.io",
         "keySize": 128
     },
+    "record": {
+        "expirationMaximum": {
+            "months": 6
+        },
+        "encryptionKeyFile": "encryption.key"
+    },
     "server": {
         "baseUrl": "https://localhost:8080/",
         "name": "OpenToken.io",

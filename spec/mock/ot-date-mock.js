@@ -26,7 +26,7 @@ function OtDateMock(d) {
      * @param {Object} spec
      * @return {OtDate}
      */
-    this.plus = jasmine.createSpy("plus").andCallFake((spec) => {
+    this.plus = jasmine.createSpy("plus").andCallFake(() => {
         return this;
     });
 
@@ -48,6 +48,18 @@ function OtDateMock(d) {
 
         return dest;
     });
+
+
+    /**
+     * Converts a date to a string in ISO format.
+     *
+     *     YYYY-MM_DDTHH:MM:SS.mmmZ
+     *
+     * @return {string}
+     */
+    this.toString = jasmine.createSpy("toString").andCallFake(() => {
+        return this.date.toISOString();
+    });
 }
 
 module.exports = {
@@ -58,7 +70,7 @@ module.exports = {
      * @param {number} [offset]
      * @return {OtDateMock}
      */
-    fromBuffer: (buff, offset) => {
+    fromBuffer: jasmine.createSpy("fromBuffer").andCallFake((buff, offset) => {
         var d, t;
 
         d = new Date();
@@ -66,7 +78,7 @@ module.exports = {
         d.setTime(t * 1000);
 
         return new OtDateMock(d);
-    },
+    }),
 
     /**
      * Creates an OtDateMock from a string
@@ -74,16 +86,16 @@ module.exports = {
      * @param {string} str
      * @return {OtDateMock}
      */
-    fromString: (str) => {
+    fromString: jasmine.createSpy("fromString").andCallFake((str) => {
         return new OtDateMock(new Date(str));
-    },
+    }),
 
     /**
      * Creates an OtDateMock from the current time
      *
      * @return {OtDateMock}
      */
-    now: () => {
+    now: jasmine.createSpy("now").andCallFake(() => {
         return new OtDateMock(new Date());
-    }
+    })
 };
