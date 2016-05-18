@@ -21,5 +21,8 @@ if (process.env.DEBUG) {
     config.debug = true;
 }
 
-// Kick off the server through dependency injection
-container.resolve("apiServer")();
+container.resolve("bootstrap")(__dirname + "/..").then(() => {
+    // Kick off the server through dependency injection
+    container.resolve("apiServer")();
+});
+
