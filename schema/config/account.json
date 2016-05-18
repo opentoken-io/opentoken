@@ -1,0 +1,45 @@
+{
+    "type": "object",
+    "properties": {
+        "accountDir": {
+            "$ref": "storage-dir"
+        },
+        "accountIdLength": {
+            "type": "integer",
+            "minimum": 6
+        },
+        "completeLifetime": {
+            "$ref": "time-offset"
+        },
+        "idHash": {
+            "type": "object",
+            "properties": {
+                "algo": {
+                    "$ref": "hash-method"
+                },
+                "hashLength": {
+                    "type": "integer",
+                    "minimum": 6
+                },
+                "iterations": {
+                    "type": "integer",
+                    "minimum": 1000
+                }
+            }
+        },
+        "initiateLifetime": {
+            "$ref": "time-offset"
+        },
+        "passwordSaltLength": {
+            "type": "integer",
+            "minimum": 6
+        },
+        "registrationDir": {
+            "$ref": "storage-dir"
+        },
+        "registrationIdLength": {
+            "type": "integer",
+            "minimum": 6
+        }
+    }
+}

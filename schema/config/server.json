@@ -1,0 +1,25 @@
+{
+    "type": "object",
+    "properties": {
+        "baseUrl": {
+            "type": "string",
+            "minLength": 2,
+            "pattern": "/$"
+        },
+        "name": {
+            "type": "string",
+            "minLength": 1
+        },
+        "port": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 65535
+        },
+        "profileMiddleware": {
+            "type": "boolean"
+        },
+        "proxyProtocol": {
+            "type": "boolean"
+        }
+    }
+}
