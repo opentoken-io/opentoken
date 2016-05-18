@@ -11,8 +11,8 @@ function createSecureHashAsync (hashMe) {
 secureHash = jasmine.createSpyObj("secureHash", [
     "compare",
     "createHash",
-    "secureHashEncodedAsync",
-    "secureHashEncodedUriAsync"
+    "encodeAsync",
+    "encodeUriAsync"
 ]);
 secureHash.compare.andCallFake((hashA, hashB) => {
     if (hashA.match("noMatch") || hashB.match("noMatch")) {
@@ -24,11 +24,11 @@ secureHash.compare.andCallFake((hashA, hashB) => {
 secureHash.createHash.andCallFake((data) => {
     return data;
 });
-secureHash.secureHashEncodedAsync.andCallFake((hashMe) => {
+secureHash.encodeAsync.andCallFake((hashMe) => {
     return createSecureHashAsync(hashMe);
 
 });
-secureHash.secureHashEncodedUriAsync.andCallFake((hashMe) => {
+secureHash.encodeUriAsync.andCallFake((hashMe) => {
     return createSecureHashAsync(hashMe);
 
 });

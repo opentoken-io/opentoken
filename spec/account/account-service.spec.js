@@ -10,10 +10,6 @@ describe("AccountService", () => {
         defaultConfig = {
             account: {
                 accountDir: "account/",
-                challenge: {
-                    algo: "sha512",
-                    saltLength: 128
-                },
                 idHash: {
                     algo: "sha256",
                     hashLength: 24,
@@ -26,8 +22,14 @@ describe("AccountService", () => {
                     iterations: 100000,
                     saltLength: 256
                 },
-                loginDir: "/login/",
                 registrationDir: "registration/"
+            },
+            login: {
+                challenge: {
+                    algo: "sha512",
+                    saltLength: 128
+                },
+                loginDir: "/login/"
             },
             storage: {
                 bucket: "some-place-wonderful"
@@ -56,7 +58,7 @@ describe("AccountService", () => {
                 expect(result).toEqual({
                     accountId: "unhashedAccountId"
                 });
-               expect(storageMock.delAsync.mostRecentCall.args[0]).toBe("registration/regId_hashed");
+                expect(storageMock.delAsync.mostRecentCall.args[0]).toBe("registration/regId_hashed");
             }).then(done, done);
         });
     });
@@ -101,7 +103,7 @@ describe("AccountService", () => {
             accountService = create();
             accountService.getRegistrationFileAsync("regIdUnhashed").then((result) => {
                 expect(result).toEqual(jasmine.any(Object));
-                expect(secureHashMock.secureHashEncodedUriAsync).toHaveBeenCalledWith("regIdUnhashed", {
+                expect(secureHashMock.encodeUriAsync).toHaveBeenCalledWith("regIdUnhashed", {
                     algo: "sha256",
                     hashLength: 24,
                     iterations: 10000,
@@ -126,7 +128,7 @@ describe("AccountService", () => {
 
             accountService = create();
             accountService.hashPasswordAsync("unhashedAccountId", "passwordSalt").then((result) => {
-                expect(secureHashMock.secureHashEncodedAsync).toHaveBeenCalled();
+                expect(secureHashMock.encodeAsync).toHaveBeenCalled();
                 expect(secureHashMock.createHash).toHaveBeenCalled();
             }).then(done, done);
         });

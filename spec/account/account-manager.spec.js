@@ -60,7 +60,13 @@ describe("AccountManager", () => {
                 email: "some.one@example.net",
                 mfaKey: "thisisasecrectcodefrommfa",
                 password: "accountPassword" + suffix,
-                passwordSalt: "longkey"
+                passwordSalt: "longkey",
+                pbkdf2: {
+                    algo: "sha512",
+                    bytes: 48,
+                    derivation: "pbkdf2",
+                    iterations: 100000
+                }
             });
         });
         accountServiceFake.getRegistrationFileAsync.andCallFake(() => {
@@ -102,14 +108,7 @@ describe("AccountManager", () => {
                 initiateLifetime: {
                     hours: 1
                 },
-                loginIdLength: 24,
-                loginLifetime: {
-                    minutes: 15
-                },
-                challenge: {
-                    algo: "sha512",
-                    saltLength: 128
-                },
+
                 secureHash: {
                     algo: "sha512",
                     hashLength: 48,
@@ -118,6 +117,16 @@ describe("AccountManager", () => {
                 },
                 passwordSaltLength: 256,
                 registrationIdLength: 128,
+            },
+            login: {
+                loginIdLength: 24,
+                loginLifetime: {
+                    minutes: 15
+                },
+                challenge: {
+                    algo: "sha512",
+                    saltLength: 128
+                }
             }
         };
         create = () => {
@@ -197,7 +206,7 @@ describe("AccountManager", () => {
                     pbkdf2: jasmine.any(Object),
                     challenge: {
                         salt: jasmine.any(String),
-                        hash: "sha512"
+                        algo: "sha512"
                     },
                     encoding: "base64",
                     mfa: [
