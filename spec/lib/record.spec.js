@@ -6,8 +6,8 @@ describe("record", () => {
     beforeEach(() => {
         var promiseMock;
 
-        otDateMock = require("./mock/ot-date-mock");
-        promiseMock = require("./mock/promise-mock");
+        otDateMock = require("../mock/ot-date-mock");
+        promiseMock = require("../mock/promise-mock");
         bufferSerializerMock = jasmine.createSpyObj("bufferSerializerMock", [
             "fromBuffer",
             "toBuffer"
@@ -58,7 +58,7 @@ describe("record", () => {
         zlibMock.inflateRaw.andCallFake((data, callback) => {
             callback(null, new Buffer("decompressed", "binary"));
         });
-        record = require("../lib/record")(bufferSerializerMock, config, encryptionMock, fsMock, otDateMock, promiseMock, zlibMock);
+        record = require("../../lib/record")(bufferSerializerMock, config, encryptionMock, fsMock, otDateMock, promiseMock, zlibMock);
     });
     it("exposes known public methods", () => {
         expect(record.freezeAsync).toEqual(jasmine.any(Function));

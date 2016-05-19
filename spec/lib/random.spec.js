@@ -11,8 +11,8 @@ describe("random", () => {
         ]);
         base64Mock.encode.andReturn(new Buffer("abcdwxyzABCDWXYZ0189+/testing++//"));
         crypto = require("crypto");
-        promiseMock = require("./mock/promise-mock");
-        random = require("../lib/random")(base64Mock, crypto, promiseMock);
+        promiseMock = require("../mock/promise-mock");
+        random = require("../../lib/random")(base64Mock, crypto, promiseMock);
     });
     describe("bufferAsync", () => {
         it("returns a Promise", () => {

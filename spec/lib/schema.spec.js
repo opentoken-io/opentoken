@@ -9,7 +9,7 @@ describe("schema", () => {
         fs = require("fs");
         globMock = jasmine.createSpy("globMock");
         validator = require("validator");
-        promiseMock = require("./mock/promise-mock");
+        promiseMock = require("../mock/promise-mock");
         tv4 = require("tv4");
         tv4.addSchema = jasmine.createSpy("tv4.addSchema").andCallThrough();
         fs.readFile = jasmine.createSpy("fs.readFile").andCallFake((fn, callback) => {
@@ -56,7 +56,7 @@ describe("schema", () => {
             callback(new Error("Invalid file: " + fn.toString()));
         });
 
-        schema = require("../lib/schema")(fs, globMock, promiseMock, tv4, validator);
+        schema = require("../../lib/schema")(fs, globMock, promiseMock, tv4, validator);
     });
     describe(".getMissingSchemas()", () => {
         it("reports on missing schemas", (done) => {

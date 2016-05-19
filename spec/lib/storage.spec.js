@@ -8,7 +8,7 @@ describe("storage", () => {
             "call"
         ]);
         create = (config) => {
-            return require("../lib/storage")(config, containerMock);
+            return require("../../lib/storage")(config, containerMock);
         };
     });
     it("finds a storage engine using configuartion option", () => {

@@ -13,9 +13,9 @@ describe("secureHash", ()  => {
         var base64, promiseMock;
 
         crypto = require("crypto");
-        promiseMock = require("./mock/promise-mock");
-        base64 = require("../lib/base64")();
-        secureHash = require("../lib/secure-hash")(base64, crypto, promiseMock);
+        promiseMock = require("../mock/promise-mock");
+        base64 = require("../../lib/base64")();
+        secureHash = require("../../lib/secure-hash")(base64, crypto, promiseMock);
     });
     describe("secureHashAsync()", () => {
         it("hashes a passed in string", (done) => {

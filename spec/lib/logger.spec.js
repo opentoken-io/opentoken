@@ -4,7 +4,7 @@ describe("logger", () => {
     var loggerFactory;
 
     beforeEach(() => {
-        loggerFactory = require("../lib/logger");
+        loggerFactory = require("../../lib/logger");
         spyOn(console, "log");
         spyOn(console, "error");
     });

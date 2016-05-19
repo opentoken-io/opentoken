@@ -6,8 +6,8 @@ describe("AccountService", () => {
     beforeEach(() => {
         var config;
 
-        promiseMock = require("../mock/promise-mock");
-        storageMock = require("../mock/storage-mock");
+        promiseMock = require("../../mock/promise-mock");
+        storageMock = require("../../mock/storage-mock");
         config = {
             account: {
                 accountDir: "account/",
@@ -29,7 +29,7 @@ describe("AccountService", () => {
         secureHash.hashAsync.andCallFake(() => {
             return promiseMock.resolve("hashedContent");
         });
-        accountService = require("../../lib/account/account-service")(config, secureHash, storageMock);
+        accountService = require("../../../lib/account/account-service")(config, secureHash, storageMock);
     });
     describe(".completeAsync()", () => {
         it("puts the information successfully", (done) => {
@@ -66,7 +66,7 @@ describe("AccountService", () => {
         it ("gets a registration file without config options", (done) => {
             var accountServiceLocal;
 
-            accountServiceLocal = require("../../lib/account/account-service")({}, secureHash, storageMock);
+            accountServiceLocal = require("../../../lib/account/account-service")({}, secureHash, storageMock);
             accountServiceLocal.getRegistrationFileAsync("regIdUnhashed").then((result) => {
                 expect(result).toEqual({
                     data: "thing"

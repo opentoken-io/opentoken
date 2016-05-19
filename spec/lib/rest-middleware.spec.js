@@ -38,8 +38,8 @@ describe("restMiddleware", () => {
     beforeEach(() => {
         var loggerMock, RestMiddleware;
 
-        RestMiddleware = require("../lib/rest-middleware");
-        loggerMock = require("./mock/logger-mock");
+        RestMiddleware = require("../../lib/rest-middleware");
+        loggerMock = require("../mock/logger-mock");
         helmetMock = mockMiddleware("helmetMock", [
             "frameguard",
             "hidePoweredBy",
