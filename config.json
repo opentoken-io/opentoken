@@ -7,14 +7,19 @@
         },
         "idHash": {
             "algo": "sha256",
-            "hashLength": 24,
-            "iterations": 10000,
-            "salt": ""
+            "bytes": 24,
+            "iterations": 10000
         },
         "initiateLifetime": {
             "hours": 1
         },
         "passwordSaltLength": 128,
+        "secureHash": {
+            "algo": "sha512",
+            "bytes": 48,
+            "derivation": "pbkdf2",
+            "iterations": 100000
+        },
         "registrationDir": "registration/",
         "registrationIdLength": 24
     },
@@ -48,6 +53,17 @@
     "hotp": {
         "name": "OpenToken.io",
         "keySize": 128
+    },
+    "login": {
+        "loginDir": "/login/",
+        "loginIdLength": 24,
+        "loginLifetime": {
+            "minutes": 15
+        },
+        "challenge": {
+            "algo": "sha512",
+            "saltLength": 128
+        }
     },
     "record": {
         "expirationMaximum": {
