@@ -6,7 +6,7 @@ describe("bufferSerializer", () => {
     beforeEach(() => {
         var container;
 
-        container = require("../lib/dependencies");
+        container = require("../../lib/dependencies");
         OtDate = container.resolve("OtDate");
         bufferSerializer = container.resolve("bufferSerializer");
     });

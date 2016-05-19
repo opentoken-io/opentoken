@@ -23,7 +23,7 @@ describe("promise", () => {
         methods.forEach((name) => {
             fakeBluebird[name] = jasmine.createSpy(name);
         });
-        promise = require("../lib/promise")(fakeBluebird);
+        promise = require("../../lib/promise")(fakeBluebird);
     });
     methods.forEach((name) => {
         it("exposes the " + name + " method", function () {

@@ -4,7 +4,7 @@ describe("AccountManager", () => {
     var accountServiceFake, create, defaultConfig, otDateMock, promiseMock;
 
     beforeEach(() => {
-        var base64, hotpFake, randomMock, secureHash;
+        var hotpFake, randomMock, secureHash;
 
         accountServiceFake = jasmine.createSpyObj("accountServiceFake", [
             "completeAsync",
@@ -16,7 +16,7 @@ describe("AccountManager", () => {
             "putLoginFileAsync",
             "signupInitiateAsync"
         ]);
-        accountServiceFake.completeAsync.andCallFake((accountInfo, options, regId) => {
+        accountServiceFake.completeAsync.andCallFake((accountInfo) => {
             return promiseMock.resolve({
                 accountId: accountInfo. accountId
             });
@@ -91,13 +91,13 @@ describe("AccountManager", () => {
         hotpFake.generateSecretAsync.andCallFake(() => {
             return promiseMock.resolve("thisisasecrectcodefrommfa");
         });
-        hotpFake.verifyToken.andCallFake((key, token, opts) => {
+        hotpFake.verifyToken.andCallFake((key, token) => {
             return token !== "987654";
         });
-        otDateMock = require("../mock/ot-date-mock");
-        promiseMock = require("../mock/promise-mock");
-        randomMock = require("../mock/random-mock");
-        secureHash = require("../mock/secure-hash-mock");
+        otDateMock = require("../../mock/ot-date-mock");
+        promiseMock = require("../../mock/promise-mock");
+        randomMock = require("../../mock/random-mock");
+        secureHash = require("../../mock/secure-hash-mock");
         defaultConfig = {
             account: {
                 accountIdLength: 128,
@@ -128,7 +128,7 @@ describe("AccountManager", () => {
             }
         };
         create = () => {
-            return require("../../lib/account/account-manager")(accountServiceFake, defaultConfig, hotpFake, otDateMock, promiseMock, randomMock, secureHash);
+            return require("../../../lib/account/account-manager")(accountServiceFake, defaultConfig, hotpFake, otDateMock, promiseMock, randomMock, secureHash);
         };
     });
     describe(".keyExpiration()", () => {

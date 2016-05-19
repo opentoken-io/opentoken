@@ -4,9 +4,9 @@ describe("AccountService", () => {
     var create, defaultConfig, promiseMock, secureHashMock, storageMock;
 
     beforeEach(() => {
-        promiseMock = require("../mock/promise-mock");
-        secureHashMock = require("../mock/secure-hash-mock");
-        storageMock = require("../mock/storage-mock");
+        promiseMock = require("../../mock/promise-mock");
+        secureHashMock = require("../../mock/secure-hash-mock");
+        storageMock = require("../../mock/storage-mock");
         defaultConfig = {
             account: {
                 accountDir: "account/",
@@ -36,7 +36,7 @@ describe("AccountService", () => {
             }
         };
         create = () => {
-            return require("../../lib/account/account-service")(defaultConfig, promiseMock, secureHashMock, storageMock);
+            return require("../../../lib/account/account-service")(defaultConfig, promiseMock, secureHashMock, storageMock);
         };
     });
     describe(".completeAsync()", () => {

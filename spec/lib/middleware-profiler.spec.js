@@ -7,7 +7,7 @@ describe("MiddlewareProfiler", () => {
         var MiddlewareProfiler;
 
         setIntervalFn = jasmine.createSpy("setIntervalFn");
-        MiddlewareProfiler = require("../lib/middleware-profiler")(setIntervalFn);
+        MiddlewareProfiler = require("../../lib/middleware-profiler")(setIntervalFn);
         mp = new MiddlewareProfiler();
     });
     it("exposes known public methods", () => {

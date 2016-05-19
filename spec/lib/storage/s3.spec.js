@@ -25,14 +25,14 @@ describe("storage/s3", () => {
                 });
             }
         }
-        promiseMock = require("../mock/promise-mock");
+        promiseMock = require("../../mock/promise-mock");
         awsSdkMock = {
             S3: S3Fake,
             config: {
                 region: null
             }
         };
-        s3 = require("../../lib/storage/s3")(awsSdkMock, {
+        s3 = require("../../../lib/storage/s3")(awsSdkMock, {
             storage: {
                 s3: {
                     bucket: "test-bucket",

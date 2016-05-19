@@ -20,8 +20,8 @@ describe("WebServer", () => {
         }
 
         middlewareProfiler = null;
-        promiseMock = require("./mock/promise-mock");
-        loggerMock = require("./mock/logger-mock");
+        promiseMock = require("../mock/promise-mock");
+        loggerMock = require("../mock/logger-mock");
         fs = jasmine.createSpyObj("fs", [
             "readFileAsync"
         ]);
@@ -43,7 +43,7 @@ describe("WebServer", () => {
             callback(null);
         });
         restMiddleware = jasmine.createSpy("restMiddleware");
-        WebServer = require("../lib/web-server")(fs, loggerMock, MiddlewareProfilerMock, promiseMock, restify, restifyRouterMagicMock, restMiddleware);
+        WebServer = require("../../lib/web-server")(fs, loggerMock, MiddlewareProfilerMock, promiseMock, restify, restifyRouterMagicMock, restMiddleware);
         webServer = new WebServer();
     });
     it("exposes known public methods", () => {
