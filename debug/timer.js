@@ -4,8 +4,8 @@
 /**
  * Shows the timing information stats with an optional prefix.
  *
- * @param {Object} stats
- * @param {string} [prefix]
+ * @param {Object} stats Statistics to show (key/value pairs)
+ * @param {string} [prefix] Prefix to add to the display of each key/value
  */
 function show(stats, prefix) {
     if (prefix) {
@@ -15,7 +15,7 @@ function show(stats, prefix) {
     }
 
     Object.keys(stats).forEach((key) => {
-        console.log(prefix + key + ":", stats[key]);
+        console.log(`${prefix}${key}:`, stats[key]);
     });
 }
 
@@ -23,12 +23,12 @@ function show(stats, prefix) {
 /**
  * Times a callback for a number of iterations.
  *
- * @param {Function} callback
- * @param {number} iterations
- * @return {Object} stats
+ * @param {Function} callback The function to execute
+ * @param {number} iterations How many times to call it
+ * @return {Object} stats The timing results, key/value pairs
  */
 function time(callback, iterations) {
-    var elapsed, end, i, start;
+    var end, i, start, total;
 
     iterations = iterations || 1;
     start = process.hrtime();
@@ -38,12 +38,12 @@ function time(callback, iterations) {
     }
 
     end = process.hrtime();
-    elapsed = (end[0] - start[0]) + (end[1] - start[1]) / 1000000000;
+    total = end[0] - start[0] + (end[1] - start[1]) / 1000000000;
 
     return {
-        average: elapsed / iterations,
-        iterations: iterations,
-        total: elapsed
+        average: total / iterations,
+        iterations,
+        total
     };
 }
 
@@ -51,13 +51,13 @@ module.exports = {
     /**
      * Combines the "time" and "run" functions.
      *
-     * @param {Function} callback
-     * @param {number} iterations
-     * @param {string} [prefix]
+     * @param {Function} callback What to run
+     * @param {number} iterations How many times to run it
+     * @param {string} [prefix] The prefix to prepend when displaying stats
      */
-    run: function (callback, iterations, prefix) {
+    run(callback, iterations, prefix) {
         show(time(callback, iterations), prefix);
     },
-    show: show,
-    time: time
-}
+    show,
+    time
+};
