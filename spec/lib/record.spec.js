@@ -1,7 +1,7 @@
 "use strict";
 
 describe("record", () => {
-    var bufferSerializerMock, config, encryptionMock, fsMock, otDateMock, record, zlibMock;
+    var bufferSerializerMock, config, encryptionMock, fsMock, otDateMock, record, zlibAsyncMock;
 
     beforeEach(() => {
         var promiseMock;
@@ -48,17 +48,8 @@ describe("record", () => {
         fsMock.readFile.andCallFake((filename, encoding, done) => {
             done(null, new Buffer("encryption key"));
         });
-        zlibMock = jasmine.createSpyObj("zlib", [
-            "deflateRaw",
-            "inflateRaw"
-        ]);
-        zlibMock.deflateRaw.andCallFake((data, callback) => {
-            callback(null, new Buffer("compressed", "binary"));
-        });
-        zlibMock.inflateRaw.andCallFake((data, callback) => {
-            callback(null, new Buffer("decompressed", "binary"));
-        });
-        record = require("../../lib/record")(bufferSerializerMock, config, encryptionMock, fsMock, otDateMock, promiseMock, zlibMock);
+        zlibAsyncMock = require("../mock/zlib-async-mock");
+        record = require("../../lib/record")(bufferSerializerMock, config, encryptionMock, promiseMock.promisifyAll(fsMock), otDateMock, promiseMock, zlibAsyncMock);
     });
     it("exposes known public methods", () => {
         expect(record.freezeAsync).toEqual(jasmine.any(Function));
@@ -83,10 +74,10 @@ describe("record", () => {
             expect(bufferSerializerMock.toBuffer).toHaveBeenCalledWith(data);
 
             // Compress
-            args = zlibMock.deflateRaw.mostRecentCall.args;
+            args = zlibAsyncMock.deflateRawAsync.mostRecentCall.args;
             expect(args[0]).toEqual(jasmine.any(Buffer));
             expect(args[0].toString("binary")).toEqual("Serialized data");
-            expect(args[1]).toEqual(jasmine.any(Function));
+            expect(args.length).toBe(1);
 
             // Inner encryption
             args = encryptionMock.encryptAsync.calls[0].args;
@@ -176,7 +167,7 @@ describe("record", () => {
             expect(args[0].toString("binary")).toBe("deserialized data");
 
             // Compression
-            args = zlibMock.inflateRaw.mostRecentCall.args;
+            args = zlibAsyncMock.inflateRawAsync.mostRecentCall.args;
             expect(args[0].toString("binary")).toBe("decrypted");
 
             // Deserialize again
