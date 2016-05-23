@@ -29,21 +29,27 @@ goodSmall.fill(0x42);
 bad = new Buffer(size);
 bad.fill(0x00);
 
+/**
+ * Runs the test for a given number of iterations
+ *
+ * @param {number} maxTimes Number of iterations
+ */
 function runIterations(maxTimes) {
-    var badTimes, goodTimes, goodSmallTimes, iterations, start, timeToRunFor;
+    var badTimes, goodTimes, iterations, start, timeToRunFor;
 
     iterations = 0;
-    while(iterations < maxTimes) {
+
+    while (iterations < maxTimes) {
         goodTimes = 0;
-        goodSmallTimes = 0;
         badTimes = 0;
         timeToRunFor = options[0];
 
-        console.log("Running " + (iterations + 1) + " out of " + maxTimes + "...");
+        console.log(`Running ${iterations + 1} out of ${maxTimes}...`);
 
         // run good
         start = process.hrtime();
-        while((process.hrtime()[0] - start[0]) < timeToRunFor) {
+
+        while (process.hrtime()[0] - start[0] < timeToRunFor) {
             secureHash.compare(against, good);
             goodTimes += 1;
         }
@@ -51,7 +57,8 @@ function runIterations(maxTimes) {
         console.log("          Times Good Hashes Ran: ", goodTimes);
 
         start = process.hrtime();
-        while((process.hrtime()[0] - start[0]) < timeToRunFor) {
+
+        while (process.hrtime()[0] - start[0] < timeToRunFor) {
             secureHash.compare(against, goodSmall);
             goodTimes += 1;
         }
@@ -60,7 +67,8 @@ function runIterations(maxTimes) {
 
         // run bad
         start = process.hrtime();
-        while((process.hrtime()[0] - start[0]) < timeToRunFor) {
+
+        while (process.hrtime()[0] - start[0] < timeToRunFor) {
             secureHash.compare(against, bad);
             badTimes += 1;
         }

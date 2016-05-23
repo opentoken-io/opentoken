@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint no-process-exit:0 no-sync:0 */
 "use strict";
 
 var crypto, digest, iterations, key, result, rounds, timer;
@@ -7,7 +8,7 @@ crypto = require("crypto");
 timer = require("./timer");
 
 if (process.argv.length < 4) {
-    console.log("Usage:")
+    console.log("Usage:");
     console.log("");
     console.log("    test-pbkdf2.js digest rounds [iterations]");
     process.exit();

@@ -6,6 +6,14 @@
             "minLength": 2,
             "pattern": "/$"
         },
+        "certificateFile": {
+            "type": "string",
+            "minLength": 1
+        },
+        "keyFile": {
+            "type": "string",
+            "minLength": 1
+        },
         "name": {
             "type": "string",
             "minLength": 1
@@ -19,7 +27,40 @@
             "type": "boolean"
         },
         "proxyProtocol": {
-            "type": "boolean"
+            "oneOf": [
+                {
+                    "type": "boolean"
+                },
+                {
+                    "type": "object"
+                }
+            ]
+        },
+        "spdy": {
+            "type": "object"
         }
-    }
+    },
+    "allOf": [
+        {
+            "description": "Define both certificateFile and keyFile or neither",
+            "oneOf": [
+                {
+                    "required": [
+                        "certificatFile",
+                        "keyFile"
+                    ]
+                },
+                {
+                    "properties": {
+                        "certificateFile": {
+                            "type": "null"
+                        },
+                        "keyFile": {
+                            "type": "null"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
 }
