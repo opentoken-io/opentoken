@@ -20,12 +20,12 @@ describe("secureHash", () => {
     describe("secureHashAsync()", () => {
         it("hashes a passed in string", (done) => {
             secureHash.hashAsync("rRTcBER_EiFUsRa34Hj5Zpok", secureHashConfig).then((result) => {
-                expect(result).toBe("9GnOLZ_xAlfMA4C6DHsjNJJpsShI_TgR");
+                expect(result).toBe("PR4ivl87GgN2bqA_tc3wA9O_HVcETOP5");
             }).then(done, done);
         });
         it("hashes a passed in buffer", (done) => {
             secureHash.hashAsync(new Buffer("rRTcBER_EiFUsRa34Hj5Zpok", "binary"), secureHashConfig).then((result) => {
-                expect(result).toBe("9GnOLZ_xAlfMA4C6DHsjNJJpsShI_TgR");
+                expect(result).toBe("PR4ivl87GgN2bqA_tc3wA9O_HVcETOP5");
             }).then(done, done);
         });
         it("hashes without a config being passed in", (done) => {
