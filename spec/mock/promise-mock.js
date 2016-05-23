@@ -1,3 +1,5 @@
+/* eslint guard-for-in:"off" */
+
 "use strict";
 
 /* global Promise*/
