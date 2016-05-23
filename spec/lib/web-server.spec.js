@@ -46,8 +46,8 @@ describe("WebServer", () => {
             "createServer"
         ]);
         restify.createServer.andReturn(restifyServer);
-        restifyRouterMagicMock = jasmine.createSpy("restifyRouterMagic").andCallFake((server, config, callback) => {
-            callback(null);
+        restifyRouterMagicMock = jasmine.createSpy("restifyRouterMagicAsync").andCallFake(() => {
+            return promiseMock.resolve();
         });
         restMiddleware = jasmine.createSpy("restMiddleware");
         WebServer = require("../../lib/web-server")(fs, loggerMock, MiddlewareProfilerMock, promiseMock, restify, restifyRouterMagicMock, restMiddleware);

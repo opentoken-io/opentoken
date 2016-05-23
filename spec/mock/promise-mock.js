@@ -172,14 +172,14 @@ module.exports = {
      * @return {Object}
      */
     promisifyAll(object) {
-        var name, result;
+        var result;
 
         result = {};
 
-        for (name in object) {
+        Object.keys(object).forEach((name) => {
             result[name] = object[name];
             result[`${name}Async`] = this.promisify(object[name]);
-        }
+        });
 
         return result;
     },
