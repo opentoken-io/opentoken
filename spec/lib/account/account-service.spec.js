@@ -13,7 +13,7 @@ describe("AccountService", () => {
                 accountDir: "account/",
                 registrationDir: "registration/",
                 idHash: {
-                    algo: "sha256",
+                    algorithm: "sha256",
                     hashLength: 24,
                     iterations: 10000,
                     salt: "pinkFullyUnicornsDancingOnRainbows"
@@ -56,7 +56,7 @@ describe("AccountService", () => {
             accountService.getRegistrationFileAsync("regIdUnhashed").then((result) => {
                 expect(result).toEqual(jasmine.any(Object));
                 expect(secureHash.hashAsync).toHaveBeenCalledWith("regIdUnhashed", {
-                    algo: "sha256",
+                    algorithm: "sha256",
                     hashLength: 24,
                     iterations: 10000,
                     salt: "pinkFullyUnicornsDancingOnRainbows"

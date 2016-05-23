@@ -6,7 +6,7 @@
             "months": 6
         },
         "idHash": {
-            "algo": "sha256",
+            "algorithm": "sha256",
             "hashLength": 24,
             "iterations": 10000,
             "salt": ""
@@ -22,24 +22,24 @@
     "encryption": {
         "primary": {
             "cipher": {
-                "algo": "aes-256-cbc",
+                "algorithm": "aes-256-cbc",
                 "digest": "sha512",
                 "iterations": 10000
             },
             "hmac": {
-                "algo": "sha512",
+                "algorithm": "sha512",
                 "digest": "sha512",
                 "iterations": 10000
             }
         },
         "secondary": {
             "cipher": {
-                "algo": "bf-cbc",
+                "algorithm": "bf-cbc",
                 "digest": "whirlpool",
                 "iterations": 10000
             },
             "hmac": {
-                "algo": "whirlpool",
+                "algorithm": "whirlpool",
                 "digest": "whirlpool",
                 "iterations": 10000
             }

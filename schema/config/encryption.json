@@ -14,7 +14,7 @@
             "cipher": {
                 "type": "object",
                 "properties": {
-                    "algo": {
+                    "algorithm": {
                         "$ref": "encryption-method"
                     },
                     "digest": {
@@ -29,7 +29,7 @@
             "hmac": {
                 "type": "object",
                 "properties": {
-                    "algo": {
+                    "algorithm": {
                         "$ref": "hash-method"
                     },
                     "digest": {

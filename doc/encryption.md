@@ -6,24 +6,24 @@ The `encryption` options in the `config.json` allow you to select the cipher, ha
     "encryption": {
         "primary": {
             "cipher": {
-                "algo": "aes-256-cbc",
+                "algorithm": "aes-256-cbc",
                 "digest": "sha512",
                 "iterations": 10000
             },
             "hmac": {
-                "algo": "sha512",
+                "algorithm": "sha512",
                 "digest": "sha512",
                 "iterations": 10000
             }
         },
         "secondary": {
             "cipher": {
-                "algo": "bf-cbc",
+                "algorithm": "bf-cbc",
                 "digest": "whirlpool",
                 "iterations": 10000
             },
             "hmac": {
-                "algo": "whirlpool",
+                "algorithm": "whirlpool",
                 "digest": "whirlpool",
                 "iterations": 10000
             }
@@ -39,9 +39,9 @@ The structure for the primary and secondary encryption layers are identical, so 
 
 All of the algorithms and hashes must be defined in the `ciphers-and-hashes.js` file.  Look there if you want to know what values are supported.
 
-* `cipher.algo` - [cipher] Encryption algorithm.
+* `cipher.algorithm` - [cipher] Encryption algorithm.
 * `cipher.digest` - [hash] The hashing digest used for secure key generation.
 * `cipher.iterations` - [number] How many times to securely hash the key before using it for encryption/decryption.
-* `hmac.algo` - [hash] Secure hash algorithm, similar to a CRC of the data.
+* `hmac.algorithm` - [hash] Secure hash algorithm, similar to a CRC of the data.
 * `hmac.digest` - [hash] The hashing digest used for secure key generation.
 * `hmac.iterations` - [number] How many times to securely hash the key before using it for generation of the HMAC.
