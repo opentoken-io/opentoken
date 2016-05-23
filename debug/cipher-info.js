@@ -20,6 +20,14 @@ function attempt(keyLen, ivLen) {
 }
 
 /**
+ * When found, the key and IV sizes are reported in an object like this one.
+ *
+ * @typedef {Object} cipherInfo~keySize
+ * @property {number} keyBytes
+ * @property {number} ivBytes
+ */
+
+/**
  * Scan through a bunch of lengths, looking for key and IV lengths.
  *
  * @param {number} startKey Starting key length
@@ -28,7 +36,7 @@ function attempt(keyLen, ivLen) {
  * @param {number} modIv How to modify the IV length
  * @param {number} endKey When to stop searching for key lengths
  * @param {number} endIv When to stop searching for IV lengths
- * @return {(Object|null)} Results object (keyBytes and ivBytes) or error
+ * @return {(cipherInfo~keySize|null)} Results object (keyBytes and ivBytes) or error
  */
 function scan(startKey, startIv, modKey, modIv, endKey, endIv) {
     var cont, ivBytes, keyBytes;
@@ -77,7 +85,7 @@ function scan(startKey, startIv, modKey, modIv, endKey, endIv) {
 /**
  * Show the results
  *
- * @param {Object} resultObj Object returned from scan()
+ * @param {cipherInfo~keySize} resultObj Object returned from scan()
  * @param {string} suffix Suffix to use when displaying
  */
 function show(resultObj, suffix) {
