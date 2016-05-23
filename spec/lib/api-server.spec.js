@@ -12,8 +12,8 @@ describe("ApiServer", () => {
 
         config = {
             server: {
-                "baseUrl": "https://localhost:8080/",
-                "port": 8443
+                baseUrl: "https://localhost:8080/",
+                port: 8443
             }
         };
         apiServer = apiServerFactory(config, WebServerMock);

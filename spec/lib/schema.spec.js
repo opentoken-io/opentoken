@@ -13,6 +13,14 @@ describe("schema", () => {
         tv4 = require("tv4");
         tv4.addSchema = jasmine.createSpy("tv4.addSchema").andCallThrough();
         fs.readFile = jasmine.createSpy("fs.readFile").andCallFake((fn, callback) => {
+            /**
+             * Signify the end of the loading of a file.  If passed a string,
+             * uses that string as a buffer.  If passed an object, first it
+             * converts the object to a JSON string and then passes back the
+             * string as a buffer.
+             *
+             * @param {(string|Object)} obj
+             */
             function done(obj) {
                 if (typeof obj !== "string") {
                     obj = JSON.stringify(obj);
@@ -23,37 +31,45 @@ describe("schema", () => {
 
             if (fn.match("email.json")) {
                 // No id in this file
-                return done({
+                done({
                     type: "string",
                     format: "email"
                 });
+
+                return;
             }
 
             if (fn.match("number.json")) {
                 // ID in this file
-                return done({
+                done({
                     id: "/folder/folder/number",
                     type: "number",
                     minimum: 5
                 });
+
+                return;
             }
 
             if (fn.match("email-parse-error.json")) {
-                return done("{\"type: \"string\", \"format\": \"email\"}");
+                done("{\"type: \"string\", \"format\": \"email\"}");
+
+                return;
             }
 
             if (fn.match("missing-one.json")) {
-                return done({
+                done({
                     type: "object",
                     properties: {
                         a: {
-                            "$ref": "/other-schema"
+                            $ref: "/other-schema"
                         }
                     }
                 });
+
+                return;
             }
 
-            callback(new Error("Invalid file: " + fn.toString()));
+            callback(new Error(`Invalid file: ${fn.toString()}`));
         });
 
         schema = require("../../lib/schema")(fs, globMock, promiseMock, tv4, validator);

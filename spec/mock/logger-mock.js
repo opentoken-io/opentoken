@@ -10,6 +10,6 @@ logger = {};
     "info",
     "warn"
 ].forEach((methodName) => {
-    logger[methodName] = jasmine.createSpy("logger." + methodName);
+    logger[methodName] = jasmine.createSpy(`logger.${methodName}`);
 });
 module.exports = logger;

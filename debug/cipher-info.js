@@ -1,8 +1,16 @@
 #!/usr/bin/env node
+/* eslint no-process-exit:0 */
 "use strict";
 
 var algorithm, crypto, result;
 
+/**
+ * Attempt to see if a key/IV length works for a cipher
+ *
+ * @param {number} keyLen Length of key to try
+ * @param {number} ivLen Length of IV to try
+ * @throws {Error} when it does not work
+ */
 function attempt(keyLen, ivLen) {
     var iv, key;
 
@@ -11,6 +19,17 @@ function attempt(keyLen, ivLen) {
     crypto.createCipheriv(algorithm, key, iv);
 }
 
+/**
+ * Scan through a bunch of lengths, looking for key and IV lengths.
+ *
+ * @param {number} startKey Starting key length
+ * @param {number} startIv Starting IV length
+ * @param {number} modKey How to modify the key length
+ * @param {number} modIv How to modify the IV length
+ * @param {number} endKey When to stop searching for key lengths
+ * @param {number} endIv When to stop searching for IV lengths
+ * @return {(Object|null)} Results object (keyBytes and ivBytes) or error
+ */
 function scan(startKey, startIv, modKey, modIv, endKey, endIv) {
     var cont, ivBytes, keyBytes;
 
@@ -23,12 +42,12 @@ function scan(startKey, startIv, modKey, modIv, endKey, endIv) {
             attempt(keyBytes, ivBytes);
 
             return {
-                keyBytes: keyBytes,
-                ivBytes: ivBytes
+                keyBytes,
+                ivBytes
             };
         } catch (e) {
             if (e.toString().indexOf("Invalid IV length") >= 0) {
-                if (ivBytes == endIv) {
+                if (ivBytes === endIv) {
                     console.error("Missed the IV");
 
                     return null;
@@ -36,7 +55,7 @@ function scan(startKey, startIv, modKey, modIv, endKey, endIv) {
 
                 ivBytes += modIv;
             } else if (e.toString().indexOf("Invalid key length") >= 0) {
-                if (keyBytes == endKey) {
+                if (keyBytes === endKey) {
                     console.error("Missed the key");
 
                     return null;
@@ -50,21 +69,30 @@ function scan(startKey, startIv, modKey, modIv, endKey, endIv) {
             }
         }
     }
+
+    return null;
 }
 
-function show(result, suffix) {
-    if (! result) {
-        console.log("failureFinding" + suffix + ":", true);
+
+/**
+ * Show the results
+ *
+ * @param {Object} resultObj Object returned from scan()
+ * @param {string} suffix Suffix to use when displaying
+ */
+function show(resultObj, suffix) {
+    if (resultObj) {
+        console.log(`ivBytes${suffix}:`, result.ivBytes);
+        console.log(`keyBytes${suffix}`, result.keyBytes);
     } else {
-        console.log("ivBytes" + suffix + ":", result.ivBytes);
-        console.log("keyBytes" + suffix + ":", result.keyBytes);
+        console.log(`failureFinding${suffix}:`, true);
     }
 }
 
 crypto = require("crypto");
 
 if (process.argv.length < 3) {
-    console.log("Usage:")
+    console.log("Usage:");
     console.log("");
     console.log("    cipher-info.js algorithm");
     console.log("");

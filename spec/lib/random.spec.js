@@ -52,12 +52,12 @@ describe("random", () => {
                 expected: "abcdwxyzABCDWXYZ0189-_testing--__"
             }
         ].forEach((scenario) => {
-            it("sends the right amount of binary data to base64: length " + scenario.desiredLength, (done) => {
+            it(`sends the right amount of binary data to base64: length ${scenario.desiredLength}`, (done) => {
                 random.randomIdAsync(scenario.desiredLength).then(() => {
                     expect(base64Mock.encode.mostRecentCall.args[0].length).toBe(scenario.binLength);
                 }).then(done, done);
             });
-            it("replaced + and /: length " + scenario.desiredLength, () => {
+            it(`replaced + and /: length ${scenario.desiredLength}`, () => {
                 random.randomIdAsync(scenario.desiredLength).then((pass) => {
                     expect(pass).toEqual(scenario.expected);
                 });

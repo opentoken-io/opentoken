@@ -4,7 +4,15 @@ describe("storage/s3", () => {
     var awsSdkMock, promiseMock, s3;
 
     beforeEach(() => {
+        /**
+         * Fake S3 class
+         */
         class S3Fake {
+            /**
+             * Set up spies on the methods
+             *
+             * @param {*} params No influence on this class
+             */
             constructor(params) {
                 this.params = params;
                 this.getObjectAsync = jasmine.createSpy("getObjectAsync");
@@ -19,8 +27,8 @@ describe("storage/s3", () => {
                     "putObjectAsync"
                 ].forEach((method) => {
                     this[method] = jasmine.createSpy(method);
-                    this[method].andCallFake((params) => {
-                        return promiseMock.resolve(params);
+                    this[method].andCallFake((paramsInside) => {
+                        return promiseMock.resolve(paramsInside);
                     });
                 });
             }

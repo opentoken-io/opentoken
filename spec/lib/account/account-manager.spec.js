@@ -13,7 +13,7 @@ describe("AccountManager", () => {
         ]);
         accountServiceFake.completeAsync.andCallFake((accountInfo) => {
             return promiseMock.resolve({
-                accountId: accountInfo. accountId
+                accountId: accountInfo.accountId
             });
         });
         accountServiceFake.getRegistrationFileAsync.andCallFake(() => {
@@ -25,7 +25,7 @@ describe("AccountManager", () => {
         });
         accountServiceFake.signupInitiateAsync.andCallFake((accountInfo, options, regId) => {
             return promiseMock.resolve({
-                regId: regId
+                regId
             });
         });
         hotpFake = jasmine.createSpyObj("hotpFake", [
@@ -67,6 +67,7 @@ describe("AccountManager", () => {
                 email: "some.one@example.net"
             }).then((result) => {
                 var args;
+
                 expect(result.regId.length).toBe(128);
                 args = accountServiceFake.signupInitiateAsync.mostRecentCall.args;
                 expect(args[0].passwordSalt.length).toBe(256);

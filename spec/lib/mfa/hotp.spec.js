@@ -1,7 +1,7 @@
 "use strict";
 
 describe("mfa/hotp", () => {
-    var hotp, twofaMock, promiseMock;
+    var hotp, promiseMock, twofaMock;
 
     beforeEach(() => {
         var config;
@@ -13,26 +13,15 @@ describe("mfa/hotp", () => {
         };
         promiseMock = require("../../mock/promise-mock");
         twofaMock = jasmine.createSpyObj("twofaMock", [
-            "generateKeyAsync",
-            "generateGoogleQRAsync",
+            "generateKey",
+            "generateGoogleQR",
             "verifyTOTP"
         ]);
-        [
-            "generateKeyAsync",
-            "generateGoogleQRAsync",
-            "verifyTOTP"
-        ].forEach((method) => {
-            twofaMock[method] = jasmine.createSpy("twofaMock" + method);
+        twofaMock.generateKey.andCallFake((size, cb) => {
+            cb(null, "thisIsAReallyLongKeyForMFA");
         });
-        twofaMock.generateKeyAsync.andCallFake(() => {
-            return promiseMock.resolve(
-                "thisIsAReallyLongKeyForMFA"
-            );
-        });
-        twofaMock.generateGoogleQRAsync.andCallFake(() => {
-            return promiseMock.resolve(
-                "data:image/png;base64,iVBORw0KGgoA....5CYII="
-            );
+        twofaMock.generateGoogleQR.andCallFake((name, email, key, cb) => {
+            cb(null, "data:image/png;base64,iVBORw0KGgoA....5CYII=");
         });
         hotp = require("../../../lib/mfa/hotp")(config, twofaMock, promiseMock);
     });
@@ -40,7 +29,7 @@ describe("mfa/hotp", () => {
         it("returns a key with 256 length set in config", (done) => {
             hotp.generateSecretAsync().then((result) => {
                 expect(result).toBe("thisIsAReallyLongKeyForMFA");
-                expect(twofaMock.generateKeyAsync).toHaveBeenCalledWith(256);
+                expect(twofaMock.generateKey).toHaveBeenCalledWith(256, jasmine.any(Function));
             }).then(done, done);
         });
         it("returns a key without config value set", (done) => {
@@ -49,7 +38,7 @@ describe("mfa/hotp", () => {
             hotpLocal = require("../../../lib/mfa/hotp")({}, twofaMock, promiseMock);
             hotpLocal.generateSecretAsync().then((result) => {
                 expect(result).toBe("thisIsAReallyLongKeyForMFA");
-                expect(twofaMock.generateKeyAsync).toHaveBeenCalledWith(128);
+                expect(twofaMock.generateKey).toHaveBeenCalledWith(128, jasmine.any(Function));
             }).then(done, done);
         });
     });
@@ -57,13 +46,13 @@ describe("mfa/hotp", () => {
         it("returns data for a qr code", (done) => {
             hotp.generateQrCodeAsync("secretKey", "some.one@example.net").then((result) => {
                 expect(result).toBe("data:image/png;base64,iVBORw0KGgoA....5CYII=");
-                expect(twofaMock.generateGoogleQRAsync).toHaveBeenCalledWith("OpenToken.io", "some.one@example.net", "secretKey");
+                expect(twofaMock.generateGoogleQR).toHaveBeenCalledWith("OpenToken.io", "some.one@example.net", "secretKey", jasmine.any(Function));
             }).then(done, done);
         });
         it("returns data for a qr code without qr code", (done) => {
             hotp.generateQrCodeAsync("secretKey").then((result) => {
                 expect(result).toBe("data:image/png;base64,iVBORw0KGgoA....5CYII=");
-                expect(twofaMock.generateGoogleQRAsync).toHaveBeenCalledWith("OpenToken.io", "", "secretKey");
+                expect(twofaMock.generateGoogleQR).toHaveBeenCalledWith("OpenToken.io", "", "secretKey", jasmine.any(Function));
             }).then(done, done);
         });
         it("has a different application name", (done) => {
@@ -75,7 +64,7 @@ describe("mfa/hotp", () => {
                 }
             }, twofaMock, promiseMock);
             hotpLocal.generateQrCodeAsync("secretKey").then(() => {
-                expect(twofaMock.generateGoogleQRAsync).toHaveBeenCalledWith("opentoken.io alternate name", "", "secretKey");
+                expect(twofaMock.generateGoogleQR).toHaveBeenCalledWith("opentoken.io alternate name", "", "secretKey", jasmine.any(Function));
             }).then(done, done);
         });
     });

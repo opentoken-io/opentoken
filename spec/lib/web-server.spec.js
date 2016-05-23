@@ -1,3 +1,5 @@
+/* eslint consistent-this:"off" */
+
 "use strict";
 
 describe("WebServer", () => {
@@ -6,8 +8,13 @@ describe("WebServer", () => {
     beforeEach(() => {
         var WebServer;
 
-        // Set up a fake MiddlewareProfiler object
+        /**
+         * Set up a fake MiddlewareProfiler object
+         */
         class MiddlewareProfilerMock {
+            /**
+             * Construct an object.  Spies on necessary functions.
+             */
             constructor() {
                 middlewareProfiler = this;
                 [
@@ -54,6 +61,9 @@ describe("WebServer", () => {
     });
     describe(".addMiddleware()", () => {
         it("adds middleware without a route", (done) => {
+            /**
+             * Meaningless function used only for testing
+             */
             function testFn() {}
 
             expect(restifyServer.use).not.toHaveBeenCalled();
@@ -63,6 +73,9 @@ describe("WebServer", () => {
             }).then(done, done);
         });
         it("adds middleware with a route", (done) => {
+            /**
+             * Meaningless function used only for testing
+             */
             function testFn() {}
 
             expect(restifyServer.use).not.toHaveBeenCalled();
@@ -72,8 +85,14 @@ describe("WebServer", () => {
             }).then(done, done);
         });
         it("adds more than one middleware", (done) => {
+            /**
+             * Meaningless function used only for testing
+             */
             function testFn1() {}
 
+            /**
+             * Meaningless function used only for testing
+             */
             function testFn2() {}
 
             expect(restifyServer.use).not.toHaveBeenCalled();
@@ -100,12 +119,19 @@ describe("WebServer", () => {
     describe(".configure()", () => {
         var defaultConfig;
 
+        /**
+         * Tests the configuration and confirms that it is set right.
+         *
+         * @param {Object} input What to pass in
+         * @param {Object} expected How to override the defaults
+         * @param {Function} done Signal completion of the test
+         */
         function testConfig(input, expected, done) {
             var actual;
 
             // Set defaults in expected
             Object.keys(defaultConfig).forEach((key) => {
-                if (expected[key] === undefined) {
+                if (typeof expected[key] === "undefined") {
                     expected[key] = defaultConfig[key];
                 }
             });
@@ -128,8 +154,7 @@ describe("WebServer", () => {
                 httpsServerOptions: null,
                 name: "OpenToken API",
                 proxyProtocol: false,
-                spdy: null,
-                version: null
+                spdy: null
             };
         });
         it("works with no configuration", (done) => {
@@ -148,15 +173,15 @@ describe("WebServer", () => {
         });
         it("reads certificate and key files", (done) => {
             fs.readFileAsync.andCallFake((fn) => {
-                if (fn == "keyfile") {
+                if (fn === "keyfile") {
                     return promiseMock.resolve("keyfile ok");
                 }
 
-                if (fn == "certfile") {
+                if (fn === "certfile") {
                     return promiseMock.resolve("certfile ok");
                 }
 
-                return promiseMock.reject("Invalid file: " + fn.toString());
+                return promiseMock.reject(`Invalid file: ${fn.toString()}`);
             });
             testConfig({
                 certificateFile: "certfile",
@@ -186,29 +211,6 @@ describe("WebServer", () => {
             }, {
                 spdy: 123
             }, done);
-        });
-        it("passes version", (done) => {
-            testConfig({
-                version: "flowers"
-            }, {
-                version: "flowers"
-            }, done);
-        });
-        it("forces the baseUrl to not have a trailing slash", (done) => {
-            var args;
-
-            webServer.configure({
-                baseUrl: "/bunnies/"
-            });
-            webServer.startServerAsync().then(() => {
-                expect(restMiddleware).toHaveBeenCalled();
-                expect(restMiddleware.callCount).toBe(1);
-                args = restMiddleware.mostRecentCall.args;
-                expect(args.length).toBe(2);
-                expect(args[1]).toBe(restifyServer);
-                expect(args[0]).toEqual(jasmine.any(Object));
-                expect(args[0].baseUrl).toBe("/bunnies");
-            }).then(done, done);
         });
         it("does not trim a baseUrl without a trailing slash", (done) => {
             webServer.configure({
@@ -252,7 +254,9 @@ describe("WebServer", () => {
                 expect(restifyServer.listen).toHaveBeenCalled();
                 expect(restifyServer.listen.callCount).toBe(1);
                 args = restifyServer.listen.mostRecentCall.args;
-                expect(args[0]).toBe(8080);  // default port
+
+                // default port
+                expect(args[0]).toBe(8080);
                 expect(args[1]).toEqual(jasmine.any(Function));
                 expect(args.length).toBe(2);
             }).then(done, done);
@@ -262,13 +266,13 @@ describe("WebServer", () => {
 
             webServer.startServerAsync().then(() => {
                 callback = restifyServer.listen.mostRecentCall.args[1];
-                expect(function() {
+                expect(() => {
                     callback();
                 }).not.toThrow();
             }).then(done, done);
         });
         it("executes the uncaughtException callback", (done) => {
-            var callback, args, uncaughtCallback, req, res, route;
+            var args, callback, req, res, route, uncaughtCallback;
 
             req = jasmine.createSpy("req");
             res = jasmine.createSpyObj("res", [
@@ -277,7 +281,7 @@ describe("WebServer", () => {
             ]);
             webServer.startServerAsync().then(() => {
                 callback = restifyServer.listen.mostRecentCall.args[1];
-                expect(function () {
+                expect(() => {
                     callback();
                 });
                 expect(restifyServer.on).toHaveBeenCalled();
@@ -286,7 +290,9 @@ describe("WebServer", () => {
                 expect(args[0]).toBe("uncaughtException");
                 expect(args[1]).toEqual(jasmine.any(Function));
                 uncaughtCallback = args[1];
-                uncaughtCallback(req, res, route, {"error": true});
+                uncaughtCallback(req, res, route, {
+                    error: true
+                });
                 expect(loggerMock.error).toHaveBeenCalled();
                 expect(res.send).toHaveBeenCalledWith(500);
                 expect(res.write).not.toHaveBeenCalled();

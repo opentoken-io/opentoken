@@ -33,9 +33,9 @@ describe("AccountService", () => {
     });
     describe(".completeAsync()", () => {
         it("puts the information successfully", (done) => {
-            accountService.getRegistrationFileAsync = jasmine.createSpy().andCallFake((directory) => {
+            accountService.getRegistrationFileAsync = jasmine.createSpy().andCallFake(() => {
                 return promiseMock.resolve(
-                    new Buffer('{"data": "thing"}', "binary")
+                    new Buffer("{\"data\": \"thing\"}", "binary")
                 );
             });
             accountService.completeAsync({
@@ -63,19 +63,24 @@ describe("AccountService", () => {
                 });
             }).then(done, done);
         });
-        it ("gets a registration file without config options", (done) => {
+        it("gets a registration file without config options", (done) => {
             var accountServiceLocal;
 
             accountServiceLocal = require("../../../lib/account/account-service")({}, secureHash, storageMock);
             accountServiceLocal.getRegistrationFileAsync("regIdUnhashed").then((result) => {
+                var args;
+
                 expect(result).toEqual({
                     data: "thing"
                 });
-                expect(secureHash.hashAsync).toHaveBeenCalledWith("regIdUnhashed", undefined);
+                expect(secureHash.hashAsync).toHaveBeenCalled();
+                args = secureHash.hashAsync.mostRecentCall.args;
+                expect(args[0]).toBe("regIdUnhashed");
+                expect(typeof args[1]).toBe("undefined");
             }).then(done, done);
         });
     });
-    describe(".signupInitiateAsync()", (done) => {
+    describe(".signupInitiateAsync()", () => {
         it("gets the registration id", (done) => {
             accountService.signupInitiateAsync({
                 email: "some.one@example.net",

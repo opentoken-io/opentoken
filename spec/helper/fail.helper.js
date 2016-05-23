@@ -1,4 +1,6 @@
-if (! jasmine.fail) {
+"use strict";
+
+if (!jasmine.fail) {
     /**
      * Sets up the scenario to actually fail; `actual` and `expected`
      * need to never match.

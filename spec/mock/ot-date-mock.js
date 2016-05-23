@@ -1,5 +1,10 @@
 "use strict";
 
+/**
+ * Fake class to mock OtDate.
+ *
+ * @param {Date} d Date value to use for mocking
+ */
 function OtDateMock(d) {
     this.date = d;
 
@@ -14,7 +19,6 @@ function OtDateMock(d) {
     this.isBefore = jasmine.createSpy("isBefore").andCallFake((other) => {
         return this.date < other.date;
     });
-
 
 
     /**
@@ -39,7 +43,7 @@ function OtDateMock(d) {
      * @return {Buffer}
      */
     this.toBuffer = jasmine.createSpy("toBuffer").andCallFake((dest, offset) => {
-        if (! dest) {
+        if (!dest) {
             dest = new Buffer(4);
             offset = 0;
         }

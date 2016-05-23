@@ -1,4 +1,4 @@
-"use strict"
+"use strict";
 
 var random;
 
@@ -13,7 +13,7 @@ random.bufferAsync.andCallFake((size) => {
     buff = new Buffer(size);
     buff.fill(0x42);
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         resolve(buff);
     });
 });
@@ -24,7 +24,7 @@ random.randomIdAsync.andCallFake((size) => {
     buff = new Buffer(size);
     buff.fill(0x42);
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         resolve(buff.toString());
     });
 });

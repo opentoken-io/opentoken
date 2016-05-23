@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint no-process-exit:0 */
 "use strict";
 
 var algorithm, crypto, data, deciphered, iterations, key, length, result, timer;
@@ -7,7 +8,7 @@ crypto = require("crypto");
 timer = require("./timer");
 
 if (process.argv.length < 4) {
-    console.log("Usage:")
+    console.log("Usage:");
     console.log("");
     console.log("    test-cipher.js algorithm data-length [iterations]");
     console.log("");
@@ -55,4 +56,4 @@ timer.run(() => {
         cipher.final()
     ]);
 }, iterations, "decrypt");
-console.log("correct:", deciphered.toString("hex") == data.toString("hex"));
+console.log("correct:", deciphered.toString("hex") === data.toString("hex"));

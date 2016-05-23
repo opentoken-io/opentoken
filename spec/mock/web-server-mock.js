@@ -8,7 +8,15 @@ var promiseMock;
 
 promiseMock = require("./promise-mock");
 
+/**
+ * This is a fake WebServer
+ */
 class WebServerMock {
+    /**
+     * Create the object.  Sets up spies on new instances.
+     *
+     * @param {Object} config
+     */
     constructor(config) {
         this.config = config;
 

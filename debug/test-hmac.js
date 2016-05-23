@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint no-process-exit:0 */
 "use strict";
 
 var crypto, data, dataLength, digest, iterations, key, result, timer;
@@ -7,7 +8,7 @@ crypto = require("crypto");
 timer = require("./timer");
 
 if (process.argv.length < 4) {
-    console.log("Usage:")
+    console.log("Usage:");
     console.log("");
     console.log("    test-hmac.js digest data_length [iterations]");
     console.log("");
@@ -20,7 +21,7 @@ dataLength = +process.argv[3];
 iterations = +(process.argv[4] || 1);
 console.log("digest:", digest);
 
-if (dataLength == 0) {
+if (dataLength === 0) {
     key = new Buffer("This is a test key.", "binary");
     data = new Buffer("This is a test message.", "binary");
     console.log("test:", true);

@@ -1,9 +1,12 @@
+"use strict";
+
 /**
- * This allows testing of a promise which is intented to fail.
+ * This allows testing of a promise which is intended to fail.
  *
  * @param {Promise} promise
  * @param {string} errMessage
  * @param {Function} done
+ * @return {Promise}
  */
 jasmine.testPromiseFailure = function (promise, errMessage, done) {
     if (typeof errMessage === "function") {
@@ -11,9 +14,9 @@ jasmine.testPromiseFailure = function (promise, errMessage, done) {
         errMessage = null;
     }
 
-    return promise.then(function () {
+    return promise.then(() => {
         done(new Error("The promise should have been rejected"));
-    }, function (err) {
+    }, (err) => {
         if (errMessage) {
             expect(err.toString()).toContain(errMessage);
         }

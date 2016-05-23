@@ -40,7 +40,7 @@ describe("record", () => {
             return promiseMock.resolve(new Buffer("decrypted", "binary"));
         });
         encryptionMock.encryptAsync.andCallFake((buffer, key, hmac, cipher) => {
-            return promiseMock.resolve(new Buffer("encrypted-" + cipher, "binary"));
+            return promiseMock.resolve(new Buffer(`encrypted-${cipher}`, "binary"));
         });
         fsMock = jasmine.createSpyObj("fs", [
             "readFile"
@@ -176,7 +176,7 @@ describe("record", () => {
             expect(args[0].toString("binary")).toBe("deserialized data");
 
             // Compression
-            args = zlibMock.inflateRaw.mostRecentCall.args
+            args = zlibMock.inflateRaw.mostRecentCall.args;
             expect(args[0].toString("binary")).toBe("decrypted");
 
             // Deserialize again
@@ -198,7 +198,7 @@ describe("record", () => {
             ]);
             bufferSerializerMock.fromBuffer.andReturn({
                 data: "deserialized data",
-                expires: expires
+                expires
             });
         });
         it("deserializes when expires is after today", (done) => {
@@ -206,7 +206,7 @@ describe("record", () => {
             record.thawAsync({}, "").then((result) => {
                 expect(result).toEqual({
                     data: "deserialized data",
-                    expires: expires
+                    expires
                 });
             }).then(done, done);
         });

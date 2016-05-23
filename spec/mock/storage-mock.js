@@ -1,6 +1,12 @@
 "use strict";
 
+/**
+ * Fake storage object
+ */
 class StorageMock {
+    /**
+     * Sets up spies on all methods.
+     */
     constructor() {
         [
             "configure",
@@ -13,8 +19,8 @@ class StorageMock {
         this.configure.andCallFake(() => {
             return this;
         });
-        this.delAsync.andCallFake((directory) => {
-            return new Promise((resolve, reject) => {
+        this.delAsync.andCallFake(() => {
+            return new Promise((resolve) => {
                 resolve(true);
             });
         });
@@ -22,23 +28,23 @@ class StorageMock {
             var dataToReturn;
 
             if (directory.match("registration")) {
-                dataToReturn = '{"data": "thing"}';
+                dataToReturn = "{\"data\": \"thing\"}";
             }
 
             if (directory.match("some/place/someIdhere")) {
-                dataToReturn = '{"accountId": "unhashedAccountId", "email": "some.one@example.net"}';
+                dataToReturn = "{\"accountId\": \"unhashedAccountId\", \"email\": \"some.one@example.net\"}";
             }
 
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve) => {
                 resolve(new Buffer(dataToReturn, "binary"));
             });
         });
         this.putAsync.andCallFake(() => {
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve) => {
                 resolve(true);
             });
         });
     }
-};
+}
 
 module.exports = new StorageMock();

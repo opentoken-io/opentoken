@@ -5,7 +5,7 @@
     "main": "lib/opentoken.js",
     "scripts": {
         "start": "node bin/server.js || true",
-        "test": "istanbul cover jasmine-node --captureExceptions spec/ && codecov",
+        "test": "istanbul cover jasmine-node --captureExceptions spec/ && codecov && eslint .",
         "watch": "jasmine-node lib spec --autotest --watch"
     },
     "repository": {
@@ -34,6 +34,7 @@
     "homepage": "https://github.com/opentoken-io/opentoken#readme",
     "devDependencies": {
         "codecov": "^1.0.1",
+        "eslint": "^2.10.2",
         "istanbul": "^0.4.2",
         "jasmine-node": "^1.14.5"
     },
