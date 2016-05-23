@@ -1,3 +1,5 @@
+/* eslint no-bitwise:"off" */
+
 "use strict";
 
 describe("encryption", () => {
@@ -25,7 +27,7 @@ describe("encryption", () => {
         }).then((result) => {
             expect(result.toString("hex")).toEqual("0001053200000040031d0000000b00000053f8a825e3b1c5e9537c20800324153042424242424242424242424242424242e94cea7494417116671128");
         }).then(done, done);
-    })
+    });
     it("decrypts from a string with a key as a buffer", (done) => {
         // The rest of the tests use Buffers because it is WAY easier
         var asString;
@@ -57,7 +59,7 @@ describe("encryption", () => {
             plain = "as a string";
         });
         it("errors with invalid HMAC", (done) => {
-            buff[20] = buff[20] ^ 0xF;
+            buff[20] ^= 0xF;
             jasmine.testPromiseFailure(encryption.decryptAsync(buff, keySource), "HMAC invalid", done);
         });
         [
@@ -86,17 +88,17 @@ describe("encryption", () => {
                 text: "Cipher Key Digest"
             }
         ].forEach((scenario) => {
-            it("errors with invalid encoding parameters - " + scenario.text, (done) => {
+            it(`errors with invalid encoding parameters - ${scenario.text}`, (done) => {
                 var config;
 
                 config = {
-                    hmacConfig: hmacConfig,
-                    cipherConfig: cipherConfig
+                    hmacConfig,
+                    cipherConfig
                 };
                 config[scenario.config][scenario.property] = "invalid";
                 jasmine.testPromiseFailure(encryption.encryptAsync(plain, keySource, hmacConfig, cipherConfig), scenario.text, done);
             });
-            it("errors with invalid header config - " + scenario.text, (done) => {
+            it(`errors with invalid header config - ${scenario.text}`, (done) => {
                 buff[scenario.byte] = 0xFF;
                 jasmine.testPromiseFailure(encryption.decryptAsync(buff, keySource), scenario.text, done);
             });
@@ -120,12 +122,12 @@ describe("encryption", () => {
             plain: "abcdefg"
         }
     ].forEach((scenario) => {
-        it("encrypts in the latest version: " + scenario.name, (done) => {
+        it(`encrypts in the latest version: ${scenario.name}`, (done) => {
             encryption.encryptAsync(scenario.plain, scenario.keySource, scenario.hmacConfig, scenario.cipherConfig).then((result) => {
                 expect(result.toString("hex")).toEqual(scenario.encryptedHex);
             }).then(done, done);
         });
-        it("decrypts the latest version: " + scenario.name, (done) => {
+        it(`decrypts the latest version: ${scenario.name}`, (done) => {
             encryption.decryptAsync(new Buffer(scenario.encryptedHex, "hex"), scenario.keySource).then((result) => {
                 expect(result.toString("binary")).toEqual(scenario.plain);
             }).then(done, done);

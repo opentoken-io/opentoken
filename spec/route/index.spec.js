@@ -10,7 +10,7 @@ describe("route: /", () => {
         expect(factory).toEqual(jasmine.any(Function));
     });
     describe("factory results", () => {
-        var route, req, res;
+        var req, res, route;
 
         beforeEach(() => {
             route = factory();

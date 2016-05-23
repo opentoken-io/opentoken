@@ -1,6 +1,8 @@
+/* eslint guard-for-in:"off" */
+
 "use strict";
 
-/*global Promise*/
+/* global Promise*/
 module.exports = {
     /**
      * Resolves when all promises are resolved.
@@ -11,10 +13,16 @@ module.exports = {
      * @param {Array.<Promise>} promises
      * @return {Promise.<Array>}
      */
-    all: function (promises) {
+    all(promises) {
         return new Promise((resolve, reject) => {
             var isDone, needed, result;
 
+            /**
+             * Handle a resolved promise
+             *
+             * @param {number} index
+             * @param {*} val
+             */
             function resolved(index, val) {
                 if (isDone) {
                     return;
@@ -29,6 +37,11 @@ module.exports = {
                 }
             }
 
+            /**
+             * Handle a rejected promise
+             *
+             * @param {*} val
+             */
             function rejected(val) {
                 if (isDone) {
                     return;
@@ -54,10 +67,15 @@ module.exports = {
      * @param {Array.<Promise>} promises
      * @return {Promise.<*>}
      */
-    any: function (promises) {
+    any(promises) {
         return new Promise((resolve, reject) => {
             var isDone;
 
+            /**
+             * Handle a resolved promise
+             *
+             * @param {*} val
+             */
             function resolved(val) {
                 if (isDone) {
                     return;
@@ -67,6 +85,11 @@ module.exports = {
                 resolve(val);
             }
 
+            /**
+             * Handle a rejected promise
+             *
+             * @param {*} val
+             */
             function rejected(val) {
                 if (isDone) {
                     return;
@@ -87,10 +110,10 @@ module.exports = {
     /**
      * Creates a Promise using ES6 syntax
      *
-     * @param {Function(resolve,reject)} cb
+     * @param {Function} cb(resolve,reject)
      * @return {Promise.<*>}
      */
-    create: function (cb) {
+    create(cb) {
         return new Promise(cb);
     },
 
@@ -99,10 +122,10 @@ module.exports = {
      * Provides a "done" callback to a function so you can wrap
      * Node-style callbacks and make them return promises.
      *
-     * @param {Function(done)} fn
+     * @param {Function} fn(done)
      * @return {Promise.<*>}
      */
-    fromCallback: function (fn) {
+    fromCallback(fn) {
         return new Promise((resolve, reject) => {
             fn((err, val) => {
                 if (err) {
@@ -121,7 +144,7 @@ module.exports = {
      * @param {Function} fn
      * @return {Promise.<*>}
      */
-    promisify: function (fn) {
+    promisify(fn) {
         return function () {
             var args;
 
@@ -135,7 +158,7 @@ module.exports = {
                         resolve(val);
                     }
                 });
-                fn.apply(this, args);
+                fn.apply(null, args);
             });
         };
     },
@@ -148,14 +171,14 @@ module.exports = {
      * @param {Object} object
      * @return {Object}
      */
-    promisifyAll: function (object) {
+    promisifyAll(object) {
         var name, result;
 
         result = {};
 
         for (name in object) {
             result[name] = object[name];
-            result[name + "Async"] = this.promisify(object[name]);
+            result[`${name}Async`] = this.promisify(object[name]);
         }
 
         return result;
@@ -170,10 +193,13 @@ module.exports = {
      * @param {Object} obj
      * @return {Promise.<Object>}
      */
-    props: function (obj) {
+    props(obj) {
         return new Promise((resolve, reject) => {
             var needed, result;
 
+            /**
+             * Handles a successful resolution
+             */
             function doneWithOne() {
                 needed -= 1;
 
@@ -182,7 +208,9 @@ module.exports = {
                 }
             }
 
-            needed = 1; // Fake number, removed later
+            // This is a fake number and is removed later.  It exists
+            // in case the first promise is already resolved.
+            needed = 1;
             result = {};
             Object.keys(obj).forEach((key) => {
                 needed += 1;
@@ -192,11 +220,13 @@ module.exports = {
                     result[key] = resolvedValue;
                     doneWithOne();
                 }, (rejectedValue) => {
-                    needed = -1;  // Force this to never call resolve();
+                    // Force this to never call resolve();
+                    needed = -1;
                     reject(rejectedValue);
                 });
             });
 
+            // This removes that fake number added earlier.
             doneWithOne();
         });
     },
@@ -208,7 +238,7 @@ module.exports = {
      * @param {*} val
      * @return {Promise}
      */
-    reject: function (val) {
+    reject(val) {
         return new Promise((resolve, reject) => {
             reject(val);
         });
@@ -221,7 +251,7 @@ module.exports = {
      * @param {*} val
      * @return {Promise.<*>}
      */
-    resolve: function (val) {
+    resolve(val) {
         return new Promise((resolve) => {
             resolve(val);
         });
@@ -251,7 +281,7 @@ module.exports = {
      * @param {Function} fn
      * @return {Promise.<*>}
      */
-    try: function (fn) {
+    try(fn) {
         return new Promise((resolve, reject) => {
             try {
                 resolve(fn());

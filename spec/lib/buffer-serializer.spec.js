@@ -33,8 +33,8 @@ describe("bufferSerializer", () => {
         result = bufferSerializer.toBuffer(date);
         expect(result).toEqual(jasmine.any(Buffer));
 
-        //         Ver     Z   O t D a t e      T ..Date, no ms
-        expected = "00" + "5A064F7444617465" + "544F00F380";
+        //          V Z   O t D a t e T ..Date, no ms
+        expected = "005A064F7444617465544F00F380";
         expect(result.toString("hex").toUpperCase()).toEqual(expected);
     });
     it("deserializes OtDate", () => {

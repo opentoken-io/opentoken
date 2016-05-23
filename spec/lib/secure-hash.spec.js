@@ -1,6 +1,6 @@
 "use strict";
 
-describe("secureHash", ()  => {
+describe("secureHash", () => {
     var crypto, secureHash, secureHashConfig;
 
     secureHashConfig = {

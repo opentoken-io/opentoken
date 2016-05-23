@@ -16,6 +16,11 @@ describe("promise", () => {
     var promise;
 
     beforeEach(() => {
+        /**
+         * Fake Bluebird class
+         *
+         * @param {Function} callback
+         */
         function fakeBluebird(callback) {
             callback();
         }
@@ -26,14 +31,14 @@ describe("promise", () => {
         promise = require("../../lib/promise")(fakeBluebird);
     });
     methods.forEach((name) => {
-        it("exposes the " + name + " method", function () {
+        it(`exposes the ${name} method`, () => {
             expect(promise[name]).toEqual(jasmine.any(Function));
         });
     });
-    it("exposes the create method (not tested previously)", function () {
+    it("exposes the create method (not tested previously)", () => {
         expect(promise.create).toEqual(jasmine.any(Function));
     });
-    it("creates a new promise", function () {
+    it("creates a new promise", () => {
         var testedCallback;
 
         testedCallback = false;

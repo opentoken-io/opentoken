@@ -26,7 +26,7 @@ describe("MiddlewareProfiler", () => {
             expect(args.length).toBe(2);
             expect(args[1]).toBe(1234);
             expect(args[0]).toEqual(jasmine.any(Function));
-            expect(function () {
+            expect(() => {
                 args[0]();
             }).not.toThrow();
         });
@@ -58,6 +58,13 @@ describe("MiddlewareProfiler", () => {
             var args1, args2, middle1, middle2, wrap1;
 
             beforeEach(() => {
+                /**
+                 * Create fake middleware that simply consumes time
+                 *
+                 * @param {Object} req Request
+                 * @param {Object} res Response
+                 * @param {Function} next
+                 */
                 function fakeMiddleware(req, res, next) {
                     var i, start;
 
@@ -65,7 +72,7 @@ describe("MiddlewareProfiler", () => {
                     i = 0;
 
                     // A little delay and fake work
-                    while (start == (new Date())) {
+                    while (start === new Date()) {
                         i += 1;
                     }
 
@@ -100,7 +107,7 @@ describe("MiddlewareProfiler", () => {
                         hits: 0,
                         elapsed: 0
                     },
-                    "_": {
+                    _: {
                         hits: 0,
                         elapsed: 0
                     }
@@ -144,11 +151,11 @@ describe("MiddlewareProfiler", () => {
             var profiles;
 
             profiles = mp.getProfiles();
-            profiles["fake"] = {
+            profiles.fake = {
                 elapsed: 0,
                 hits: 0
             };
-            profiles["fake2"] = {
+            profiles.fake2 = {
                 elapsed: .3333,
                 hits: 3
             };

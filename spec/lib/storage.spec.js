@@ -1,7 +1,7 @@
 "use strict";
 
 describe("storage", () => {
-    var containerMock,create;
+    var containerMock, create;
 
     beforeEach(() => {
         containerMock = jasmine.createSpyObj("containerMock", [

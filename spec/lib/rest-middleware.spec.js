@@ -1,14 +1,14 @@
 "use strict";
 
 describe("restMiddleware", () => {
-    var helmetMock, restMiddleware, serverMock, restifyMock, restifyLinks;
+    var helmetMock, restifyLinks, restifyMock, restMiddleware, serverMock;
 
     /**
      * Tests the common middleware set up when calling restMiddleware.
      * StandardLinks is tested on it's own due to the nature of what
      * needs to be tested there.
      */
-    function expectNormalMiddlewareWasCalled () {
+    function expectNormalMiddlewareWasCalled() {
         [
             helmetMock.frameguard,
             helmetMock.ieNoOpen,
@@ -24,6 +24,13 @@ describe("restMiddleware", () => {
         });
     }
 
+    /**
+     * This generates fake middleware that are spies.
+     *
+     * @param {string} name
+     * @param {Array.<string>} methods
+     * @return {Object} middleware
+     */
     function mockMiddleware(name, methods) {
         var middleware;
 
