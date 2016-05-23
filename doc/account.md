@@ -25,7 +25,7 @@ The `passwordSaltLength` is used to adjust the length of the password salt we ge
             "months": 6
         },
         "idHash": {
-            "algo": "sha256",
+            "algorithm": "sha256",
             "hashLength": 24,
             "iterations": 10000,
             "salt": "Ucg4TTL1N7tt6GMw3W3wULgaf4lALKHOuM4SBnh0FocOr3ccLH9eXLneoDDOrMVZ"

@@ -14,7 +14,7 @@
         "idHash": {
             "type": "object",
             "properties": {
-                "algo": {
+                "algorithm": {
                     "$ref": "hash-method"
                 },
                 "hashLength": {
