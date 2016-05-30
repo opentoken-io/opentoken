@@ -10,8 +10,8 @@
         "encryption": {
             "$ref": "encryption"
         },
-        "hotp": {
-            "$ref": "hotp"
+        "mfa": {
+            "$ref": "mfa"
         },
         "schemaPath": {
             "$ref": "schema-path"
@@ -22,5 +22,8 @@
         "storage": {
             "$ref": "storage"
         }
-    }
+    },
+    "required": [
+        "mfa"
+    ]
 }

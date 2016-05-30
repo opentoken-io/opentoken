@@ -45,9 +45,11 @@
             }
         }
     },
-    "hotp": {
-        "name": "OpenToken.io",
-        "keySize": 128
+    "mfa": {
+        "totp": {
+            "keyLength": 128,
+            "name": "OpenToken.io"
+        }
     },
     "record": {
         "expirationMaximum": {
