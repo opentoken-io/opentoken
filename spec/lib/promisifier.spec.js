@@ -23,4 +23,17 @@ describe("promisifier", () => {
         expect(promisifier(obj)).toBe(result);
         expect(promiseMock.promisifyAll).toHaveBeenCalledWith(obj);
     });
+    it("promisifies a function as well", () => {
+        var fn, result;
+
+        fn = () => {};
+        result = () => {};
+        spyOn(promiseMock, "promisify").andReturn(result);
+        spyOn(promiseMock, "promisifyAll").andCallFake((x) => {
+            return x;
+        });
+        expect(promisifier(fn)).toBe(result);
+        expect(promiseMock.promisify).toHaveBeenCalledWith(fn);
+        expect(promiseMock.promisifyAll).toHaveBeenCalledWith(result);
+    });
 });
