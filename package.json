@@ -43,7 +43,7 @@
         "aws-sdk": "^2.3.3",
         "bluebird": "^3.3.4",
         "buffer-serializer": "^1.0.2",
-        "dizzy": "^2.0.1",
+        "dizzy": "^2.0.4",
         "findhit-proxywrap": "^0.3.11",
         "glob": "^7.0.3",
         "helmet": "^2.1.0",
