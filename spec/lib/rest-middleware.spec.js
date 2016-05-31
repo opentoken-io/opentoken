@@ -43,9 +43,9 @@ describe("restMiddleware", () => {
     }
 
     beforeEach(() => {
-        var loggerMock, RestMiddleware;
+        var loggerMock, restMiddlewareFactory;
 
-        RestMiddleware = require("../../lib/rest-middleware");
+        restMiddlewareFactory = require("../../lib/rest-middleware");
         loggerMock = require("../mock/logger-mock")();
         helmetMock = mockMiddleware("helmetMock", [
             "frameguard",
@@ -64,7 +64,7 @@ describe("restMiddleware", () => {
         ]);
         restifyLinks = jasmine.createSpy("restifyLinks");
         restifyLinks.andReturn(restifyLinks);
-        restMiddleware = new RestMiddleware(helmetMock, loggerMock, restifyMock, restifyLinks);
+        restMiddleware = restMiddlewareFactory(helmetMock, loggerMock, restifyMock, restifyLinks);
     });
     it("calls restMiddleware without https", () => {
         restMiddleware({
@@ -80,32 +80,71 @@ describe("restMiddleware", () => {
         expectNormalMiddlewareWasCalled();
         expect(helmetMock.hsts).toHaveBeenCalled();
     });
-    it("sets up self-discovery links", () => {
-        var next, req, res, standardLinks;
+    describe("self-discovery links", () => {
+        var linkFunction, links, next, req, res;
 
-        res = jasmine.createSpyObj("resMock", [
-            "links"
-        ]);
-        req = jasmine.createSpyObj("reqMock", [
-            "href"
-        ]);
-        req.href.andReturn("/path");
-        next = jasmine.createSpy("nextMock");
-        restMiddleware({
-            baseUrl: "http://localhost:8443",
-            https: false
-        }, serverMock);
-        standardLinks = serverMock.use.mostRecentCall.args[0];
-        expect(standardLinks).toEqual(jasmine.any(Function));
-        expect(() => {
-            standardLinks(req, res, next);
-        }).not.toThrow();
-        expect(res.links).toHaveBeenCalledWith({
-            self: "http://localhost:8443/path",
-            up: {
-                href: "http://localhost:8443/",
-                title: "self-discovery"
-            }
+        beforeEach(() => {
+            links = [];
+            next = jasmine.createSpy("nextMock");
+            res = jasmine.createSpyObj("resMock", [
+                "links"
+            ]);
+            res.links.andCallFake((linkObj) => {
+                Object.keys(linkObj).forEach((rel) => {
+                    var linkVals;
+
+                    linkVals = [].concat(linkObj[rel]);
+                    linkVals.forEach((linkVal) => {
+                        if (typeof linkVal === "string") {
+                            linkVal = {
+                                href: linkVal
+                            };
+                        }
+
+                        linkVal.rel = rel;
+                        links.push(linkVal);
+                    });
+                });
+            });
+            req = jasmine.createSpyObj("reqMock", [
+                "href"
+            ]);
+            req.href.andReturn("/path");
+            req.method = "GET";
+            restMiddleware({
+                baseUrl: "http://localhost:8443",
+                https: false
+            }, serverMock);
+            linkFunction = serverMock.use.mostRecentCall.args[0];
+        });
+        it("set up for GET", () => {
+            expect(() => {
+                linkFunction(req, res, next);
+            }).not.toThrow();
+            expect(links).toEqual([
+                {
+                    href: "http://localhost:8443/",
+                    rel: "up",
+                    title: "self-discovery"
+                },
+                {
+                    href: "http://localhost:8443/path",
+                    rel: "self"
+                }
+            ]);
+        });
+        it("set up for POST", () => {
+            req.method = "POST";
+            expect(() => {
+                linkFunction(req, res, next);
+            }).not.toThrow();
+            expect(links).toEqual([
+                {
+                    href: "http://localhost:8443/",
+                    rel: "up",
+                    title: "self-discovery"
+                }
+            ]);
         });
     });
 });

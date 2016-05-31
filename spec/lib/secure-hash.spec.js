@@ -9,7 +9,7 @@ describe("secureHash", () => {
         promiseMock = require("../mock/promise-mock")();
         cryptoAsync = promiseMock.promisifyAll(require("crypto"));
         base64 = require("../../lib/base64")();
-        secureHash = require("../../lib/secure-hash")(base64, cryptoAsync, promiseMock);
+        secureHash = require("../../lib/secure-hash")(base64, cryptoAsync);
     });
     describe("compare()", () => {
         it("compares successfully", () => {
@@ -32,17 +32,24 @@ describe("secureHash", () => {
         });
     });
     describe("pbkdf2Async()", () => {
-        // Only one test here because this is more thoroughly tested
-        // with pbkdf2IdAsync.
+        // pbkdf2IdAsync tests this function more thoroughly
         it("hashes a passed in string", (done) => {
             secureHash.pbkdf2Async("rRTcBER_EiFUsRa34Hj5Zpok", {
                 algorithm: "sha256",
                 hashLength: 24,
-                iterations: 10000,
-                salt: "pinkFluffyUnicornsDancingOnRainbows"
+                iterations: 10000
             }).then((result) => {
-                expect(result.toString("base64")).toBe("PR4ivl87GgN2bqA/tc3wA9O/HVcETOP5");
+                expect(result.toString("base64")).toBe("gamhxTutw1xATEyonZ2HdUNlsNwMZvMS");
             }).then(done, done);
+        });
+        it("throws when there is no data to hash", () => {
+            expect(() => {
+                secureHash.pbkdf2Async("", {
+                    algorithm: "sha256",
+                    hashLength: 24,
+                    iterations: 10000
+                });
+            }).toThrow("Nothing to hash");
         });
     });
     describe("pbkdf2IdAsync()", () => {
@@ -66,10 +73,15 @@ describe("secureHash", () => {
                 expect(result).toBe("PR4ivl87GgN2bqA_tc3wA9O_HVcETOP5");
             }).then(done, done);
         });
-        it("throws an error as there is nothing to hash", () => {
+        it("throws an error when there is nothing to hash", () => {
             expect(() => {
-                secureHash.hashAsync("");
-            }).toThrow();
+                secureHash.pbkdf2IdAsync("", {
+                    algorithm: "sha256",
+                    hashLength: 24,
+                    iterations: 10000,
+                    salt: "salty"
+                });
+            }).toThrow("Nothing to hash");
         });
     });
 });

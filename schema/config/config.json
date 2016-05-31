@@ -30,6 +30,7 @@
         "account",
         "mfa",
         "registration",
+        "server",
         "storage"
     ]
 }

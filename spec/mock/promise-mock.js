@@ -1,8 +1,6 @@
-/* eslint guard-for-in:"off" */
-
 "use strict";
 
-/* global Promise*/
+/* global Promise */
 module.exports = () => {
     /**
      * Resolves when all promises are resolved.
