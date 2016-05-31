@@ -5,7 +5,7 @@ describe("ApiServer", () => {
 
     beforeEach(() => {
         apiServerFactory = require("../../lib/api-server");
-        WebServerMock = require("../mock/web-server-mock");
+        WebServerMock = require("../mock/web-server-mock")();
     });
     it("starts a server", (done) => {
         var apiServer, config;

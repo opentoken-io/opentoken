@@ -1,22 +1,18 @@
 {
     "account": {
-        "accountDir": "account/",
-        "accountIdLength": 24,
-        "completeLifetime": {
+        "idLength": 32,
+        "lifetime": {
             "months": 6
         },
-        "idHash": {
-            "algorithm": "sha256",
-            "hashLength": 24,
-            "iterations": 10000,
-            "salt": ""
-        },
-        "initiateLifetime": {
-            "hours": 1
+        "passwordHash": {
+            "algorithm": "sha512",
+            "derivedLength": 48,
+            "encoding": "base64",
+            "iterations": 100000,
+            "type": "pbkdf2"
         },
         "passwordSaltLength": 128,
-        "registrationDir": "registration/",
-        "registrationIdLength": 24
+        "storagePrefix": "account/"
     },
     "debug": false,
     "encryption": {
@@ -45,19 +41,34 @@
             }
         }
     },
-    "hotp": {
-        "name": "OpenToken.io",
-        "keySize": 128
+    "mfa": {
+        "totp": {
+            "name": "OpenToken.io",
+            "keyLength": 128
+        }
     },
     "record": {
-        "expirationMaximum": {
+        "lifetimeMaximum": {
             "months": 6
         },
         "encryptionKeyFile": "encryption.key"
     },
+    "registration": {
+        "confirmationCodeLength": 32,
+        "idHash": {
+            "algorithm": "sha512",
+            "hashLength": 48,
+            "iterations": 100000
+        },
+        "idLength": 32,
+        "lifetime": {
+            "hours": 1
+        },
+        "storagePrefix": "registration/"
+    },
     "schemaPath": "./schema",
     "server": {
-        "baseUrl": "https://localhost:8080/",
+        "baseUrl": "https://localhost:8080",
         "name": "OpenToken.io",
         "port": 8443,
         "profileMiddleware": false,
@@ -66,7 +77,7 @@
     "storage": {
         "engine": "s3",
         "s3": {
-            "bucket": "fill-this-in",
+            "bucket": "opentoken-io-test-s3",
             "region": "us-east-1"
         }
     }

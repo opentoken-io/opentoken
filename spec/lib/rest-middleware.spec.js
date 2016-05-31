@@ -46,7 +46,7 @@ describe("restMiddleware", () => {
         var loggerMock, RestMiddleware;
 
         RestMiddleware = require("../../lib/rest-middleware");
-        loggerMock = require("../mock/logger-mock");
+        loggerMock = require("../mock/logger-mock")();
         helmetMock = mockMiddleware("helmetMock", [
             "frameguard",
             "hidePoweredBy",

@@ -1,45 +1,57 @@
 {
     "type": "object",
     "properties": {
-        "accountDir": {
-            "$ref": "storage-dir"
-        },
-        "accountIdLength": {
+        "idLength": {
+            "description": "Number of bytes for generated IDs.",
             "type": "integer",
-            "minimum": 6
+            "minimum": 8
         },
-        "completeLifetime": {
-            "$ref": "time-offset"
+        "lifetime": {
+            "$ref": "time-offset.json"
         },
-        "idHash": {
+        "passwordHash": {
             "type": "object",
             "properties": {
                 "algorithm": {
-                    "$ref": "hash-method"
+                    "$ref": "../meta/hash-method.json"
                 },
-                "hashLength": {
+                "derivedLength": {
                     "type": "integer",
-                    "minimum": 6
+                    "minimum": 8
+                },
+                "encoding": {
+                    "$ref": "../meta/encoding-method.json"
                 },
                 "iterations": {
                     "type": "integer",
-                    "minimum": 1000
+                    "minimum": 10000
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "pbkdf2"
+                    ]
                 }
-            }
-        },
-        "initiateLifetime": {
-            "$ref": "time-offset"
+            },
+            "required": [
+                "algorithm",
+                "derivedLength",
+                "encoding",
+                "iterations",
+                "type"
+            ]
         },
         "passwordSaltLength": {
+            "description": "Number of characters to use for a password salt.",
             "type": "integer",
-            "minimum": 6
+            "minimum": 8
         },
-        "registrationDir": {
-            "$ref": "storage-dir"
-        },
-        "registrationIdLength": {
-            "type": "integer",
-            "minimum": 6
+        "storagePrefix": {
+            "$ref": "storage-prefix.json"
         }
-    }
+    },
+    "required": [
+        "passwordSaltLength",
+        "storagePrefix"
+    ]
 }

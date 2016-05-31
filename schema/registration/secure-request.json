@@ -1,0 +1,32 @@
+{
+    "type": "object",
+    "properties": {
+        "passwordHash": {
+            "minLength": 24,
+            "allOf": [
+                {
+                    "$ref": "../../meta/base64.json"
+                }
+            ]
+        },
+        "totp": {
+            "type": "object",
+            "properties": {
+                "current": {
+                    "$ref": "../meta/totp-code.json"
+                },
+                "previous": {
+                    "$ref": "../meta/totp-code.json"
+                }
+            },
+            "required": [
+                "current",
+                "previous"
+            ]
+        }
+    },
+    "required": [
+        "passwordHash",
+        "totp"
+    ]
+}

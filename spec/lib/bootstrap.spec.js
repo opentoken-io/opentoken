@@ -9,7 +9,7 @@ describe("bootstrap", () => {
         baseDir = __dirname.replace(/\/spec(\/.*)?$/, "/");
         config = require("../../config.json");
         path = require("path");
-        promise = require("../mock/promise-mock");
+        promise = require("../mock/promise-mock")();
         schemaMock = jasmine.createSpyObj("schema", [
             "getMissingSchemas",
             "loadSchemaFolderAsync",

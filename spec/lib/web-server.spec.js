@@ -27,8 +27,8 @@ describe("WebServer", () => {
         }
 
         middlewareProfiler = null;
-        promiseMock = require("../mock/promise-mock");
-        loggerMock = require("../mock/logger-mock");
+        promiseMock = require("../mock/promise-mock")();
+        loggerMock = require("../mock/logger-mock")();
         fs = jasmine.createSpyObj("fs", [
             "readFileAsync"
         ]);

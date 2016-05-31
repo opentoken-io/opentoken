@@ -1,45 +1,17 @@
 "use strict";
 
 describe("secureHash", () => {
-    var crypto, secureHash, secureHashConfig;
+    var secureHash;
 
-    secureHashConfig = {
-        algorithm: "sha256",
-        hashLength: 24,
-        iterations: 10000,
-        salt: "pinkFluffyUnicornsDancingOnRainbows"
-    };
     beforeEach(() => {
-        var base64, promiseMock;
+        var base64, cryptoAsync, promiseMock;
 
-        crypto = require("crypto");
-        promiseMock = require("../mock/promise-mock");
+        promiseMock = require("../mock/promise-mock")();
+        cryptoAsync = promiseMock.promisifyAll(require("crypto"));
         base64 = require("../../lib/base64")();
-        secureHash = require("../../lib/secure-hash")(base64, crypto, promiseMock);
+        secureHash = require("../../lib/secure-hash")(base64, cryptoAsync, promiseMock);
     });
-    describe("secureHashAsync()", () => {
-        it("hashes a passed in string", (done) => {
-            secureHash.hashAsync("rRTcBER_EiFUsRa34Hj5Zpok", secureHashConfig).then((result) => {
-                expect(result).toBe("PR4ivl87GgN2bqA_tc3wA9O_HVcETOP5");
-            }).then(done, done);
-        });
-        it("hashes a passed in buffer", (done) => {
-            secureHash.hashAsync(new Buffer("rRTcBER_EiFUsRa34Hj5Zpok", "binary"), secureHashConfig).then((result) => {
-                expect(result).toBe("PR4ivl87GgN2bqA_tc3wA9O_HVcETOP5");
-            }).then(done, done);
-        });
-        it("hashes without a config being passed in", (done) => {
-            secureHash.hashAsync("rRTcBER_EiFUsRa34Hj5Zpok").then((result) => {
-                expect(result).toBe("-IbPFNBgU7JvnlwV7IM_MR6Y9PaPd8gyJP7xZ_RzHjo0lcejcbWFgQcbXJJ2e9n1");
-            }).then(done, done);
-        });
-        it("throws an error as there is nothing to hash", () => {
-            expect(() => {
-                secureHash.hashAsync("");
-            }).toThrow();
-        });
-    });
-    describe("secureHashCompareAsync()", () => {
+    describe("compare()", () => {
         it("compares successfully", () => {
             var result;
 
@@ -57,6 +29,47 @@ describe("secureHash", () => {
 
             result = secureHash.compare("9GnOLZ_xAlfMA4C6DHsjNJJpsShI_Tg5", "9GnOLZ_xAlfMA4C6DHsjNJJpsShI_TgR");
             expect(result).toBe(false);
+        });
+    });
+    describe("pbkdf2Async()", () => {
+        // Only one test here because this is more thoroughly tested
+        // with pbkdf2IdAsync.
+        it("hashes a passed in string", (done) => {
+            secureHash.pbkdf2Async("rRTcBER_EiFUsRa34Hj5Zpok", {
+                algorithm: "sha256",
+                hashLength: 24,
+                iterations: 10000,
+                salt: "pinkFluffyUnicornsDancingOnRainbows"
+            }).then((result) => {
+                expect(result.toString("base64")).toBe("PR4ivl87GgN2bqA/tc3wA9O/HVcETOP5");
+            }).then(done, done);
+        });
+    });
+    describe("pbkdf2IdAsync()", () => {
+        var hashConfig;
+
+        beforeEach(() => {
+            hashConfig = {
+                algorithm: "sha256",
+                hashLength: 24,
+                iterations: 10000,
+                salt: "pinkFluffyUnicornsDancingOnRainbows"
+            };
+        });
+        it("hashes a passed in string", (done) => {
+            secureHash.pbkdf2IdAsync("rRTcBER_EiFUsRa34Hj5Zpok", hashConfig).then((result) => {
+                expect(result).toBe("PR4ivl87GgN2bqA_tc3wA9O_HVcETOP5");
+            }).then(done, done);
+        });
+        it("hashes a passed in buffer", (done) => {
+            secureHash.pbkdf2IdAsync(new Buffer("rRTcBER_EiFUsRa34Hj5Zpok", "binary"), hashConfig).then((result) => {
+                expect(result).toBe("PR4ivl87GgN2bqA_tc3wA9O_HVcETOP5");
+            }).then(done, done);
+        });
+        it("throws an error as there is nothing to hash", () => {
+            expect(() => {
+                secureHash.hashAsync("");
+            }).toThrow();
         });
     });
 });

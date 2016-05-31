@@ -1,0 +1,21 @@
+{
+    "type": "object",
+    "properties": {
+        "idLength": {
+            "description": "Number of bytes for generated IDs",
+            "type": "integer",
+            "minimum": 8
+        },
+        "lifetime": {
+            "$ref": "time-offset.json"
+        },
+        "storagePrefix": {
+            "$ref": "storage-prefix.json"
+        }
+    },
+    "required": [
+        "idLength",
+        "lifetime",
+        "storagePrefix"
+    ]
+}

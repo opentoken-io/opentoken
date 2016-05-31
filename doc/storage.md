@@ -19,3 +19,4 @@ The `storage` options in `config.json` help to handle many facets of how storage
 To configure the engine to use Amazon's S3 as OpenToken.io is by default inside the `s3` key, `bucket` will set where the engine will be getting, putting, listing, and deleting the data from, while `region` lets you decide the region the data should be stored in.
 
 *These are if you are using Amazon's S3, these keys can change to suit other storage needs.*
+*Fix this*

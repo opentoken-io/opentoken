@@ -10,8 +10,8 @@ describe("encryption", () => {
 
         ciphersAndHashes = require("../../lib/ciphers-and-hashes");
         crypto = require("crypto");
-        promiseMock = require("../mock/promise-mock");
-        randomMock = require("../mock/random-mock");
+        promiseMock = require("../mock/promise-mock")();
+        randomMock = require("../mock/random-mock")();
         encryption = require("../../lib/encryption")(ciphersAndHashes, crypto, promiseMock, randomMock);
     });
     it("encrypts from a buffer with a key as a buffer", (done) => {

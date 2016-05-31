@@ -9,7 +9,7 @@ describe("schema", () => {
         fs = require("fs");
         globMock = jasmine.createSpy("globMock");
         validator = require("validator");
-        promiseMock = require("../mock/promise-mock");
+        promiseMock = require("../mock/promise-mock")();
         tv4 = require("tv4");
         tv4.addSchema = jasmine.createSpy("tv4.addSchema").andCallThrough();
         fs.readFile = jasmine.createSpy("fs.readFile").andCallFake((fn, callback) => {
@@ -42,7 +42,7 @@ describe("schema", () => {
             if (fn.match("number.json")) {
                 // ID in this file
                 done({
-                    id: "/folder/folder/number",
+                    id: "/folder/folder/number.json",
                     type: "number",
                     minimum: 5
                 });
@@ -87,7 +87,7 @@ describe("schema", () => {
         it("loads a schema with an ID and validates against it", (done) => {
             schema.loadSchemaAsync("./email.json", "./").then(() => {
                 expect(() => {
-                    schema.validate("someone@example.net", "/email");
+                    schema.validate("someone@example.net", "/email.json");
                 }).not.toThrow();
             }).then(done, done);
         });
@@ -119,11 +119,11 @@ describe("schema", () => {
                 var result;
 
                 expect(() => {
-                    result = schema.validate("someone@example.net", "/folder/email");
+                    result = schema.validate("someone@example.net", "/folder/email.json");
                 }).not.toThrow();
                 expect(result).toBe(null);
                 expect(() => {
-                    result = schema.validate(5, "/folder/folder/number");
+                    result = schema.validate(5, "/folder/folder/number.json");
                 }).not.toThrow();
                 expect(result).toBe(null);
             }).then(done, done);
@@ -134,8 +134,8 @@ describe("schema", () => {
             schema.loadSchemaAsync("./email.json", "./").then(() => {
                 var result;
 
-                expect(schema.validate("someone@example.net", "/email")).toBe(null);
-                result = schema.validate("someone", "/email");
+                expect(schema.validate("someone@example.net", "/email.json")).toBe(null);
+                result = schema.validate("someone", "/email.json");
                 expect(result).toEqual(jasmine.any(Object));
                 expect(result.valid).toBe(false);
             }).then(done, done);

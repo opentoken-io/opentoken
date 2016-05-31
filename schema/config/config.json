@@ -2,25 +2,34 @@
     "type": "object",
     "properties": {
         "account": {
-            "$ref": "account"
+            "$ref": "account.json"
         },
         "debug": {
             "type": "boolean"
         },
         "encryption": {
-            "$ref": "encryption"
+            "$ref": "encryption.json"
         },
-        "hotp": {
-            "$ref": "hotp"
+        "mfa": {
+            "$ref": "mfa.json"
+        },
+        "registration": {
+            "$ref": "registration.json"
         },
         "schemaPath": {
-            "$ref": "schema-path"
+            "$ref": "schema-path.json"
         },
         "server": {
-            "$ref": "server"
+            "$ref": "server.json"
         },
         "storage": {
-            "$ref": "storage"
+            "$ref": "storage.json"
         }
-    }
+    },
+    "required": [
+        "account",
+        "mfa",
+        "registration",
+        "storage"
+    ]
 }
