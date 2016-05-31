@@ -3,7 +3,7 @@
 "use strict";
 
 describe("WebServer", () => {
-    var fs, loggerMock, middlewareProfiler, promiseMock, restify, restifyRouterMagicMock, restifyServer, restMiddleware, webServer;
+    var containerMock, fs, loggerMock, middlewareProfiler, promiseMock, restify, restifyRouterMagicMock, restifyServer, restMiddleware, webServer;
 
     beforeEach(() => {
         var WebServer;
@@ -27,8 +27,8 @@ describe("WebServer", () => {
         }
 
         middlewareProfiler = null;
-        promiseMock = require("../mock/promise-mock");
-        loggerMock = require("../mock/logger-mock");
+        promiseMock = require("../mock/promise-mock")();
+        loggerMock = require("../mock/logger-mock")();
         fs = jasmine.createSpyObj("fs", [
             "readFileAsync"
         ]);
@@ -50,7 +50,8 @@ describe("WebServer", () => {
             return promiseMock.resolve();
         });
         restMiddleware = jasmine.createSpy("restMiddleware");
-        WebServer = require("../../lib/web-server")(fs, loggerMock, MiddlewareProfilerMock, promiseMock, restify, restifyRouterMagicMock, restMiddleware);
+        containerMock = {};
+        WebServer = require("../../lib/web-server")(containerMock, fs, loggerMock, MiddlewareProfilerMock, promiseMock, restify, restifyRouterMagicMock, restMiddleware);
         webServer = new WebServer();
     });
     it("exposes known public methods", () => {
@@ -111,6 +112,11 @@ describe("WebServer", () => {
             webServer.startServerAsync().then(() => {
                 expect(restifyRouterMagicMock).toHaveBeenCalled();
                 expect(restifyRouterMagicMock.mostRecentCall.args[1]).toEqual({
+                    indexWithSlash: "never",
+                    options: {
+                        container: containerMock
+                    },
+                    routesMatch: "**/!(_)*.js",
                     routesPath: "/routes"
                 });
             }).then(done, done);
@@ -149,6 +155,9 @@ describe("WebServer", () => {
 
         beforeEach(() => {
             defaultConfig = {
+                formatters: {
+                    "image/png; q=0.1": jasmine.any(Function)
+                },
                 handleUncaughtExceptions: true,
                 handleUpgrades: false,
                 httpsServerOptions: null,
@@ -243,6 +252,80 @@ describe("WebServer", () => {
                     args[1]("test");
                 }).not.toThrow();
             }).then(done, done);
+        });
+    });
+    describe("restify formatters", () => {
+        var formatters, req, res;
+
+        beforeEach((done) => {
+            webServer.configure({
+                baseUrl: "/"
+            });
+            webServer.startServerAsync().then(() => {
+                formatters = restify.createServer.mostRecentCall.args[0].formatters;
+            }).then(done, done);
+            req = require("../mock/request-mock.js")();
+            res = require("../mock/response-mock.js")();
+        });
+        describe("png", () => {
+            var formatter;
+
+            beforeEach(() => {
+                formatter = formatters["image/png; q=0.1"];
+            });
+            it("is a function", () => {
+                expect(formatter).toEqual(jasmine.any(Function));
+            });
+            it("converts an Error without a status code", (done) => {
+                formatter(req, res, new Error("x"), (err, data) => {
+                    if (!err) {
+                        expect(Buffer.isBuffer(data)).toBe(true);
+                        expect(data.toString("binary")).toBe("Error: x");
+                        expect(res.statusCode).toBe(500);
+                    }
+
+                    done(err);
+                });
+            });
+            it("converts an Error with a status code", (done) => {
+                var errorObject;
+
+                errorObject = new Error("x");
+                errorObject.statusCode = 999;
+                formatter(req, res, errorObject, (err, data) => {
+                    if (!err) {
+                        expect(Buffer.isBuffer(data)).toBe(true);
+                        expect(data.toString("binary")).toBe("Error: x");
+                        expect(res.statusCode).toBe(999);
+                    }
+
+                    done(err);
+                });
+            });
+            it("handles a string", (done) => {
+                res.statusCode = 200;
+                formatter(req, res, "abcdefg", (err, data) => {
+                    if (!err) {
+                        expect(Buffer.isBuffer(data)).toBe(true);
+                        expect(data.toString("binary")).toBe("abcdefg");
+                        expect(res.statusCode).toBe(200);
+                    }
+
+                    done(err);
+                });
+            });
+            it("handles a buffer", (done) => {
+                res.statusCode = 200;
+                formatter(req, res, new Buffer("buff", "binary"), (err, data) => {
+                    if (!err) {
+                        expect(Buffer.isBuffer(data)).toBe(true);
+                        expect(data.toString("binary")).toBe("buff");
+                        expect(res.statusCode).toBe(200);
+                    }
+
+                    done(err);
+                });
+            });
         });
     });
     describe(".startServerAsync()", () => {

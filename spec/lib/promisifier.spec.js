@@ -4,7 +4,7 @@ describe("promisifier", () => {
     var promiseMock, promisifier;
 
     beforeEach(() => {
-        promiseMock = require("../mock/promise-mock");
+        promiseMock = require("../mock/promise-mock")();
         promisifier = require("../../lib/promisifier")(promiseMock);
     });
     it("is a function", () => {
@@ -19,7 +19,7 @@ describe("promisifier", () => {
         result = {
             description: "result from promise.promisifyAll()"
         };
-        spyOn(promiseMock, "promisifyAll").andReturn(result);
+        promiseMock.promisifyAll.andReturn(result);
         expect(promisifier(obj)).toBe(result);
         expect(promiseMock.promisifyAll).toHaveBeenCalledWith(obj);
     });

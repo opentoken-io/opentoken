@@ -3,8 +3,8 @@
     "properties": {
         "baseUrl": {
             "type": "string",
-            "minLength": 2,
-            "pattern": "/$"
+            "minLength": 1,
+            "pattern": "[^/]$"
         },
         "certificateFile": {
             "type": "string",

@@ -11,7 +11,7 @@ describe("mfa/hotp", () => {
                 keySize: 256
             }
         };
-        promiseMock = require("../../mock/promise-mock");
+        promiseMock = require("../../mock/promise-mock")();
         twofaMock = jasmine.createSpyObj("twofaMock", [
             "generateKey",
             "generateGoogleQR",
