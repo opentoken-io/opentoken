@@ -17,9 +17,19 @@ I'm using "E" instead of "×10^" notation.  The number after the E is the number
 
 * 1E9: One billion.  A fountain pen cap (55 mm) enlarged to be one billion times larger would be able to hold the Earth inside (55,000 kilometers for the pen cap, a mere 12,742 km for Earth).
 
+* 4.3E17:  400 quadrillion.  This is our current guess as to the age of the universe in seconds.
+
+* 4E19: 40 quintillion.  The grand canyon can hold about this many grains of sand.
+
+* 7E27: 7 octillion.  This is close to the number of atoms in an average human body.
+
 * 8.0E27:  8 octillion.  The estimated number of grains of sand in the Sahara.
 
 * 1.33E50:  Approximation for the number of atoms in the Earth.
+
+* 1.2E57:  Roughly how many atoms are in the sun.  Incidentally, it's roughly the same amount of mass as a million Earths.
+
+* 8.07E67:  The number of permutations of a deck of cards, rounded.  This is the total number of different ways one can shuffle a standard deck of 52 playing cards.  To give you a much better feel for the size of this number, visit this [52 Factorial](http://czep.net/weblog/52cards.html) explanation page.
 
 * 4E78 - 4E82: Estimate for the number of atoms in the observable universe.
 
@@ -27,9 +37,14 @@ I'm using "E" instead of "×10^" notation.  The number after the E is the number
 Random Tokens
 -------------
 
-Account IDs, tokens and other randomly generated things on the system generate a secure hash of a particular length.  By default we use 24 random bytes of information, which translates into 32 bytes of Base64 encoded data.  Trying to guess one of these generated identifiers is very hard.  In 24 bytes there are 192 bits (24 * 8 = 192).  All of them have random values (0 or 1).  That means there are 2^192 possible accounts.  Roughly 6.2E57 accounts are possible.  That's more than one account for each atom on a million Earths.
+Account IDs, tokens and other randomly generated things on the system generate a secure hash of a particular length.  Secure hashes are made by getting random bytes and encoding them with base64, so each character in the ID can be one of 64 different values.
 
-Token IDs are similarly random.  Each of the 6.2E57 accounts can store 6.2E57 tokens when we generate the token IDs.
+By default we use identifiers of 32 bytes, though the configuration file may be altered to pick nearly any size you like.  Our validation forces identifiers to be at least 8 bytes.  Trying to guess one of these generated identifiers is very hard.
+
+* 8 bytes (the minimum) = 2.8E14 (about 281,474,976,700,000)
+* 32 bytes (our default) = 6.2E57
+
+This means each atom on Earth can have a million accounts on our system and that would consume 20% of the total accounts available, give or take.
 
 The reason these figures are important is because we encrypt data with the real account ID and the token ID.  Even we can not read your data until the moment you are requesting it!  Keeping it safe from everyone, including us, is very important.
 
