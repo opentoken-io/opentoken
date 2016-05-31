@@ -1,0 +1,26 @@
+{
+    "type": "object",
+    "properties": {
+        "totp": {
+            "type": "object",
+            "properties": {
+                "keyLength": {
+                    "description": "Number of characters in base-36 encoded string.",
+                    "type": "integer",
+                    "minimum": 32
+                },
+                "name": {
+                    "type": "string",
+                    "minLength": 1
+                }
+            },
+            "required": [
+                "keyLength",
+                "name"
+            ]
+        }
+    },
+    "required": [
+        "totp"
+    ]
+}

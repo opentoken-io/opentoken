@@ -1,10 +1,10 @@
 "use strict";
 
 describe("AccountManager", () => {
-    var accountServiceFake, create, defaultConfig;
+    var accountServiceFake, create, defaultConfig, totpFake;
 
     beforeEach(() => {
-        var hotpFake, otDateMock, promiseMock, randomMock;
+        var otDateMock, promiseMock, randomMock;
 
         accountServiceFake = jasmine.createSpyObj("accountServiceFake", [
             "completeAsync",
@@ -28,16 +28,14 @@ describe("AccountManager", () => {
                 regId
             });
         });
-        hotpFake = jasmine.createSpyObj("hotpFake", [
+        totpFake = jasmine.createSpyObj("totpFake", [
             "generateSecretAsync",
-            "verifyToken"
+            "verifyCurrentAndPrevious"
         ]);
-        hotpFake.generateSecretAsync.andCallFake(() => {
+        totpFake.generateSecretAsync.andCallFake(() => {
             return promiseMock.resolve("thisisasecrectcodefrommfa");
         });
-        hotpFake.verifyToken.andCallFake((key, token) => {
-            return token !== "987654";
-        });
+        totpFake.verifyCurrentAndPrevious.andReturn(true);
         otDateMock = require("../../mock/ot-date-mock");
         promiseMock = require("../../mock/promise-mock");
         randomMock = require("../../mock/random-mock");
@@ -55,7 +53,7 @@ describe("AccountManager", () => {
             }
         };
         create = (config) => {
-            return require("../../../lib/account/account-manager")(accountServiceFake, config || defaultConfig, hotpFake, otDateMock, promiseMock, randomMock);
+            return require("../../../lib/account/account-manager")(accountServiceFake, config || defaultConfig, otDateMock, promiseMock, randomMock, totpFake);
         };
     });
     describe(".signupInitiationAsync()", () => {
@@ -124,27 +122,17 @@ describe("AccountManager", () => {
                 expect(result.accountId.length).toBe(128);
             }).then(done, done);
         });
-        it("has an expired previous token", (done) => {
+        it("has an expired token", (done) => {
             var accountManager;
 
             accountManager = create();
+            totpFake.verifyCurrentAndPrevious.andReturn(false);
             jasmine.testPromiseFailure(accountManager.signupCompleteAsync({
                 regId: "aeifFeight3ighrFieigheilw5lfiek",
                 currentMfa: "123456",
                 previousMfa: "987654",
                 password: "3439gajs933098fj3jfj90aj09fj9390a9023"
-            }), "Previous MFA Token did not validate", done);
-        });
-        it("has an expired current token", (done) => {
-            var accountManager;
-
-            accountManager = create();
-            jasmine.testPromiseFailure(accountManager.signupCompleteAsync({
-                regId: "aeifFeight3ighrFieigheilw5lfiek",
-                currentMfa: "987654",
-                previousMfa: "123456",
-                password: "3439gajs933098fj3jfj90aj09fj9390a9023"
-            }), "Current MFA Token did not validate", done);
+            }), "MFA codes are wrong", done);
         });
         it("fails without accountIdLength set", (done) => {
             var accountManager;
