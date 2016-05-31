@@ -28,8 +28,8 @@ describe("promisifier", () => {
 
         fn = () => {};
         result = () => {};
-        spyOn(promiseMock, "promisify").andReturn(result);
-        spyOn(promiseMock, "promisifyAll").andCallFake((x) => {
+        promiseMock.promisify.andReturn(result);
+        promiseMock.promisifyAll.andCallFake((x) => {
             return x;
         });
         expect(promisifier(fn)).toBe(result);
