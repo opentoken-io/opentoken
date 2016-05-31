@@ -1,9 +1,7 @@
-/* eslint guard-for-in:"off" */
-
 "use strict";
 
-/* global Promise*/
-module.exports = {
+/* global Promise */
+module.exports = () => {
     /**
      * Resolves when all promises are resolved.
      *
@@ -13,8 +11,8 @@ module.exports = {
      * @param {Array.<Promise>} promises
      * @return {Promise.<Array>}
      */
-    all(promises) {
-        return new Promise((resolve, reject) => {
+    function all(promises) {
+        return new Promise((resolver, rejecter) => {
             var isDone, needed, result;
 
             /**
@@ -33,7 +31,7 @@ module.exports = {
 
                 if (!needed) {
                     isDone = true;
-                    resolve(result);
+                    resolver(result);
                 }
             }
 
@@ -48,7 +46,7 @@ module.exports = {
                 }
 
                 isDone = true;
-                reject(val);
+                rejecter(val);
             }
 
             isDone = false;
@@ -58,7 +56,7 @@ module.exports = {
                 promise.then(resolved.bind(null, key), rejected);
             });
         });
-    },
+    }
 
     /**
      * Resolved when the first promise is resolved.  Rejected when the
@@ -67,8 +65,8 @@ module.exports = {
      * @param {Array.<Promise>} promises
      * @return {Promise.<*>}
      */
-    any(promises) {
-        return new Promise((resolve, reject) => {
+    function any(promises) {
+        return new Promise((resolver, rejecter) => {
             var isDone;
 
             /**
@@ -82,7 +80,7 @@ module.exports = {
                 }
 
                 isDone = true;
-                resolve(val);
+                resolver(val);
             }
 
             /**
@@ -96,7 +94,7 @@ module.exports = {
                 }
 
                 isDone = true;
-                reject(val);
+                rejecter(val);
             }
 
             isDone = false;
@@ -104,7 +102,7 @@ module.exports = {
                 promise.then(resolved, rejected);
             });
         });
-    },
+    }
 
 
     /**
@@ -113,9 +111,9 @@ module.exports = {
      * @param {Function} cb(resolve,reject)
      * @return {Promise.<*>}
      */
-    create(cb) {
+    function create(cb) {
         return new Promise(cb);
-    },
+    }
 
 
     /**
@@ -125,17 +123,17 @@ module.exports = {
      * @param {Function} fn(done)
      * @return {Promise.<*>}
      */
-    fromCallback(fn) {
-        return new Promise((resolve, reject) => {
+    function fromCallback(fn) {
+        return new Promise((resolver, rejecter) => {
             fn((err, val) => {
                 if (err) {
-                    reject(err);
+                    rejecter(err);
                 } else {
-                    resolve(val);
+                    resolver(val);
                 }
             });
         });
-    },
+    }
 
 
     /**
@@ -144,24 +142,24 @@ module.exports = {
      * @param {Function} fn
      * @return {Promise.<*>}
      */
-    promisify(fn) {
+    function promisify(fn) {
         return function () {
             var args;
 
             args = [].slice.call(arguments);
 
-            return new Promise((resolve, reject) => {
+            return new Promise((resolver, rejecter) => {
                 args.push((err, val) => {
                     if (err) {
-                        reject(err);
+                        rejecter(err);
                     } else {
-                        resolve(val);
+                        resolver(val);
                     }
                 });
                 fn.apply(null, args);
             });
         };
-    },
+    }
 
 
     /**
@@ -171,18 +169,32 @@ module.exports = {
      * @param {Object} object
      * @return {Object}
      */
-    promisifyAll(object) {
+    function promisifyAll(object) {
         var result;
 
         result = {};
 
-        Object.keys(object).forEach((name) => {
+        Object.getOwnPropertyNames(object).filter((name) => {
+            var desc;
+
+            desc = Object.getOwnPropertyDescriptor(object, name);
+
+            if (!desc || desc.get || desc.set) {
+                return false;
+            }
+
+            if (typeof object[name] !== "function") {
+                return false;
+            }
+
+            return true;
+        }).forEach((name) => {
             result[name] = object[name];
-            result[`${name}Async`] = this.promisify(object[name]);
+            result[`${name}Async`] = promisify(object[name]);
         });
 
         return result;
-    },
+    }
 
 
     /**
@@ -193,8 +205,8 @@ module.exports = {
      * @param {Object} obj
      * @return {Promise.<Object>}
      */
-    props(obj) {
-        return new Promise((resolve, reject) => {
+    function props(obj) {
+        return new Promise((resolver, rejecter) => {
             var needed, result;
 
             /**
@@ -204,7 +216,7 @@ module.exports = {
                 needed -= 1;
 
                 if (!needed) {
-                    resolve(result);
+                    resolver(result);
                 }
             }
 
@@ -222,14 +234,14 @@ module.exports = {
                 }, (rejectedValue) => {
                     // Force this to never call resolve();
                     needed = -1;
-                    reject(rejectedValue);
+                    rejecter(rejectedValue);
                 });
             });
 
             // This removes that fake number added earlier.
             doneWithOne();
         });
-    },
+    }
 
 
     /**
@@ -238,11 +250,11 @@ module.exports = {
      * @param {*} val
      * @return {Promise}
      */
-    reject(val) {
-        return new Promise((resolve, reject) => {
-            reject(val);
+    function reject(val) {
+        return new Promise((resolver, rejecter) => {
+            rejecter(val);
         });
-    },
+    }
 
 
     /**
@@ -251,11 +263,11 @@ module.exports = {
      * @param {*} val
      * @return {Promise.<*>}
      */
-    resolve(val) {
-        return new Promise((resolve) => {
-            resolve(val);
+    function resolve(val) {
+        return new Promise((resolver) => {
+            resolver(val);
         });
-    },
+    }
 
 
     /**
@@ -281,13 +293,26 @@ module.exports = {
      * @param {Function} fn
      * @return {Promise.<*>}
      */
-    try(fn) {
-        return new Promise((resolve, reject) => {
+    function tryFn(fn) {
+        return new Promise((resolver, rejecter) => {
             try {
-                resolve(fn());
+                resolver(fn());
             } catch (e) {
-                reject(e);
+                rejecter(e);
             }
         });
     }
+
+    return {
+        all: jasmine.createSpy("promise.all").andCallFake(all),
+        any: jasmine.createSpy("promise.any").andCallFake(any),
+        create: jasmine.createSpy("promise.create").andCallFake(create),
+        fromCallback: jasmine.createSpy("promise.fromCallback").andCallFake(fromCallback),
+        promisify: jasmine.createSpy("promise.promisify").andCallFake(promisify),
+        promisifyAll: jasmine.createSpy("promise.promisify").andCallFake(promisifyAll),
+        props: jasmine.createSpy("promise.props").andCallFake(props),
+        reject: jasmine.createSpy("promise.reject").andCallFake(reject),
+        resolve: jasmine.createSpy("promise.resolve").andCallFake(resolve),
+        try: jasmine.createSpy("promise.try").andCallFake(tryFn)
+    };
 };

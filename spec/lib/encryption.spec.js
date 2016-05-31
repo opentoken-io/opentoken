@@ -6,13 +6,13 @@ describe("encryption", () => {
     var encryption;
 
     beforeEach(() => {
-        var ciphersAndHashes, crypto, promiseMock, randomMock;
+        var ciphersAndHashes, cryptoAsync, promiseMock, randomMock;
 
-        ciphersAndHashes = require("../../lib/ciphers-and-hashes");
-        crypto = require("crypto");
-        promiseMock = require("../mock/promise-mock");
-        randomMock = require("../mock/random-mock");
-        encryption = require("../../lib/encryption")(ciphersAndHashes, crypto, promiseMock, randomMock);
+        ciphersAndHashes = require("../../lib/ciphers-and-hashes")();
+        promiseMock = require("../mock/promise-mock")();
+        cryptoAsync = promiseMock.promisifyAll(require("crypto"));
+        randomMock = require("../mock/random-mock")();
+        encryption = require("../../lib/encryption")(ciphersAndHashes, cryptoAsync, promiseMock, randomMock);
     });
     it("encrypts from a buffer with a key as a buffer", (done) => {
         // The rest of the tests use Buffers because it is WAY easier

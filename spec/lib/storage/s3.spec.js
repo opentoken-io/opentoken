@@ -33,7 +33,7 @@ describe("storage/s3", () => {
                 });
             }
         }
-        promiseMock = require("../../mock/promise-mock");
+        promiseMock = require("../../mock/promise-mock")();
         awsSdkMock = {
             S3: S3Fake,
             config: {

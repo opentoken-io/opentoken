@@ -22,7 +22,7 @@ describe("mfa/totp", () => {
             return require("../../../lib/mfa/totp")(config, twofaAsyncMock);
         };
 
-        promiseMock = require("../../mock/promise-mock");
+        promiseMock = require("../../mock/promise-mock")();
         twofaAsyncMock = jasmine.createSpyObj("twofaAsyncMock", [
             "generateKeyAsync",
             "generateGoogleQRAsync",
