@@ -17,13 +17,19 @@ I'm using "E" instead of "×10^" notation.  The number after the E is the number
 
 * 1E9: One billion.  A fountain pen cap (55 mm) enlarged to be one billion times larger would be able to hold the Earth inside (55,000 kilometers for the pen cap, a mere 12,742 km for Earth).
 
+* 4.3E17:  400 quadrillion.  This is our current guess as to the age of the universe in seconds.
+
+* 4E19: 40 quintillion.  The grand canyon can hold about this many grains of sand.
+
 * 7E27: 7 octillion.  This is close to the number of atoms in an average human body.
 
 * 8.0E27:  8 octillion.  The estimated number of grains of sand in the Sahara.
 
 * 1.33E50:  Approximation for the number of atoms in the Earth.
 
-* 1.2E57L:  Roughly how many atoms are in the sun.  Incidentally, it's roughly the same amount of mass as a million Earths.
+* 1.2E57:  Roughly how many atoms are in the sun.  Incidentally, it's roughly the same amount of mass as a million Earths.
+
+* 8.07E67:  The number of permutations of a deck of cards, rounded.  This is the total number of different ways one can shuffle a standard deck of 52 playing cards.  To give you a much better feel for the size of this number, visit this [52 Factorial](http://czep.net/weblog/52cards.html) explanation page.
 
 * 4E78 - 4E82: Estimate for the number of atoms in the observable universe.
 
