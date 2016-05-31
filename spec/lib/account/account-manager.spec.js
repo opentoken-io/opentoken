@@ -36,9 +36,9 @@ describe("AccountManager", () => {
             return promiseMock.resolve("thisisasecrectcodefrommfa");
         });
         totpFake.verifyCurrentAndPrevious.andReturn(true);
-        otDateMock = require("../../mock/ot-date-mock");
-        promiseMock = require("../../mock/promise-mock");
-        randomMock = require("../../mock/random-mock");
+        otDateMock = require("../../mock/ot-date-mock")();
+        promiseMock = require("../../mock/promise-mock")();
+        randomMock = require("../../mock/random-mock")();
         defaultConfig = {
             account: {
                 accountIdLength: 128,

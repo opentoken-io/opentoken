@@ -2,7 +2,7 @@
 
 "use strict";
 
-var config, container, logger, path;
+var config, container, logger;
 
 container = require("../lib/dependencies");
 
@@ -21,8 +21,7 @@ if (process.env.DEBUG) {
     config.debug = true;
 }
 
-path = container.resolve("path");
-container.resolve("bootstrap")(path.resolve(__dirname, "..")).then(() => {
+container.resolve("bootstrap")().then(() => {
     // Kick off the server through dependency injection
     container.resolve("apiServer")();
 });

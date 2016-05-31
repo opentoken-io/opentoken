@@ -14,8 +14,8 @@ describe("route: /", () => {
 
         beforeEach(() => {
             route = factory();
-            req = require("../mock/request");
-            res = require("../mock/response");
+            req = require("../mock/request-mock")();
+            res = require("../mock/response-mock")();
         });
         it("has only a GET method", () => {
             expect(Object.keys(route)).toEqual([
