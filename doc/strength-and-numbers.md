@@ -25,6 +25,8 @@ I'm using "E" instead of "×10^" notation.  The number after the E is the number
 
 * 1.2E57L:  Roughly how many atoms are in the sun.  Incidentally, it's roughly the same amount of mass as a million Earths.
 
+* 8.07e67:  The number of permutations of a deck of cards, rounded.  This is the total number of different ways one can shuffle a standard deck of 52 playing cards.  To give you a much better feel for the size of this number, visit this [52 Factorial](http://czep.net/weblog/52cards.html) explanation page.
+
 * 4E78 - 4E82: Estimate for the number of atoms in the observable universe.
 
 
