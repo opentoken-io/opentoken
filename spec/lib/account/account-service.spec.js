@@ -6,8 +6,8 @@ describe("AccountService", () => {
     beforeEach(() => {
         var config;
 
-        promiseMock = require("../../mock/promise-mock");
-        storageMock = require("../../mock/storage-mock");
+        promiseMock = require("../../mock/promise-mock")();
+        storageMock = require("../../mock/storage-mock")();
         config = {
             account: {
                 accountDir: "account/",
@@ -33,11 +33,7 @@ describe("AccountService", () => {
     });
     describe(".completeAsync()", () => {
         it("puts the information successfully", (done) => {
-            accountService.getRegistrationFileAsync = jasmine.createSpy().andCallFake(() => {
-                return promiseMock.resolve(
-                    new Buffer("{\"data\": \"thing\"}", "binary")
-                );
-            });
+            storageMock.getAsync.andReturn(promiseMock.resolve(new Buffer("{\"data\": \"thing\"}", "binary")));
             accountService.completeAsync({
                 accountId: "unhashedAccountId",
                 password: "somereallylonghashedpassword"
@@ -53,6 +49,7 @@ describe("AccountService", () => {
     });
     describe(".getRegistrationFileAsync()", () => {
         it("gets a registration file with config options", (done) => {
+            storageMock.getAsync.andReturn(promiseMock.resolve(new Buffer("{\"data\": \"thing\"}", "binary")));
             accountService.getRegistrationFileAsync("regIdUnhashed").then((result) => {
                 expect(result).toEqual(jasmine.any(Object));
                 expect(secureHash.hashAsync).toHaveBeenCalledWith("regIdUnhashed", {
@@ -66,6 +63,7 @@ describe("AccountService", () => {
         it("gets a registration file without config options", (done) => {
             var accountServiceLocal;
 
+            storageMock.getAsync.andReturn(promiseMock.resolve(new Buffer("{\"data\": \"thing\"}", "binary")));
             accountServiceLocal = require("../../../lib/account/account-service")({}, secureHash, storageMock);
             accountServiceLocal.getRegistrationFileAsync("regIdUnhashed").then((result) => {
                 var args;

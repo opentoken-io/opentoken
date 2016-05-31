@@ -24,22 +24,22 @@ describe("storage", () => {
     it("throws an error without configuration options set", () => {
         expect(() => {
             create({});
-        }).toThrow("Storage Engine not set");
+        }).toThrow();
     });
     it("throws an error without storage configuartion option for engine", () => {
         expect(() => {
             create({
                 storage: {}
             });
-        }).toThrow("Storage Engine not set");
+        }).toThrow();
     });
-    it("throwns an error for an engine which does not exist", () => {
+    it("throws an error for an engine which does not exist", () => {
         expect(() => {
             create({
                 storage: {
                     engine: "notThere"
                 }
             });
-        }).toThrow("Could not find Storage Engine: notThere");
+        }).toThrow("Could not find storage engine: notThere");
     });
 });

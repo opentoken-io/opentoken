@@ -24,6 +24,8 @@
         }
     },
     "required": [
-        "mfa"
+        "mfa",
+        "server",
+        "storage"
     ]
 }

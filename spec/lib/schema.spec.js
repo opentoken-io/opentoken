@@ -9,7 +9,7 @@ describe("schema", () => {
         fs = require("fs");
         globMock = jasmine.createSpy("globMock");
         validator = require("validator");
-        promiseMock = require("../mock/promise-mock");
+        promiseMock = require("../mock/promise-mock")();
         tv4 = require("tv4");
         tv4.addSchema = jasmine.createSpy("tv4.addSchema").andCallThrough();
         fs.readFile = jasmine.createSpy("fs.readFile").andCallFake((fn, callback) => {

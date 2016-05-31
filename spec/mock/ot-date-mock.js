@@ -66,40 +66,42 @@ function OtDateMock(d) {
     });
 }
 
-module.exports = {
-    /**
-     * Convert a buffer to an OtDateMock
-     *
-     * @param {Buffer} buff
-     * @param {number} [offset]
-     * @return {OtDateMock}
-     */
-    fromBuffer: jasmine.createSpy("fromBuffer").andCallFake((buff, offset) => {
-        var d, t;
+module.exports = () => {
+    return {
+        /**
+         * Convert a buffer to an OtDateMock
+         *
+         * @param {Buffer} buff
+         * @param {number} [offset]
+         * @return {OtDateMock}
+         */
+        fromBuffer: jasmine.createSpy("fromBuffer").andCallFake((buff, offset) => {
+            var d, t;
 
-        d = new Date();
-        t = buff.readUInt32LE(offset);
-        d.setTime(t * 1000);
+            d = new Date();
+            t = buff.readUInt32LE(offset);
+            d.setTime(t * 1000);
 
-        return new OtDateMock(d);
-    }),
+            return new OtDateMock(d);
+        }),
 
-    /**
-     * Creates an OtDateMock from a string
-     *
-     * @param {string} str
-     * @return {OtDateMock}
-     */
-    fromString: jasmine.createSpy("fromString").andCallFake((str) => {
-        return new OtDateMock(new Date(str));
-    }),
+        /**
+         * Creates an OtDateMock from a string
+         *
+         * @param {string} str
+         * @return {OtDateMock}
+         */
+        fromString: jasmine.createSpy("fromString").andCallFake((str) => {
+            return new OtDateMock(new Date(str));
+        }),
 
-    /**
-     * Creates an OtDateMock from the current time
-     *
-     * @return {OtDateMock}
-     */
-    now: jasmine.createSpy("now").andCallFake(() => {
-        return new OtDateMock(new Date());
-    })
+        /**
+         * Creates an OtDateMock from the current time
+         *
+         * @return {OtDateMock}
+         */
+        now: jasmine.createSpy("now").andCallFake(() => {
+            return new OtDateMock(new Date());
+        })
+    };
 };
