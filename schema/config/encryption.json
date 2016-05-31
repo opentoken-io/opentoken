@@ -2,10 +2,10 @@
     "type": "object",
     "properties": {
         "primary": {
-            "$ref": "#/_encryption-cipher-hmac"
+            "$ref": "#/_encryption-cipher-hmac.json"
         },
         "secondary": {
-            "$ref": "#/_encryption-cipher-hmac"
+            "$ref": "#/_encryption-cipher-hmac.json"
         }
     },
     "_encryption-cipher-hmac": {
@@ -15,10 +15,10 @@
                 "type": "object",
                 "properties": {
                     "algorithm": {
-                        "$ref": "encryption-method"
+                        "$ref": "encryption-method.json"
                     },
                     "digest": {
-                        "$ref": "hash-method"
+                        "$ref": "hash-method.json"
                     },
                     "iterations": {
                         "type": "integer",
@@ -30,10 +30,10 @@
                 "type": "object",
                 "properties": {
                     "algorithm": {
-                        "$ref": "hash-method"
+                        "$ref": "hash-method.json"
                     },
                     "digest": {
-                        "$ref": "hash-method"
+                        "$ref": "hash-method.json"
                     },
                     "iterations": {
                         "type": "integer",
