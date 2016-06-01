@@ -23,6 +23,8 @@ module.exports = () => {
         var buff;
 
         buff = new Buffer(size);
+
+        // Fill with the letter B, BBBBBBBBBBBBB... etc
         buff.fill(0x42);
 
         return new Promise((resolve) => {

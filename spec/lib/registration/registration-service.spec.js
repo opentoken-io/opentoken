@@ -28,6 +28,13 @@ describe("registrationService", () => {
             return require("../../../lib/registration/registration-service")(config, OtDateMock, promiseMock, recordMock, secureHashMock, storageMock);
         };
     });
+    it("exposes known methods", () => {
+        expect(factory()).toEqual({
+            delAsync: jasmine.any(Function),
+            getAsync: jasmine.any(Function),
+            putAsync: jasmine.any(Function)
+        });
+    });
     describe(".delAsync()", () => {
         it("simply calls storage.delAsync()", (done) => {
             factory().delAsync("test").then((result) => {

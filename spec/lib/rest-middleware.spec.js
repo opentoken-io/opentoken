@@ -59,14 +59,7 @@ describe("restMiddleware", () => {
             "noSniff",
             "xssFilter"
         ]);
-        serverMock = jasmine.createSpyObj("serverMock", [
-            "use"
-        ]);
-        serverMock.router = {
-            render: jasmine.createSpy("serverMock.router.render").andCallFake((name) => {
-                return `rendered route: ${name}`;
-            })
-        };
+        serverMock = require("../mock/server-mock")();
         restifyMock = mockMiddleware("restifyMock", [
             "CORS"
         ]);
