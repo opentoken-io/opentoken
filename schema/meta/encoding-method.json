@@ -1,6 +1,8 @@
 {
+    "description": "How binary data should be converted to text.  base64-uri replaces + with -, / with _ and eliminates =.",
     "type": "string",
     "enum": [
-        "base64"
+        "base64",
+        "base64-uri"
     ]
 }

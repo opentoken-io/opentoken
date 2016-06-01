@@ -1,6 +1,6 @@
 "use strict";
 
-describe("route: /", () => {
+xdescribe("route: /", () => {
     var factory;
 
     beforeEach(() => {

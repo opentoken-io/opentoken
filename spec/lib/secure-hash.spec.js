@@ -32,11 +32,10 @@ describe("secureHash", () => {
         });
     });
     describe("pbkdf2Async()", () => {
-        // pbkdf2IdAsync tests this function more thoroughly
         it("hashes a passed in string", (done) => {
             secureHash.pbkdf2Async("rRTcBER_EiFUsRa34Hj5Zpok", {
                 algorithm: "sha256",
-                hashLength: 24,
+                derivedLength: 24,
                 iterations: 10000
             }).then((result) => {
                 expect(result.toString("base64")).toBe("gamhxTutw1xATEyonZ2HdUNlsNwMZvMS");
@@ -46,42 +45,60 @@ describe("secureHash", () => {
             expect(() => {
                 secureHash.pbkdf2Async("", {
                     algorithm: "sha256",
-                    hashLength: 24,
+                    derivedLength: 24,
                     iterations: 10000
                 });
             }).toThrow("Nothing to hash");
         });
     });
-    describe("pbkdf2IdAsync()", () => {
-        var hashConfig;
-
-        beforeEach(() => {
-            hashConfig = {
-                algorithm: "sha256",
-                hashLength: 24,
-                iterations: 10000,
-                salt: "pinkFluffyUnicornsDancingOnRainbows"
-            };
-        });
+    describe("hashAsync()", () => {
         it("hashes a passed in string", (done) => {
-            secureHash.pbkdf2IdAsync("rRTcBER_EiFUsRa34Hj5Zpok", hashConfig).then((result) => {
+            secureHash.hashAsync("rRTcBER_EiFUsRa34Hj5Zpok", {
+                algorithm: "sha256",
+                derivedLength: 24,
+                encoding: "base64-uri",
+                iterations: 10000,
+                salt: "pinkFluffyUnicornsDancingOnRainbows",
+                type: "pbkdf2"
+            }).then((result) => {
                 expect(result).toBe("PR4ivl87GgN2bqA_tc3wA9O_HVcETOP5");
             }).then(done, done);
         });
         it("hashes a passed in buffer", (done) => {
-            secureHash.pbkdf2IdAsync(new Buffer("rRTcBER_EiFUsRa34Hj5Zpok", "binary"), hashConfig).then((result) => {
-                expect(result).toBe("PR4ivl87GgN2bqA_tc3wA9O_HVcETOP5");
+            secureHash.hashAsync(new Buffer("rRTcBER_EiFUsRa34Hj5Zpok", "binary"), {
+                algorithm: "sha256",
+                derivedLength: 24,
+                encoding: "base64",
+                iterations: 10000,
+                salt: "pinkFluffyUnicornsDancingOnRainbows",
+                type: "pbkdf2"
+            }).then((result) => {
+                expect(result).toBe("PR4ivl87GgN2bqA/tc3wA9O/HVcETOP5");
             }).then(done, done);
         });
-        it("throws an error when there is nothing to hash", () => {
+        it("throws an error with an invalid type", () => {
             expect(() => {
-                secureHash.pbkdf2IdAsync("", {
+                secureHash.hashAsync("data", {
                     algorithm: "sha256",
+                    encoding: "base64",
                     hashLength: 24,
                     iterations: 10000,
-                    salt: "salty"
+                    salt: "salty",
+                    type: "unknown"
                 });
-            }).toThrow("Nothing to hash");
+            }).toThrow("Invalid hash type configuration");
+        });
+        it("throws an error with an invalid encoding method", () => {
+            expect(() => {
+                secureHash.hashAsync("data", {
+                    algorithm: "sha256",
+                    encoding: "broken",
+                    hashLength: 24,
+                    iterations: 10000,
+                    salt: "salty",
+                    type: "pbkdf2"
+                });
+            }).toThrow("Invalid hash encoding configuration");
         });
     });
 });

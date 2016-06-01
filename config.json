@@ -57,8 +57,10 @@
         "confirmationCodeLength": 32,
         "idHash": {
             "algorithm": "sha512",
-            "hashLength": 48,
-            "iterations": 100000
+            "derivedLength": 48,
+            "encoding": "base64-uri",
+            "iterations": 100000,
+            "type": "pbkdf2"
         },
         "idLength": 32,
         "lifetime": {

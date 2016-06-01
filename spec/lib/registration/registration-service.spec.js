@@ -17,11 +17,7 @@ describe("registrationService", () => {
             override = override || {};
             config = {
                 registration: {
-                    idHash: override.idHash || {
-                        algorithm: "sha256",
-                        hashLength: 24,
-                        iterations: 10000
-                    },
+                    idHash: override.idHash || "normal idhash",
                     lifetime: override.lifetime || {
                         hours: 1
                     },
@@ -36,27 +32,15 @@ describe("registrationService", () => {
         it("simply calls storage.delAsync()", (done) => {
             factory().delAsync("test").then((result) => {
                 expect(result).toEqual(true);
-                expect(secureHashMock.pbkdf2IdAsync).toHaveBeenCalledWith("test", {
-                    algorithm: "sha256",
-                    hashLength: 24,
-                    iterations: 10000
-                });
-                expect(storageMock.delAsync).toHaveBeenCalledWith("somewhere/pbkdf2IdHash");
+                expect(secureHashMock.hashAsync).toHaveBeenCalledWith("test", "normal idhash");
+                expect(storageMock.delAsync).toHaveBeenCalledWith("somewhere/---hash---");
             }).then(done, done);
         });
         it("uses the right configuration for generating the key", (done) => {
             factory({
-                idHash: {
-                    algorithm: "whirlpool",
-                    hashLength: 123,
-                    iterations: 100
-                }
+                idHash: "different idhash"
             }).delAsync("test").then(() => {
-                expect(secureHashMock.pbkdf2IdAsync).toHaveBeenCalledWith("test", {
-                    algorithm: "whirlpool",
-                    hashLength: 123,
-                    iterations: 100
-                });
+                expect(secureHashMock.hashAsync).toHaveBeenCalledWith("test", "different idhash");
             }).then(done, done);
         });
     });
@@ -66,7 +50,7 @@ describe("registrationService", () => {
                 var args;
 
                 expect(result).toEqual("thawed");
-                expect(storageMock.getAsync).toHaveBeenCalledWith("somewhere/pbkdf2IdHash");
+                expect(storageMock.getAsync).toHaveBeenCalledWith("somewhere/---hash---");
                 args = recordMock.thawAsync.mostRecentCall.args;
                 expect(args[0] instanceof Buffer).toBe(true);
                 expect(args[0].toString("binary")).toBe("record data");
@@ -78,7 +62,7 @@ describe("registrationService", () => {
             factory({
                 storagePrefix: "elsewhere/"
             }).getAsync("test").then(() => {
-                expect(storageMock.getAsync).toHaveBeenCalledWith("elsewhere/pbkdf2IdHash");
+                expect(storageMock.getAsync).toHaveBeenCalledWith("elsewhere/---hash---");
             }).then(done, done);
         });
     });
@@ -102,7 +86,7 @@ describe("registrationService", () => {
                     }
                 }, undefined);
                 args = storageMock.putAsync.mostRecentCall.args;
-                expect(args[0]).toBe("somewhere/pbkdf2IdHash");
+                expect(args[0]).toBe("somewhere/---hash---");
                 expect(args[1] instanceof Buffer).toBe(true);
                 expect(args[1].toString("binary")).toBe("frozen");
                 expect(args[2]).toEqual({
