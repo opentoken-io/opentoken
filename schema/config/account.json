@@ -2,20 +2,20 @@
     "type": "object",
     "properties": {
         "accountDir": {
-            "$ref": "storage-dir"
+            "$ref": "storage-dir.json"
         },
         "accountIdLength": {
             "type": "integer",
             "minimum": 6
         },
         "completeLifetime": {
-            "$ref": "time-offset"
+            "$ref": "time-offset.json"
         },
         "idHash": {
             "type": "object",
             "properties": {
                 "algorithm": {
-                    "$ref": "hash-method"
+                    "$ref": "hash-method.json"
                 },
                 "hashLength": {
                     "type": "integer",
@@ -28,14 +28,14 @@
             }
         },
         "initiateLifetime": {
-            "$ref": "time-offset"
+            "$ref": "time-offset.json"
         },
         "passwordSaltLength": {
             "type": "integer",
             "minimum": 6
         },
         "registrationDir": {
-            "$ref": "storage-dir"
+            "$ref": "storage-dir.json"
         },
         "registrationIdLength": {
             "type": "integer",
