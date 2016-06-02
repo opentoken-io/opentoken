@@ -1,74 +1,34 @@
 "use strict";
 
-xdescribe("route: /", () => {
-    var factory;
-
-    beforeEach(() => {
-        factory = require("../../route/");
+jasmine.routeTester("/", null, (routeTester) => {
+    it("exports GET and a name", () => {
+        expect(Object.keys(routeTester.exports).sort()).toEqual([
+            "get",
+            "name"
+        ]);
     });
-    it("exports a factory", () => {
-        expect(factory).toEqual(jasmine.any(Function));
-    });
-    describe("factory results (/)", () => {
-        var req, res, route, serverMock;
-
-        beforeEach(() => {
-            var container;
-
-            container = require("../../lib/dependencies.js");
-            container.register("config", {
-                baseDir: "/"
-            });
-            serverMock = require("../mock/server-mock")();
-            route = factory(serverMock, "/", {
-                container
-            });
-            req = require("../mock/request-mock")();
-            res = require("../mock/response-mock")();
+    describe("GET", () => {
+        it("has no content", (done) => {
+            routeTester.get().then(() => {
+                expect(routeTester.res.send).toHaveBeenCalledWith(204);
+            }).then(done, done);
         });
-        it("has only a GET method", () => {
-            expect(Object.keys(route)).toEqual([
-                "get"
-            ]);
+        it("adds service links", (done) => {
+            routeTester.get().then(() => {
+                expect(routeTester.res.linkObjects).toEqual([
+                    {
+                        href: "rendered route: registration-register",
+                        profile: "/schema/registration/register-request.json",
+                        rel: "service",
+                        title: "registration-register"
+                    }
+                ]);
+            }).then(done, done);
         });
-        describe("GET", () => {
-            it("does testing-only actions", (done) => {
-                route.get(req, res, () => {
-                    expect(res.contentType).toBe("text/plain");
-                    expect(res.send).toHaveBeenCalled();
-                    done();
-                });
-            });
-            it("calls server.get for static assets", (done) => {
-                route.get(req, res, () => {
-                    expect(serverMock.get).toHaveBeenCalledWith(jasmine.any(RegExp), jasmine.any(Function));
-                    done();
-                });
-            });
-        });
-    });
-    describe("factory results (/index)", () => {
-        var req, res, route, serverMock;
-
-        beforeEach(() => {
-            var container;
-
-            container = require("../../lib/dependencies.js");
-            container.register("config", {
-                baseDir: "/"
-            });
-            serverMock = require("../mock/server-mock")();
-            route = factory(serverMock, "/index", {
-                container
-            });
-            req = require("../mock/request-mock")();
-            res = require("../mock/response-mock")();
-        });
-        it("never called server.get()", (done) => {
-            route.get(req, res, () => {
-                expect(serverMock.get).not.toHaveBeenCalled();
-                done();
-            });
+        it("calls server.get to serve static assets", (done) => {
+            routeTester.get().then(() => {
+                expect(routeTester.server.get).toHaveBeenCalledWith(jasmine.any(RegExp), jasmine.any(Function));
+            }).then(done, done);
         });
     });
 });

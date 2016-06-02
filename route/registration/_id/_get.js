@@ -10,10 +10,10 @@ module.exports = (server, secureInfoGroup, res) => {
             title: "registration-secure"
         },
         item: {
-            href: server.router.render("registration-qr", {
+            href: server.router.render("registration-secure-qr", {
                 id: secureInfoGroup.id
             }),
-            title: "registration-qr"
+            title: "registration-secure-qr"
         }
     });
     res.send(secureInfoGroup.secureInfo);

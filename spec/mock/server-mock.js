@@ -8,8 +8,18 @@ module.exports = () => {
         use: jasmine.createSpy("server.use")
     };
     mock.router = {
-        render: jasmine.createSpy("server.router.render").andCallFake((name) => {
-            return `rendered route: ${name}`;
+        render: jasmine.createSpy("server.router.render").andCallFake((name, obj) => {
+            var route;
+
+            route = `rendered route: ${name}`;
+
+            if (obj) {
+                Object.keys(obj).forEach((key) => {
+                    route += `, ${key}:${JSON.stringify(obj[key])}`;
+                });
+            }
+
+            return route;
         })
     };
 

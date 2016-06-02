@@ -9,7 +9,7 @@ module.exports = (server, path, options) => {
                     res.send(pngData);
                 }).then(next, next);
             },
-            name: "registration-qr"
+            name: "registration-secure-qr"
         };
     });
 };

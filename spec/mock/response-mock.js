@@ -3,33 +3,49 @@
 module.exports = () => {
     var response;
 
-    response = {
-        contentType: "auto",
-        linkObjects: [],
-        links: jasmine.createSpy("response.links").andCallFake((linkObj) => {
-            Object.keys(linkObj).sort().forEach((rel) => {
-                var linkVals;
+    /**
+     * Sets a header on this response mock
+     *
+     * @param {string} key
+     * @param {string} value
+     */
+    function headerSetter(key, value) {
+        key = key.toLowerCase();
+        response.headers[key] = value;
 
-                linkVals = [].concat(linkObj[rel]);
-                linkVals.forEach((linkVal) => {
-                    if (typeof linkVal === "string") {
-                        linkVal = {
-                            href: linkVal
-                        };
-                    }
+        if (key === "content-type") {
+            response.contentType = value;
+        }
+    }
 
-                    linkVal.rel = rel;
-                    response.linkObjects.push(linkVal);
-                });
+    response = jasmine.createSpyObj("response", [
+        "links",
+        "header",
+        "send",
+        "setHeader"
+    ]);
+    response.contentType = "auto";
+    response.header.andCallFake(headerSetter);
+    response.headers = {};
+    response.linkObjects = [];
+    response.links.andCallFake((linkObj) => {
+        Object.keys(linkObj).sort().forEach((rel) => {
+            var linkVals;
+
+            linkVals = [].concat(linkObj[rel]);
+            linkVals.forEach((linkVal) => {
+                if (typeof linkVal === "string") {
+                    linkVal = {
+                        href: linkVal
+                    };
+                }
+
+                linkVal.rel = rel;
+                response.linkObjects.push(linkVal);
             });
-        }),
-        send: jasmine.createSpy("response.send"),
-        setHeader: jasmine.createSpy("response.setHeader").andCallFake((header, value) => {
-            if (header.toLowerCase() === "content-type") {
-                response.contentType = value;
-            }
-        })
-    };
+        });
+    });
+    response.setHeader.andCallFake(headerSetter);
 
     return response;
 };

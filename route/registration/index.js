@@ -5,7 +5,7 @@ var getHandler;
 getHandler = require("./_id/_get.js");
 
 module.exports = (server, path, options) => {
-    return options.container.call((registrationManager, schema, validateRequestMiddleware) => {
+    return options.container.call((registrationManager, validateRequestMiddleware) => {
         return {
             name: "registration-register",
             post: [

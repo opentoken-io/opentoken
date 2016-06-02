@@ -51,6 +51,20 @@ describe("chainMiddleware", () => {
             done();
         });
     });
+    it("skips members of a chain if next is called with false", (done) => {
+        var mw1, mw2, result;
+
+        mw1 = fakeMiddleware("mw1", false);
+        mw2 = fakeMiddleware("mw2");
+        result = chainMiddleware(mw1, mw2);
+        expect(result).toEqual(jasmine.any(Function));
+        result(requestMock, responseMock, (err) => {
+            expect(mw1).toHaveBeenCalledWith(requestMock, responseMock, jasmine.any(Function));
+            expect(mw2).not.toHaveBeenCalled();
+            expect(err).toBe(false);
+            done();
+        });
+    });
     it("untangles a complicated array of things", (done) => {
         var chain, mw, result;
 

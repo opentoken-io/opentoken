@@ -201,7 +201,7 @@ describe("registrationManager", () => {
                     }
                 });
                 expect(emailMock.sendTemplate).toHaveBeenCalledWith("user@example.com", "registration", {
-                    confirmUrl: "rendered route: registration-confirm"
+                    confirmUrl: "rendered route: registration-confirm, code:\"code\", id:\"id\""
                 });
             }).then(done, done);
         });

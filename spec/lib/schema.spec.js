@@ -11,8 +11,8 @@ describe("schema", () => {
         validator = require("validator");
         promiseMock = require("../mock/promise-mock")();
         tv4 = require("tv4");
-        tv4.addSchema = jasmine.createSpy("tv4.addSchema").andCallThrough();
-        fs.readFile = jasmine.createSpy("fs.readFile").andCallFake((fn, callback) => {
+        spyOn(tv4, "addSchema").andCallThrough();
+        spyOn(fs, "readFile").andCallFake((fn, callback) => {
             /**
              * Signify the end of the loading of a file.  If passed a string,
              * uses that string as a buffer.  If passed an object, first it
