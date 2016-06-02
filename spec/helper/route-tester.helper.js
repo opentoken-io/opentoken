@@ -15,6 +15,7 @@ path = require("path");
  * @prop {Object} req Mock request object
  * @prop {Object} res Mock response object
  * @prop {Object} server Mock server object
+ * @prop {(Object|null)} validationResult From validating against a schema
  */
 
 /**
@@ -47,6 +48,8 @@ function addRouteMethods(routeTester) {
 
         if (typeof middleware === "function") {
             routeTester[methodName] = (body) => {
+                var schema;
+
                 if (body) {
                     routeTester.req.body = body;
 
@@ -56,12 +59,14 @@ function addRouteMethods(routeTester) {
                     }
                 }
 
-                return routeTester.container.resolve("bootstrap")().then(() => {
+                schema = routeTester.container.resolve("schema");
+
+                return schema.loadSchemaFolderAsync(path.resolve(__dirname, "../../schema")).then(() => {
                     return new Promise((resolve, reject) => {
                         middleware(routeTester.req, routeTester.res, (val) => {
-                            // This does not match normal promise behavior.
-                            // Because of that, I must manually handle it
-                            // here.
+                            // This does not match normal promise behavior,
+                            // so I must manually handle it here instead of
+                            // using promisifyAll().
                             if (typeof val === "undefined") {
                                 resolve();
                             } else {
@@ -105,7 +110,12 @@ jasmine.routeTester = (routePath, containerOverrideFn, callback) => {
                 container = require("../../lib/dependencies");
                 validateRequestMiddleware = jasmine.createSpy("validateRequestMiddleware").andCallFake((schemaPath) => {
                     return (req, res, next) => {
-                        if (container.resolve("schema").validate(req.body, schemaPath)) {
+                        var result;
+
+                        result = container.resolve("schema").validate(req.body, schemaPath);
+                        routeTester.validationResult = result;
+
+                        if (result) {
                             res.send(400, new Error(`Did not validate against schema: ${schemaPath}`));
 
                             return next(false);
@@ -134,6 +144,7 @@ jasmine.routeTester = (routePath, containerOverrideFn, callback) => {
                 routeTester.server = serverMock;
                 routeTester.req = require("../mock/request-mock")();
                 routeTester.res = require("../mock/response-mock")();
+                routeTester.validationResult = null;
                 addRouteMethods(routeTester);
             });
             callback(routeTester);

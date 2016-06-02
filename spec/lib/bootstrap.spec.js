@@ -26,7 +26,7 @@ describe("bootstrap", () => {
     });
     it("passes with stock config", (done) => {
         bootstrap().then(() => {
-            expect(schemaMock.loadSchemaFolderAsync).toHaveBeenCalledWith(`${baseDir}schema/`);
+            expect(schemaMock.loadSchemaFolderAsync).toHaveBeenCalledWith(`${baseDir}schema`);
         }).then(done, done);
     });
     it("errors when config is a string", (done) => {

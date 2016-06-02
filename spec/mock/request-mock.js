@@ -14,6 +14,7 @@ module.exports = () => {
     request.headers = [];
     request.href.andReturn("/path");
     request.method = "GET";
+    request.params = {};
 
     return request;
 };

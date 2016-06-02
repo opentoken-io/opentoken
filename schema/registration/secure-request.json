@@ -3,6 +3,7 @@
     "properties": {
         "passwordHash": {
             "minLength": 24,
+            "format": "password-hash",
             "allOf": [
                 {
                     "$ref": "../../meta/base64.json"
@@ -11,6 +12,7 @@
         },
         "totp": {
             "type": "object",
+            "format": "totp-current-and-previous",
             "properties": {
                 "current": {
                     "$ref": "../meta/totp-code.json"

@@ -1,12 +1,14 @@
 "use strict";
 
 describe("schema", () => {
-    var globMock, promiseMock, schema;
+    var globMock, path, promiseMock, schema;
 
     beforeEach(() => {
         var fs, tv4, validator;
 
         fs = require("fs");
+        path = require("path");
+        spyOn(path, "resolve").andCallThrough();
         globMock = jasmine.createSpy("globMock");
         validator = require("validator");
         promiseMock = require("../mock/promise-mock")();
@@ -72,7 +74,7 @@ describe("schema", () => {
             callback(new Error(`Invalid file: ${fn.toString()}`));
         });
 
-        schema = require("../../lib/schema")(promiseMock.promisifyAll(fs), globMock, promiseMock, tv4, validator);
+        schema = require("../../lib/schema")(promiseMock.promisifyAll(fs), globMock, path, promiseMock, tv4, validator);
     });
     describe(".getMissingSchemas()", () => {
         it("reports on missing schemas", (done) => {
@@ -103,6 +105,9 @@ describe("schema", () => {
     });
     describe(".loadSchemaFolderAsync()", () => {
         it("loads schemas in folder and validates against them", (done) => {
+            path.resolve.andCallFake((a, b) => {
+                return a + b;
+            });
             globMock.andCallFake((pattern, options) => {
                 expect(pattern).toBe("./folder/**/*.json");
                 expect(options).toEqual({

@@ -5,12 +5,7 @@ describe("registrationManager", () => {
 
     beforeEach(() => {
         promiseMock = require("../../mock/promise-mock")();
-        accountManagerMock = jasmine.createSpyObj("accountManagerMock", [
-            "createAsync",
-            "passwordHashConfigAsync"
-        ]);
-        accountManagerMock.createAsync.andReturn(promiseMock.resolve("createdId"));
-        accountManagerMock.passwordHashConfigAsync.andReturn(promiseMock.resolve("accountManager.passwordHashConfig"));
+        accountManagerMock = require("../../mock/account-manager-mock")();
         emailMock = require("../../mock/email-mock")();
         randomMock = require("../../mock/random-mock")();
         registrationServiceMock = jasmine.createSpyObj("registrationServiceMock", [

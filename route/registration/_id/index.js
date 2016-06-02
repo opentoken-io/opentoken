@@ -10,9 +10,6 @@ module.exports = (server, path, options) => {
             get(req, res, next) {
                 registrationManager.secureInfoAsync(req.params.id).then((secureInfoGroup) => {
                     getHandler(server, secureInfoGroup, res);
-                }).then(null, (err) => {
-                    console.log(err.stack);
-                    throw err;
                 }).then(next, next);
             },
             name: "registration-secure",

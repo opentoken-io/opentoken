@@ -1,18 +1,9 @@
 "use strict";
 
-jasmine.routeTester("/registration", (container) => {
-    var promiseMock, registrationManagerMock;
+var registrationManagerMock;
 
-    promiseMock = require("../../mock/promise-mock")();
-    registrationManagerMock = jasmine.createSpyObj("registrationManager", [
-        "registerAsync"
-    ]);
-    registrationManagerMock.registerAsync.andReturn(promiseMock.resolve({
-        id: "id",
-        secureInfo: {
-            secure: "info"
-        }
-    }));
+jasmine.routeTester("/registration", (container) => {
+    registrationManagerMock = require("../../mock/registration-manager-mock")();
     container.register("registrationManager", registrationManagerMock);
 }, (routeTester) => {
     it("exports the right methods", () => {
@@ -35,6 +26,9 @@ jasmine.routeTester("/registration", (container) => {
             routeTester.post({
                 email: "test@example.org"
             }).then(() => {
+                expect(registrationManagerMock.registerAsync).toHaveBeenCalledWith({
+                    email: "test@example.org"
+                });
                 expect(routeTester.res.linkObjects).toEqual([
                     {
                         href: "rendered route: registration-secure, id:\"id\"",

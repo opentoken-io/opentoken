@@ -6,6 +6,14 @@ module.exports = (server, path, options) => {
             get(req, res, next) {
                 registrationManager.qrCodeImageAsync(req.params.id).then((pngData) => {
                     res.contentType = "image/png";
+                    res.links({
+                        item: {
+                            href: server.router.render("registration-secure", {
+                                id: req.params.id
+                            }),
+                            title: "registration-secure"
+                        }
+                    });
                     res.send(pngData);
                 }).then(next, next);
             },
