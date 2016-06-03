@@ -43,8 +43,8 @@
     },
     "mfa": {
         "totp": {
-            "name": "OpenToken.io",
-            "keyLength": 128
+            "keyLength": 128,
+            "name": "OpenToken.io"
         }
     },
     "record": {
