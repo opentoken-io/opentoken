@@ -105,6 +105,17 @@ describe("record", () => {
             expect(result.toString("binary")).toEqual("encrypted-primary-cipher");
         }).then(done, done);
     });
+    describe("freezing with metadata", () => {
+        it("saves metadata outside the inner encryption", (done) => {
+            record.freezeAsync({}, "", {}, {
+                meta: "data"
+            }).then(() => {
+                expect(bufferSerializerMock.toBuffer.calls[1].args[0].meta).toEqual({
+                    meta: "data"
+                });
+            }).then(done, done);
+        });
+    });
     describe("freezing with expires", () => {
         var expiresMax, expiresOption;
 

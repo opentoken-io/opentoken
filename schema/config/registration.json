@@ -1,0 +1,31 @@
+{
+    "type": "object",
+    "properties": {
+        "confirmationCodeLength": {
+            "description": "Number of bytes for generated IDs",
+            "type": "integer",
+            "minimum": 8
+        },
+        "idHash": {
+            "$ref": "../meta/secure-hash.json"
+        },
+        "idLength": {
+            "description": "Number of bytes for generated IDs",
+            "type": "integer",
+            "minimum": 8
+        },
+        "lifetime": {
+            "$ref": "time-offset.json"
+        },
+        "storagePrefix": {
+            "$ref": "storage-prefix.json"
+        }
+    },
+    "required": [
+        "confirmationCodeLength",
+        "idHash",
+        "idLength",
+        "lifetime",
+        "storagePrefix"
+    ]
+}

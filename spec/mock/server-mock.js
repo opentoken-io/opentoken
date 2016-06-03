@@ -1,7 +1,27 @@
 "use strict";
 
 module.exports = () => {
-    return {
-        get: jasmine.createSpy("server.get")
+    var mock;
+
+    mock = {
+        get: jasmine.createSpy("server.get"),
+        use: jasmine.createSpy("server.use")
     };
+    mock.router = {
+        render: jasmine.createSpy("server.router.render").andCallFake((name, obj) => {
+            var route;
+
+            route = `rendered route: ${name}`;
+
+            if (obj) {
+                Object.keys(obj).forEach((key) => {
+                    route += `, ${key}:${JSON.stringify(obj[key])}`;
+                });
+            }
+
+            return route;
+        })
+    };
+
+    return mock;
 };

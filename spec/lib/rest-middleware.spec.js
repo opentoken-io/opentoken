@@ -59,9 +59,7 @@ describe("restMiddleware", () => {
             "noSniff",
             "xssFilter"
         ]);
-        serverMock = jasmine.createSpyObj("serverMock", [
-            "use"
-        ]);
+        serverMock = require("../mock/server-mock")();
         restifyMock = mockMiddleware("restifyMock", [
             "CORS"
         ]);
@@ -88,50 +86,24 @@ describe("restMiddleware", () => {
         expectNormalMiddlewareWasCalled();
         expect(helmetMock.hsts).toHaveBeenCalled();
     });
-    describe("self-discovery links", () => {
-        var linkFunction, links, next, req, res;
+    describe("self-discovery link creation", () => {
+        var linkFunction, next, req, res;
 
         beforeEach(() => {
-            links = [];
             next = jasmine.createSpy("nextMock");
-            res = jasmine.createSpyObj("resMock", [
-                "links"
-            ]);
-            res.links.andCallFake((linkObj) => {
-                Object.keys(linkObj).forEach((rel) => {
-                    var linkVals;
-
-                    linkVals = [].concat(linkObj[rel]);
-                    linkVals.forEach((linkVal) => {
-                        if (typeof linkVal === "string") {
-                            linkVal = {
-                                href: linkVal
-                            };
-                        }
-
-                        linkVal.rel = rel;
-                        links.push(linkVal);
-                    });
-                });
-            });
-            req = jasmine.createSpyObj("reqMock", [
-                "href"
-            ]);
-            req.href.andReturn("/path");
-            req.method = "GET";
+            res = require("../mock/response-mock")();
+            req = require("../mock/request-mock")();
             restMiddleware({
                 baseUrl: "http://localhost:8443",
                 https: false
             }, serverMock);
             linkFunction = serverMock.use.mostRecentCall.args[0];
         });
-        it("set up for GET", () => {
-            expect(() => {
-                linkFunction(req, res, next);
-            }).not.toThrow();
-            expect(links).toEqual([
+        it("adds appropriate links for GET", () => {
+            linkFunction(req, res, next);
+            expect(res.linkObjects).toEqual([
                 {
-                    href: "http://localhost:8443/",
+                    href: "rendered route: self-discovery",
                     rel: "up",
                     title: "self-discovery"
                 },
@@ -141,14 +113,12 @@ describe("restMiddleware", () => {
                 }
             ]);
         });
-        it("set up for POST", () => {
+        it("adds appropriate links for POST", () => {
             req.method = "POST";
-            expect(() => {
-                linkFunction(req, res, next);
-            }).not.toThrow();
-            expect(links).toEqual([
+            linkFunction(req, res, next);
+            expect(res.linkObjects).toEqual([
                 {
-                    href: "http://localhost:8443/",
+                    href: "rendered route: self-discovery",
                     rel: "up",
                     title: "self-discovery"
                 }

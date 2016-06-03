@@ -1,96 +1,85 @@
 "use strict";
 
-describe("AccountService", () => {
-    var accountService, promiseMock, secureHash, storageMock;
+describe("account/accountService", () => {
+    var factory, OtDateMock, recordMock, storageMock;
 
     beforeEach(() => {
-        var config;
-
-        promiseMock = require("../../mock/promise-mock")();
+        OtDateMock = require("../../mock/ot-date-mock")();
+        recordMock = require("../../mock/record-mock")();
         storageMock = require("../../mock/storage-mock")();
-        config = {
-            account: {
-                accountDir: "account/",
-                registrationDir: "registration/",
-                idHash: {
-                    algorithm: "sha256",
-                    hashLength: 24,
-                    iterations: 10000,
-                    salt: "pinkFullyUnicornsDancingOnRainbows"
+        factory = () => {
+            var config;
+
+            config = {
+                account: {
+                    lifetime: "lifetime",
+                    storagePrefix: "storagePrefix/"
                 }
-            },
-            storage: {
-                bucket: "some-place-wonderful"
-            }
+            };
+
+            return require("../../../lib/account/account-service")(config, OtDateMock, recordMock, storageMock);
         };
-        secureHash = jasmine.createSpyObj("secureHash", [
-            "hashAsync"
-        ]);
-        secureHash.hashAsync.andCallFake(() => {
-            return promiseMock.resolve("hashedContent");
-        });
-        accountService = require("../../../lib/account/account-service")(config, secureHash, storageMock);
     });
-    describe(".completeAsync()", () => {
-        it("puts the information successfully", (done) => {
-            storageMock.getAsync.andReturn(promiseMock.resolve(new Buffer("{\"data\": \"thing\"}", "binary")));
-            accountService.completeAsync({
-                accountId: "unhashedAccountId",
-                password: "somereallylonghashedpassword"
-            }, {
-                expires: new Date()
-            }, "somethinghere").then((result) => {
-                expect(result).toEqual({
-                    accountId: "unhashedAccountId"
-                });
-                expect(storageMock.delAsync).toHaveBeenCalledWith("registration/hashedContent");
-            }).then(done, done);
+    it("exposes known methods", () => {
+        expect(factory()).toEqual({
+            delAsync: jasmine.any(Function),
+            getAsync: jasmine.any(Function),
+            putAsync: jasmine.any(Function)
         });
     });
-    describe(".getRegistrationFileAsync()", () => {
-        it("gets a registration file with config options", (done) => {
-            storageMock.getAsync.andReturn(promiseMock.resolve(new Buffer("{\"data\": \"thing\"}", "binary")));
-            accountService.getRegistrationFileAsync("regIdUnhashed").then((result) => {
-                expect(result).toEqual(jasmine.any(Object));
-                expect(secureHash.hashAsync).toHaveBeenCalledWith("regIdUnhashed", {
-                    algorithm: "sha256",
-                    hashLength: 24,
-                    iterations: 10000,
-                    salt: "pinkFullyUnicornsDancingOnRainbows"
-                });
-            }).then(done, done);
-        });
-        it("gets a registration file without config options", (done) => {
-            var accountServiceLocal;
+    it("deletes", (done) => {
+        var service;
 
-            storageMock.getAsync.andReturn(promiseMock.resolve(new Buffer("{\"data\": \"thing\"}", "binary")));
-            accountServiceLocal = require("../../../lib/account/account-service")({}, secureHash, storageMock);
-            accountServiceLocal.getRegistrationFileAsync("regIdUnhashed").then((result) => {
-                var args;
-
-                expect(result).toEqual({
-                    data: "thing"
-                });
-                expect(secureHash.hashAsync).toHaveBeenCalled();
-                args = secureHash.hashAsync.mostRecentCall.args;
-                expect(args[0]).toBe("regIdUnhashed");
-                expect(typeof args[1]).toBe("undefined");
-            }).then(done, done);
-        });
+        service = factory();
+        service.delAsync("id").then(() => {
+            expect(storageMock.delAsync).toHaveBeenCalledWith("storagePrefix/id");
+        }).then(done, done);
     });
-    describe(".signupInitiateAsync()", () => {
-        it("gets the registration id", (done) => {
-            accountService.signupInitiateAsync({
-                email: "some.one@example.net",
-                mfa: "somesecretcodehere",
-                salt: "someothersecretcodehere"
-            }, {
-                expires: new Date()
-            }, "jb-oRdCgvdImImS4v1XSTYcE").then((result) => {
-                expect(result).toEqual({
-                    regId: "jb-oRdCgvdImImS4v1XSTYcE"
-                });
-            }).then(done, done);
+    it("gets", (done) => {
+        var service;
+
+        service = factory();
+        service.getAsync("id", "innerkey").then((result) => {
+            var args;
+
+            expect(storageMock.getAsync).toHaveBeenCalledWith("storagePrefix/id");
+            args = recordMock.thawAsync.mostRecentCall.args;
+            expect(Buffer.isBuffer(args[0])).toBe(true);
+            expect(args[0].toString("binary")).toBe("record data");
+            expect(args[1]).toBe("innerkey");
+            expect(args.length).toBe(2);
+            expect(result).toBe("thawed");
+        }).then(done, done);
+    });
+    it("puts without metadata", (done) => {
+        var otDate, service;
+
+        service = factory();
+        otDate = OtDateMock.now();
+        OtDateMock.now.andReturn(otDate);
+        otDate.plus.andCallFake((lifetime) => {
+            return lifetime;
         });
+        service.putAsync("id", "innerkey", "record data").then(() => {
+            /* eslint no-undefined:"off" */
+            expect(recordMock.freezeAsync).toHaveBeenCalledWith("record data", "innerkey", {
+                expires: "lifetime"
+            }, undefined);
+        }).then(done, done);
+    });
+    it("puts with metadata", (done) => {
+        var service;
+
+        service = factory();
+        service.putAsync("id", "innerkey", "record data", {
+            meta: "data"
+        }).then(() => {
+            /* eslint no-undefined:"off" */
+            expect(recordMock.freezeAsync).toHaveBeenCalledWith("record data", "innerkey", {
+                expires: jasmine.any(OtDateMock)
+            }, {
+                meta: "data"
+            });
+        }).then(done, done);
     });
 });

@@ -1,45 +1,28 @@
 {
     "type": "object",
     "properties": {
-        "accountDir": {
-            "$ref": "storage-dir.json"
-        },
-        "accountIdLength": {
+        "idLength": {
+            "description": "Number of bytes for generated IDs.",
             "type": "integer",
-            "minimum": 6
+            "minimum": 8
         },
-        "completeLifetime": {
+        "lifetime": {
             "$ref": "time-offset.json"
         },
-        "idHash": {
-            "type": "object",
-            "properties": {
-                "algorithm": {
-                    "$ref": "hash-method.json"
-                },
-                "hashLength": {
-                    "type": "integer",
-                    "minimum": 6
-                },
-                "iterations": {
-                    "type": "integer",
-                    "minimum": 1000
-                }
-            }
-        },
-        "initiateLifetime": {
-            "$ref": "time-offset.json"
+        "passwordHash": {
+            "$ref": "../meta/secure-hash.json"
         },
         "passwordSaltLength": {
+            "description": "Number of characters to use for a password salt.",
             "type": "integer",
-            "minimum": 6
+            "minimum": 8
         },
-        "registrationDir": {
-            "$ref": "storage-dir.json"
-        },
-        "registrationIdLength": {
-            "type": "integer",
-            "minimum": 6
+        "storagePrefix": {
+            "$ref": "storage-prefix.json"
         }
-    }
+    },
+    "required": [
+        "passwordSaltLength",
+        "storagePrefix"
+    ]
 }

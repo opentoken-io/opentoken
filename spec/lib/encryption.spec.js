@@ -10,7 +10,7 @@ describe("encryption", () => {
 
         ciphersAndHashes = require("../../lib/ciphers-and-hashes")();
         promiseMock = require("../mock/promise-mock")();
-        cryptoAsync = promiseMock.promisifyAll(require("crypto"));
+        cryptoAsync = require("../mock/crypto-async-mock")();
         randomMock = require("../mock/random-mock")();
         encryption = require("../../lib/encryption")(ciphersAndHashes, cryptoAsync, promiseMock, randomMock);
     });

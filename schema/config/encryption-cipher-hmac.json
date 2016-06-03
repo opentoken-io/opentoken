@@ -1,0 +1,35 @@
+{
+    "type": "object",
+    "properties": {
+        "cipher": {
+            "type": "object",
+            "properties": {
+                "algorithm": {
+                    "$ref": "../meta/encryption-method.json"
+                },
+                "digest": {
+                    "$ref": "../meta/hash-method.json"
+                },
+                "iterations": {
+                    "type": "integer",
+                    "minimum": 1000
+                }
+            }
+        },
+        "hmac": {
+            "type": "object",
+            "properties": {
+                "algorithm": {
+                    "$ref": "../meta/hash-method.json"
+                },
+                "digest": {
+                    "$ref": "../meta/hash-method.json"
+                },
+                "iterations": {
+                    "type": "integer",
+                    "minimum": 1000
+                }
+            }
+        }
+    }
+}
