@@ -22,7 +22,8 @@ describe("registrationManager", () => {
             passwordHashConfig: "passwordHashConfig",
             totp: {
                 key: "totp key"
-            }
+            },
+            totpConfirmed: false
         }));
         registrationServiceMock.putAsync.andReturn(promiseMock.resolve());
         totpMock = jasmine.createSpyObj("totpMock", [
@@ -58,6 +59,48 @@ describe("registrationManager", () => {
         });
     });
     describe(".confirmEmailAsync", () => {
+        beforeEach(() => {
+            registrationServiceMock.getAsync.andReturn(promiseMock.resolve({
+                confirmationCode: "code",
+                email: "user@example.com",
+                passwordHash: "hashed password",
+                passwordHashConfig: "passwordHashConfig",
+                totp: {
+                    key: "totp key"
+                },
+                totpConfirmed: true
+            }));
+        });
+        it("fails if the record was not secured (passwordHash)", (done) => {
+            registrationServiceMock.getAsync.andReturn(promiseMock.resolve({
+                confirmationCode: "code",
+                totpConfirmed: true
+            }));
+            factory().confirmEmailAsync("id", "code").then(() => {
+                jasmine.fail();
+                done();
+            }, (result) => {
+                expect(result).toEqual(jasmine.any(Error));
+                expect(accountManagerMock.createAsync).not.toHaveBeenCalled();
+                expect(registrationServiceMock.delAsync).not.toHaveBeenCalled();
+                done();
+            });
+        });
+        it("fails if the record was not secured (totpConfirmed)", (done) => {
+            registrationServiceMock.getAsync.andReturn(promiseMock.resolve({
+                confirmationCode: "code",
+                passwordHash: "hash"
+            }));
+            factory().confirmEmailAsync("id", "code").then(() => {
+                jasmine.fail();
+                done();
+            }, (result) => {
+                expect(result).toEqual(jasmine.any(Error));
+                expect(accountManagerMock.createAsync).not.toHaveBeenCalled();
+                expect(registrationServiceMock.delAsync).not.toHaveBeenCalled();
+                done();
+            });
+        });
         it("fails if confirmation code is wrong", (done) => {
             factory().confirmEmailAsync("id", "wrong code").then(() => {
                 jasmine.fail();
@@ -138,7 +181,8 @@ describe("registrationManager", () => {
                     passwordHashConfig: "accountManager.passwordHashConfig",
                     totp: {
                         key: "base32 secret"
-                    }
+                    },
+                    totpConfirmed: false
                 });
                 expect(result).toEqual({
                     id: "BBBBBBBB",
@@ -193,7 +237,8 @@ describe("registrationManager", () => {
                     passwordHashConfig: "passwordHashConfig",
                     totp: {
                         key: "totp key"
-                    }
+                    },
+                    totpConfirmed: true
                 });
                 expect(emailMock.sendTemplate).toHaveBeenCalledWith("user@example.com", "registration", {
                     confirmUrl: "rendered route: registration-confirm, code:\"code\", id:\"id\""
