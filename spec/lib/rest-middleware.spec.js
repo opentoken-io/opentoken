@@ -1,7 +1,7 @@
 "use strict";
 
 describe("restMiddleware", () => {
-    var helmetMock, restifyLinks, restifyMock, restifyPlugins, restMiddleware, serverMock;
+    var helmetMock, restifyCookiesMock, restifyLinks, restifyMock, restifyPlugins, restMiddleware, serverMock;
 
     /**
      * Tests the common middleware set up when calling restMiddleware.
@@ -70,7 +70,10 @@ describe("restMiddleware", () => {
             "gzipResponse",
             "queryParser"
         ]);
-        restMiddleware = restMiddlewareFactory(helmetMock, loggerMock, restifyMock, restifyLinks, restifyPlugins);
+        restifyCookiesMock = jasmine.createSpyObj("restifyCookies", [
+            "parse"
+        ]);
+        restMiddleware = restMiddlewareFactory(helmetMock, loggerMock, restifyMock, restifyCookiesMock, restifyLinks, restifyPlugins);
     });
     it("calls restMiddleware without https", () => {
         restMiddleware({
