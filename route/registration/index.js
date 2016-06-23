@@ -1,11 +1,11 @@
 "use strict";
 
-var getHandler;
-
-getHandler = require("./_id/_get.js");
-
 module.exports = (server, path, options) => {
     return options.container.call((registrationManager, validateRequestMiddleware) => {
+        var getResponse;
+
+        getResponse = require("./_id/_get-response")(server);
+
         return {
             name: "registration-register",
             post: [
@@ -21,7 +21,7 @@ module.exports = (server, path, options) => {
                         res.links({
                             self: url
                         });
-                        getHandler(server, secureInfoGroup, res);
+                        getResponse(secureInfoGroup, res);
                     }).then(next, next);
                 }
             ]
