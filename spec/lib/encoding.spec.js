@@ -18,7 +18,7 @@ describe("encoding", () => {
         });
         it("throws on invalid method", () => {
             expect(() => {
-                encoding.encode("anything", "wrong");
+                encoding.decode("anything", "wrong");
             }).toThrow("Invalid decoding method: wrong");
         });
     });
@@ -31,7 +31,7 @@ describe("encoding", () => {
         });
         it("throws on invalid method", () => {
             expect(() => {
-                encoding.decode("anything", "wrong");
+                encoding.encode("anything", "wrong");
             }).toThrow("Invalid encoding method: wrong");
         });
     });
