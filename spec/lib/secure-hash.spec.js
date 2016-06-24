@@ -4,12 +4,12 @@ describe("secureHash", () => {
     var secureHash;
 
     beforeEach(() => {
-        var base64, cryptoAsync, promiseMock;
+        var base64Mock, cryptoAsync, promiseMock;
 
         promiseMock = require("../mock/promise-mock")();
         cryptoAsync = promiseMock.promisifyAll(require("crypto"));
-        base64 = require("../../lib/base64")();
-        secureHash = require("../../lib/secure-hash")(base64, cryptoAsync);
+        base64Mock = require("../mock/base64-mock")();
+        secureHash = require("../../lib/secure-hash")(base64Mock, cryptoAsync);
     });
     describe("compare()", () => {
         it("compares successfully", () => {
