@@ -1,23 +1,22 @@
 "use strict";
 
-describe("account/accountManager", () => {
-    var accountServiceMock, factory, randomMock;
+describe("accountManager", () => {
+    var factory, randomMock, storageServiceFactoryMock;
 
     beforeEach(() => {
         var promiseMock;
 
-        promiseMock = require("../../mock/promise-mock")();
-        accountServiceMock = jasmine.createSpyObj("accountServiceMock", [
-            "put"
-        ]);
-        accountServiceMock.put.andReturn(promiseMock.resolve());
-        randomMock = require("../../mock/random-mock")();
+        promiseMock = require("../mock/promise-mock")();
+        randomMock = require("../mock/random-mock")();
+        storageServiceFactoryMock = require("../mock/storage-service-factory-mock")();
         factory = () => {
             var config;
 
             config = {
                 account: {
+                    idHash: {},
                     idLength: 10,
+                    lifetime: {},
                     passwordHash: {
                         algorithm: "algorithm",
                         derivedLength: "derivedLength",
@@ -25,11 +24,12 @@ describe("account/accountManager", () => {
                         iterations: "iterations",
                         type: "type"
                     },
-                    passwordSaltLength: 20
+                    passwordSaltLength: 20,
+                    storagePrefix: "anything"
                 }
             };
 
-            return require("../../../lib/account/account-manager")(accountServiceMock, config, promiseMock, randomMock);
+            return require("../../lib/account-manager")(config, promiseMock, randomMock, storageServiceFactoryMock);
         };
     });
     it("exposes known methods", () => {
@@ -48,7 +48,7 @@ describe("account/accountManager", () => {
         manager = factory();
         manager.createAsync(record).then((result) => {
             expect(randomMock.idAsync).toHaveBeenCalledWith(10);
-            expect(accountServiceMock.put).toHaveBeenCalledWith("BBBBBBBBBB", record, {
+            expect(storageServiceFactoryMock.instance.putAsync).toHaveBeenCalledWith("BBBBBBBBBB", record, {
                 email: record.email
             });
             expect(result).toBe("BBBBBBBBBB");

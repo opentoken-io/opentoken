@@ -1,6 +1,9 @@
 {
     "type": "object",
     "properties": {
+        "idHash": {
+            "$ref": "../meta/secure-hash.json"
+        },
         "idLength": {
             "description": "Number of bytes for generated IDs.",
             "type": "integer",

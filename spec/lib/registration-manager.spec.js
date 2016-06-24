@@ -1,20 +1,18 @@
 "use strict";
 
 describe("registrationManager", () => {
-    var accountManagerMock, emailMock, factory, promiseMock, randomMock, registrationServiceMock, totpMock;
+    var accountManagerMock, emailMock, factory, promiseMock, randomMock, storageService, totpMock;
 
     beforeEach(() => {
-        promiseMock = require("../../mock/promise-mock")();
-        accountManagerMock = require("../../mock/account-manager-mock")();
-        emailMock = require("../../mock/email-mock")();
-        randomMock = require("../../mock/random-mock")();
-        registrationServiceMock = jasmine.createSpyObj("registrationServiceMock", [
-            "delAsync",
-            "getAsync",
-            "putAsync"
-        ]);
-        registrationServiceMock.delAsync.andReturn(promiseMock.resolve());
-        registrationServiceMock.getAsync.andReturn(promiseMock.resolve({
+        var storageServiceFactoryMock;
+
+        promiseMock = require("../mock/promise-mock")();
+        accountManagerMock = require("../mock/account-manager-mock")();
+        emailMock = require("../mock/email-mock")();
+        randomMock = require("../mock/random-mock")();
+        storageServiceFactoryMock = require("../mock/storage-service-factory-mock")();
+        storageService = storageServiceFactoryMock.instance;
+        storageService.getAsync.andReturn(promiseMock.resolve({
             confirmationCode: "code",
             email: "user@example.com",
             extraProperty: "discarded when saved as an account",
@@ -25,7 +23,6 @@ describe("registrationManager", () => {
             },
             totpConfirmed: false
         }));
-        registrationServiceMock.putAsync.andReturn(promiseMock.resolve());
         totpMock = jasmine.createSpyObj("totpMock", [
             "generateQrCodeAsync",
             "generateSecretAsync",
@@ -42,11 +39,14 @@ describe("registrationManager", () => {
                 account: {},
                 registration: {
                     confirmationCodeLength: 5,
-                    idLength: 8
+                    idHash: {},
+                    idLength: 8,
+                    lifetime: {},
+                    storagePrefix: "anything"
                 }
             };
 
-            return require("../../../lib/registration/registration-manager")(accountManagerMock, config, emailMock, promiseMock, randomMock, registrationServiceMock, totpMock);
+            return require("../../lib/registration-manager")(accountManagerMock, config, emailMock, promiseMock, randomMock, storageServiceFactoryMock, totpMock);
         };
     });
     it("exposes known functions", () => {
@@ -60,7 +60,7 @@ describe("registrationManager", () => {
     });
     describe(".confirmEmailAsync", () => {
         beforeEach(() => {
-            registrationServiceMock.getAsync.andReturn(promiseMock.resolve({
+            storageService.getAsync.andReturn(promiseMock.resolve({
                 confirmationCode: "code",
                 email: "user@example.com",
                 passwordHash: "hashed password",
@@ -72,7 +72,7 @@ describe("registrationManager", () => {
             }));
         });
         it("fails if the record was not secured (passwordHash)", (done) => {
-            registrationServiceMock.getAsync.andReturn(promiseMock.resolve({
+            storageService.getAsync.andReturn(promiseMock.resolve({
                 confirmationCode: "code",
                 totpConfirmed: true
             }));
@@ -82,12 +82,12 @@ describe("registrationManager", () => {
             }, (result) => {
                 expect(result).toEqual(jasmine.any(Error));
                 expect(accountManagerMock.createAsync).not.toHaveBeenCalled();
-                expect(registrationServiceMock.delAsync).not.toHaveBeenCalled();
+                expect(storageService.delAsync).not.toHaveBeenCalled();
                 done();
             });
         });
         it("fails if the record was not secured (totpConfirmed)", (done) => {
-            registrationServiceMock.getAsync.andReturn(promiseMock.resolve({
+            storageService.getAsync.andReturn(promiseMock.resolve({
                 confirmationCode: "code",
                 passwordHash: "hash"
             }));
@@ -97,7 +97,7 @@ describe("registrationManager", () => {
             }, (result) => {
                 expect(result).toEqual(jasmine.any(Error));
                 expect(accountManagerMock.createAsync).not.toHaveBeenCalled();
-                expect(registrationServiceMock.delAsync).not.toHaveBeenCalled();
+                expect(storageService.delAsync).not.toHaveBeenCalled();
                 done();
             });
         });
@@ -108,7 +108,7 @@ describe("registrationManager", () => {
             }, (result) => {
                 expect(result).toEqual(jasmine.any(Error));
                 expect(accountManagerMock.createAsync).not.toHaveBeenCalled();
-                expect(registrationServiceMock.delAsync).not.toHaveBeenCalled();
+                expect(storageService.delAsync).not.toHaveBeenCalled();
                 done();
             });
         });
@@ -127,13 +127,13 @@ describe("registrationManager", () => {
                         key: "totp key"
                     }
                 });
-                expect(registrationServiceMock.delAsync).not.toHaveBeenCalled();
+                expect(storageService.delAsync).not.toHaveBeenCalled();
                 done();
             });
         });
         it("saves successfully", (done) => {
             factory().confirmEmailAsync("id", "code").then((result) => {
-                expect(registrationServiceMock.getAsync).toHaveBeenCalledWith("id");
+                expect(storageService.getAsync).toHaveBeenCalledWith("id");
 
                 // Note: some properties have been removed intentionally.
                 expect(accountManagerMock.createAsync).toHaveBeenCalledWith({
@@ -144,14 +144,14 @@ describe("registrationManager", () => {
                         key: "totp key"
                     }
                 });
-                expect(registrationServiceMock.delAsync).toHaveBeenCalledWith("id");
+                expect(storageService.delAsync).toHaveBeenCalledWith("id");
                 expect(result).toEqual("createdId");
             }).then(done, done);
         });
     });
     describe(".qrCodeImageAsync", () => {
         it("does not generate a code if the get fails", (done) => {
-            registrationServiceMock.getAsync.andReturn(promiseMock.reject("err"));
+            storageService.getAsync.andReturn(promiseMock.reject("err"));
             factory().qrCodeImageAsync("id").then(() => {
                 jasmine.fail();
                 done();
@@ -163,7 +163,7 @@ describe("registrationManager", () => {
         });
         it("generates a QR code as a buffer", (done) => {
             factory().qrCodeImageAsync("id").then((result) => {
-                expect(registrationServiceMock.getAsync).toHaveBeenCalledWith("id");
+                expect(storageService.getAsync).toHaveBeenCalledWith("id");
                 expect(totpMock.generateQrCodeAsync).toHaveBeenCalledWith("totp key", "user@example.com");
                 expect(Buffer.isBuffer(result)).toBe(true);
                 expect(result.toString("binary")).toBe("png data");
@@ -175,7 +175,7 @@ describe("registrationManager", () => {
             factory().registerAsync({
                 email: "someone@example.net"
             }).then((result) => {
-                expect(registrationServiceMock.putAsync).toHaveBeenCalledWith("BBBBBBBB", {
+                expect(storageService.putAsync).toHaveBeenCalledWith("BBBBBBBB", {
                     confirmationCode: "BBBBB",
                     email: "someone@example.net",
                     passwordHashConfig: "accountManager.passwordHashConfig",
@@ -200,7 +200,7 @@ describe("registrationManager", () => {
         var serverMock;
 
         beforeEach(() => {
-            serverMock = require("../../mock/server-mock")();
+            serverMock = require("../mock/server-mock")();
         });
         it("fails on invalid TOTP keys", (done) => {
             totpMock.verifyCurrentAndPrevious.andReturn(false);
@@ -214,7 +214,7 @@ describe("registrationManager", () => {
                 done();
             }, (err) => {
                 expect(totpMock.verifyCurrentAndPrevious).toHaveBeenCalledWith("totp key", "000000", "111111");
-                expect(registrationServiceMock.putAsync).not.toHaveBeenCalled();
+                expect(storageService.putAsync).not.toHaveBeenCalled();
                 expect(err).toEqual(jasmine.any(Error));
                 expect(err.toString()).toContain("TOTP validation failed");
                 done();
@@ -229,7 +229,7 @@ describe("registrationManager", () => {
                 }
             }, serverMock).then(() => {
                 expect(totpMock.verifyCurrentAndPrevious).toHaveBeenCalledWith("totp key", "000000", "111111");
-                expect(registrationServiceMock.putAsync).toHaveBeenCalledWith("id", {
+                expect(storageService.putAsync).toHaveBeenCalledWith("id", {
                     confirmationCode: "code",
                     email: "user@example.com",
                     extraProperty: "discarded when saved as an account",
@@ -249,7 +249,7 @@ describe("registrationManager", () => {
     describe(".secureInfoAsync", () => {
         it("returns filtered information", (done) => {
             factory().secureInfoAsync("id").then((result) => {
-                expect(registrationServiceMock.getAsync).toHaveBeenCalledWith("id");
+                expect(storageService.getAsync).toHaveBeenCalledWith("id");
                 expect(result).toEqual({
                     id: "id",
                     secureInfo: {
@@ -262,7 +262,7 @@ describe("registrationManager", () => {
             }).then(done, done);
         });
         it("does not return the totp if the record is confirmed", (done) => {
-            registrationServiceMock.getAsync.andReturn(promiseMock.resolve({
+            storageService.getAsync.andReturn(promiseMock.resolve({
                 confirmationCode: "code",
                 email: "user@example.com",
                 extraProperty: "discarded when saved as an account",

@@ -1,5 +1,12 @@
 {
     "account": {
+        "idHash": {
+            "algorithm": "sha512",
+            "derivedLength": 32,
+            "encoding": "base64-uri",
+            "iterations": 5000,
+            "type": "pbkdf2"
+        },
         "idLength": 32,
         "lifetime": {
             "months": 6
