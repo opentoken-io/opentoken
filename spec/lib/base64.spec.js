@@ -72,4 +72,10 @@ describe("base64", () => {
         result = base64.encodeForUri("p5>T44d3?12Ui");
         expect(result).toBe("cDU-VDQ0ZDM_MTJVaQ");
     });
+    it("decodes a string for use in a URI (perfect size)", () => {
+        expect(base64.decodeForUri("cDU-VDQ0ZDM_MTJVaQ")).toBe("p5>T44d3?12Ui");
+    });
+    it("decodes a string for use in a URI (size is not a multiple of four)", () => {
+        expect(base64.decodeForUri("eA==")).toBe("x");
+    });
 });
