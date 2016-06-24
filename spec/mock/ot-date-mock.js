@@ -104,5 +104,20 @@ module.exports = () => {
     });
 
 
+    /**
+     * Return a fixed value for "now".  Used in tests.
+     *
+     * @return {OtDateMock}
+     */
+    OtDateMock.stubNow = () => {
+        var otDate;
+
+        otDate = OtDateMock.now();
+        OtDateMock.now.andReturn(otDate);
+
+        return otDate;
+    };
+
+
     return OtDateMock;
 };
