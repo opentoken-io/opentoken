@@ -1,15 +1,15 @@
 "use strict";
 
-var getHandler;
-
-getHandler = require("./_get.js");
-
 module.exports = (server, path, options) => {
     return options.container.call((registrationManager, validateRequestMiddleware) => {
+        var getResponse;
+
+        getResponse = require("./_get-response")(server);
+
         return {
             get(req, res, next) {
                 registrationManager.secureInfoAsync(req.params.id).then((secureInfoGroup) => {
-                    getHandler(server, secureInfoGroup, res);
+                    getResponse(secureInfoGroup, res);
                 }).then(next, next);
             },
             name: "registration-secure",
