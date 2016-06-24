@@ -262,7 +262,7 @@ describe("registrationManager", () => {
             }).then(done, done);
         });
         it("does not return the totp if the record is confirmed", (done) => {
-            registrationServiceMock.getAsync.andReturn(promiseMock.resolve({
+            storageService.getAsync.andReturn(promiseMock.resolve({
                 confirmationCode: "code",
                 email: "user@example.com",
                 extraProperty: "discarded when saved as an account",
