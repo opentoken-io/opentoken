@@ -6,9 +6,7 @@ describe("random", () => {
     beforeEach(() => {
         var cryptoAsyncMock;
 
-        base64Mock = jasmine.createSpyObj("base64", [
-            "encode"
-        ]);
+        base64Mock = require("../mock/base64-mock")();
         base64Mock.encode.andReturn(new Buffer("abcdwxyzABCDWXYZ0189+/testing++//"));
         cryptoAsyncMock = require("../mock/crypto-async-mock")();
         random = require("../../lib/random")(base64Mock, cryptoAsyncMock);
