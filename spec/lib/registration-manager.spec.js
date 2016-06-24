@@ -261,5 +261,26 @@ describe("registrationManager", () => {
                 });
             }).then(done, done);
         });
+        it("does not return the totp if the record is confirmed", (done) => {
+            registrationServiceMock.getAsync.andReturn(promiseMock.resolve({
+                confirmationCode: "code",
+                email: "user@example.com",
+                extraProperty: "discarded when saved as an account",
+                passwordHash: "hashed password",
+                passwordHashConfig: "passwordHashConfig",
+                totp: {
+                    key: "totp key"
+                },
+                totpConfirmed: true
+            }));
+            factory().secureInfoAsync("id").then((result) => {
+                expect(result).toEqual({
+                    id: "id",
+                    secureInfo: {
+                        passwordHashConfig: "passwordHashConfig"
+                    }
+                });
+            }).then(done, done);
+        });
     });
 });
