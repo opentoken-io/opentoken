@@ -2,7 +2,7 @@
     "type": "object",
     "properties": {
         "idHash": {
-            "$ref": "../meta/secure-hash.json"
+            "$ref": "../meta/hash-derivation.json"
         },
         "idLength": {
             "description": "Number of bytes for generated IDs.",
@@ -13,7 +13,7 @@
             "$ref": "time-offset.json"
         },
         "passwordHash": {
-            "$ref": "../meta/secure-hash.json"
+            "$ref": "../meta/hash-derivation.json"
         },
         "passwordSaltLength": {
             "description": "Number of characters to use for a password salt.",

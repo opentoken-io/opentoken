@@ -1,18 +1,18 @@
 "use strict";
 
 describe("storageServiceFactory", () => {
-    var OtDateMock, promiseMock, recordMock, secureHashMock, storageMock, storageServiceFactory;
+    var hashMock, OtDateMock, promiseMock, recordMock, storageMock, storageServiceFactory;
 
     beforeEach(() => {
         OtDateMock = require("../mock/ot-date-mock")();
         promiseMock = require("../mock/promise-mock")();
         recordMock = require("../mock/record-mock")();
-        secureHashMock = require("../mock/secure-hash-mock")();
-        secureHashMock.hashAsync.andCallFake((input) => {
+        hashMock = require("../mock/hash-mock")();
+        hashMock.deriveAsync.andCallFake((input) => {
             return promiseMock.resolve(`hash(${input})`);
         });
         storageMock = require("../mock/storage-mock")();
-        storageServiceFactory = require("../../lib/storage-service-factory")(OtDateMock, promiseMock, recordMock, secureHashMock, storageMock);
+        storageServiceFactory = require("../../lib/storage-service-factory")(hashMock, OtDateMock, promiseMock, recordMock, storageMock);
     });
     it("returns a function (hopefully a factory)", () => {
         expect(storageServiceFactory).toEqual(jasmine.any(Function));

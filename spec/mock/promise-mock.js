@@ -140,9 +140,15 @@ module.exports = () => {
      * Changes one Node-style callback function into returning a Promise.
      *
      * @param {Function} fn
+     * @param {Object} [context]
      * @return {Promise.<*>}
      */
-    function promisify(fn) {
+    function promisify(fn, context) {
+        // typeof null === "object", but that is ok here
+        if (typeof context !== "object") {
+            context = null;
+        }
+
         return function () {
             var args;
 
@@ -156,7 +162,7 @@ module.exports = () => {
                         resolver(val);
                     }
                 });
-                fn.apply(null, args);
+                fn.apply(context, args);
             });
         };
     }
@@ -190,7 +196,7 @@ module.exports = () => {
             return true;
         }).forEach((name) => {
             result[name] = object[name];
-            result[`${name}Async`] = promisify(object[name]);
+            result[`${name}Async`] = promisify(object[name], object);
         });
 
         return result;
