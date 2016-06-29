@@ -4,6 +4,9 @@
         "account": {
             "$ref": "account.json"
         },
+        "challenge": {
+            "$ref": "challenge.json"
+        },
         "debug": {
             "type": "boolean"
         },
@@ -21,6 +24,9 @@
         },
         "server": {
             "$ref": "server.json"
+        },
+        "session": {
+            "$ref": "session.json"
         },
         "storage": {
             "$ref": "storage.json"

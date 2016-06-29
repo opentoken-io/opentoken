@@ -17,7 +17,7 @@ jasmine.routeTester("/registration/_id", (container) => {
         it("returns the registration configuration", (done) => {
             routeTester.req.params.id = "id";
             routeTester.get().then(() => {
-                expect(registrationManagerMock.secureInfoAsync).toHaveBeenCalledWith("id");
+                expect(registrationManagerMock.getRecordAsync).toHaveBeenCalledWith("id");
                 expect(routeTester.res.linkObjects).toEqual([
                     {
                         href: "rendered route: registration-secure, id:\"id\"",

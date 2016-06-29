@@ -11,6 +11,18 @@
         "lifetime": {
             "months": 6
         },
+        "loginCookie": {
+            "name": "login",
+            "settings": {
+                "httpOnly": true,
+                "maxAge": 600,
+                "path": "/account/",
+                "secure": true
+            }
+        },
+        "loginLifetime": {
+            "minutes": 10
+        },
         "passwordHash": {
             "algorithm": "sha512",
             "derivedLength": 48,
@@ -20,6 +32,25 @@
         },
         "passwordSaltLength": 128,
         "storagePrefix": "account/"
+    },
+    "challenge": {
+        "challengeHash": {
+            "algorithm": "sha512",
+            "encoding": "base64"
+        },
+        "idHash": {
+            "algorithm": "sha512",
+            "derivedLength": 32,
+            "encoding": "base64",
+            "iterations": 5000,
+            "salt": "Something to make this different than the account hash.",
+            "type": "pbkdf2"
+        },
+        "idLength": 128,
+        "lifetime": {
+            "minutes": 10
+        },
+        "storagePrefix": "challenge/"
     },
     "debug": false,
     "encryption": {
@@ -76,6 +107,20 @@
         "storagePrefix": "registration/"
     },
     "schemaPath": "./schema",
+    "session": {
+        "idHash": {
+            "algorithm": "sha512",
+            "derivedLength": 48,
+            "encoding": "base64-uri",
+            "iterations": 5000,
+            "type": "pbkdf2"
+        },
+        "idLength": 32,
+        "lifetime": {
+            "minutes": 15
+        },
+        "storagePrefix": "session/"
+    },
     "server": {
         "baseUrl": "https://localhost:8080",
         "name": "OpenToken.io",

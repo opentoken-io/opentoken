@@ -8,7 +8,7 @@ module.exports = (server, path, options) => {
 
         return {
             get(req, res, next) {
-                registrationManager.secureInfoAsync(req.params.id).then((secureInfoGroup) => {
+                registrationManager.getRecordAsync(req.params.id).then((secureInfoGroup) => {
                     getResponse(secureInfoGroup, res);
                 }).then(next, next);
             },

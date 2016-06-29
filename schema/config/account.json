@@ -12,6 +12,44 @@
         "lifetime": {
             "$ref": "time-offset.json"
         },
+        "loginCookie": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "settings": {
+                    "description": "Security settings for login cookies",
+                    "type": "object",
+                    "properties": {
+                        "domain": {
+                            "type": "string"
+                        },
+                        "httpOnly": {
+                            "type": "boolean"
+                        },
+                        "maxAge": {
+                            "description": "Cookie lifetime in seconds",
+                            "type": "integer"
+                        },
+                        "path": {
+                            "type": "string"
+                        },
+                        "secure": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            },
+            "required": [
+                "name",
+                "settings"
+            ]
+        },
+        "loginLifetime": {
+            "$ref": "time-offset.json"
+        },
         "passwordHash": {
             "$ref": "../meta/hash-derivation.json"
         },
@@ -25,6 +63,12 @@
         }
     },
     "required": [
+        "idHash",
+        "idLength",
+        "lifetime",
+        "loginCookie",
+        "loginLifetime",
+        "passwordHash",
         "passwordSaltLength",
         "storagePrefix"
     ]

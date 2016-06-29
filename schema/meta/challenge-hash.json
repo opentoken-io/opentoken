@@ -1,0 +1,10 @@
+{
+    "type": "string",
+    "minLength": 24,
+    "format": "challenge-hash",
+    "allOf": [
+        {
+            "$ref": "../../meta/base64.json"
+        }
+    ]
+}

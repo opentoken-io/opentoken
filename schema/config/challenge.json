@@ -1,0 +1,29 @@
+{
+    "type": "object",
+    "properties": {
+        "challengeHash": {
+            "$ref": "../meta/hash-config.json"
+        },
+        "idHash": {
+            "$ref": "../meta/secure-hash-config.json"
+        },
+        "idLength": {
+            "type": "integer",
+            "minimum": 32
+        },
+        "lifetime": {
+            "$ref": "time-offset.json"
+        },
+        "storagePrefix": {
+            "$ref": "storage-prefix.json"
+        }
+    },
+    "required": [
+        "algorithm",
+        "encoding",
+        "idHash",
+        "idLength",
+        "lifetime",
+        "storagePrefix"
+    ]
+}

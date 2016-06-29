@@ -1,34 +1,36 @@
 {
     "type": "object",
     "properties": {
-        "passwordHash": {
-            "minLength": 24,
-            "format": "password-hash",
-            "allOf": [
-                {
-                    "$ref": "../../meta/base64.json"
-                }
-            ]
-        },
-        "totp": {
+        "mfa": {
             "type": "object",
-            "format": "totp-current-and-previous",
             "properties": {
-                "current": {
-                    "$ref": "../meta/totp-code.json"
-                },
-                "previous": {
-                    "$ref": "../meta/totp-code.json"
+                "totp": {
+                    "type": "object",
+                    "format": "totp-current-and-previous",
+                    "properties": {
+                        "current": {
+                            "$ref": "../meta/totp-code.json"
+                        },
+                        "previous": {
+                            "$ref": "../meta/totp-code.json"
+                        }
+                    },
+                    "required": [
+                        "current",
+                        "previous"
+                    ]
                 }
             },
             "required": [
-                "current",
-                "previous"
+                "totp"
             ]
+        },
+        "passwordHash": {
+            "$ref": "../../meta/password-hash.json"
         }
     },
     "required": [
-        "passwordHash",
-        "totp"
+        "mfa",
+        "passwordHash"
     ]
 }
