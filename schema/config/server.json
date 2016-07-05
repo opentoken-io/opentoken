@@ -10,6 +10,10 @@
             "type": "string",
             "minLength": 1
         },
+        "exceptionIdLength": {
+            "type": "integer",
+            "minimum": 1
+        },
         "keyFile": {
             "type": "string",
             "minLength": 1
