@@ -1,7 +1,7 @@
 "use strict";
 
 module.exports = (server, path, options) => {
-    return options.container.call((accountManager, config, validateRequestMiddleware) => {
+    return options.container.call((accountManager, config) => {
         var loginCookie;
 
         /**
@@ -18,7 +18,7 @@ module.exports = (server, path, options) => {
             next();
         }
 
-        loginCookie = require("./login/_login-cookie")(config);
+        loginCookie = require("../_login-cookie")(config);
 
         return {
             get: logout,

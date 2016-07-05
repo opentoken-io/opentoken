@@ -23,7 +23,7 @@ module.exports = (config) => {
      * @return {string} May be an empty string.
      */
     function get(req) {
-        return res.cookies[cookieName];
+        return req.cookies[cookieName];
     }
 
 
@@ -56,9 +56,13 @@ module.exports = (config) => {
     cookieSettings = config.account.loginCookie.settings;
     cookieName = config.account.loginCookie.name;
 
+    // Avoiding shorthand here because node.js does not like using
+    // it for get and set.  Tried with node v5.12.0
+    /* eslint object-shorthand:"off" */
     return {
         clear,
+        get: get,
         refresh,
-        set
-    }
+        set: set
+    };
 };

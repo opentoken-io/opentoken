@@ -19,8 +19,7 @@
         }
     },
     "required": [
-        "algorithm",
-        "encoding",
+        "challengeHash",
         "idHash",
         "idLength",
         "lifetime",

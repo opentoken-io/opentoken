@@ -4,7 +4,7 @@ module.exports = (server, path, options) => {
     return options.container.call((accountManager, config, sessionManager) => {
         var loginCookie;
 
-        loginCookie = require("./login/_login-cookie")(config);
+        loginCookie = require("./_login-cookie")(config);
 
         return {
             get(req, res, next) {
