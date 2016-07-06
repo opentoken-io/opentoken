@@ -4,8 +4,9 @@ describe("registrationManager", () => {
     var accountManagerMock, emailMock, factory, promiseMock, randomMock, storageService, totpMock;
 
     beforeEach(() => {
-        var storageServiceFactoryMock;
+        var encodingMock, storageServiceFactoryMock;
 
+        encodingMock = require("../mock/encoding-mock")();
         promiseMock = require("../mock/promise-mock")();
         accountManagerMock = require("../mock/account-manager-mock")();
         emailMock = require("../mock/email-mock")();
@@ -16,21 +17,16 @@ describe("registrationManager", () => {
             confirmationCode: "code",
             email: "user@example.com",
             extraProperty: "discarded when saved as an account",
-            passwordHash: "hashed password",
-            passwordHashConfig: "passwordHashConfig",
-            totp: {
-                key: "totp key"
+            mfa: {
+                totp: {
+                    confirmed: false,
+                    key: "totp key"
+                }
             },
-            totpConfirmed: false
+            passwordHash: "hashed password",
+            passwordHashConfig: "passwordHashConfig"
         }));
-        totpMock = jasmine.createSpyObj("totpMock", [
-            "generateQrCodeAsync",
-            "generateSecretAsync",
-            "verifyCurrentAndPrevious"
-        ]);
-        totpMock.generateQrCodeAsync.andReturn(promiseMock.resolve(new Buffer("png data", "binary")));
-        totpMock.generateSecretAsync.andReturn(promiseMock.resolve("base32 secret"));
-        totpMock.verifyCurrentAndPrevious.andReturn(true);
+        totpMock = require("../mock/mfa/totp-mock")();
         factory = (override) => {
             var config;
 
@@ -46,16 +42,16 @@ describe("registrationManager", () => {
                 }
             };
 
-            return require("../../lib/registration-manager")(accountManagerMock, config, emailMock, promiseMock, randomMock, storageServiceFactoryMock, totpMock);
+            return require("../../lib/registration-manager")(accountManagerMock, config, emailMock, encodingMock, promiseMock, randomMock, storageServiceFactoryMock, totpMock);
         };
     });
     it("exposes known functions", () => {
         expect(factory()).toEqual({
             confirmEmailAsync: jasmine.any(Function),
+            getRecordAsync: jasmine.any(Function),
             qrCodeImageAsync: jasmine.any(Function),
             registerAsync: jasmine.any(Function),
-            secureAsync: jasmine.any(Function),
-            secureInfoAsync: jasmine.any(Function)
+            secureAsync: jasmine.any(Function)
         });
     });
     describe(".confirmEmailAsync", () => {
@@ -63,12 +59,14 @@ describe("registrationManager", () => {
             storageService.getAsync.andReturn(promiseMock.resolve({
                 confirmationCode: "code",
                 email: "user@example.com",
-                passwordHash: "hashed password",
-                passwordHashConfig: "passwordHashConfig",
-                totp: {
-                    key: "totp key"
+                mfa: {
+                    totp: {
+                        confirmed: true,
+                        key: "totp key"
+                    }
                 },
-                totpConfirmed: true
+                passwordHash: "hashed password",
+                passwordHashConfig: "passwordHashConfig"
             }));
         });
         it("fails if the record was not secured (passwordHash)", (done) => {
@@ -121,11 +119,14 @@ describe("registrationManager", () => {
                 expect(result).toBe("err");
                 expect(accountManagerMock.createAsync).toHaveBeenCalledWith({
                     email: "user@example.com",
+                    mfa: {
+                        totp: {
+                            confirmed: true,
+                            key: "totp key"
+                        }
+                    },
                     passwordHash: "hashed password",
                     passwordHashConfig: "passwordHashConfig",
-                    totp: {
-                        key: "totp key"
-                    }
                 });
                 expect(storageService.delAsync).not.toHaveBeenCalled();
                 done();
@@ -138,11 +139,14 @@ describe("registrationManager", () => {
                 // Note: some properties have been removed intentionally.
                 expect(accountManagerMock.createAsync).toHaveBeenCalledWith({
                     email: "user@example.com",
+                    mfa: {
+                        totp: {
+                            confirmed: true,
+                            key: "totp key"
+                        }
+                    },
                     passwordHash: "hashed password",
-                    passwordHashConfig: "passwordHashConfig",
-                    totp: {
-                        key: "totp key"
-                    }
+                    passwordHashConfig: "passwordHashConfig"
                 });
                 expect(storageService.delAsync).toHaveBeenCalledWith("id");
                 expect(result).toEqual("createdId");
@@ -166,7 +170,7 @@ describe("registrationManager", () => {
                 expect(storageService.getAsync).toHaveBeenCalledWith("id");
                 expect(totpMock.generateQrCodeAsync).toHaveBeenCalledWith("totp key", "user@example.com");
                 expect(Buffer.isBuffer(result)).toBe(true);
-                expect(result.toString("binary")).toBe("png data");
+                expect(result.toString("binary")).toBe("QR CODE PNG");
             }).then(done, done);
         });
     });
@@ -178,19 +182,25 @@ describe("registrationManager", () => {
                 expect(storageService.putAsync).toHaveBeenCalledWith("BBBBBBBB", {
                     confirmationCode: "BBBBB",
                     email: "someone@example.net",
-                    passwordHashConfig: "accountManager.passwordHashConfig",
-                    totp: {
-                        key: "base32 secret"
+                    mfa: {
+                        totp: {
+                            confirmed: false,
+                            key: jasmine.any(Buffer)
+                        }
                     },
-                    totpConfirmed: false
+                    passwordHashConfig: "accountManager.passwordHashConfig"
                 });
                 expect(result).toEqual({
                     id: "BBBBBBBB",
-                    secureInfo: {
-                        passwordHashConfig: "accountManager.passwordHashConfig",
-                        totp: {
-                            key: "base32 secret"
-                        }
+                    record: {
+                        mfa: {
+                            totp: {
+                                keyBase32: "U0VDUkVU",
+                                keyHex: "U0VDUkVU",
+                                keyUri: "url"
+                            }
+                        },
+                        passwordHashConfig: "accountManager.passwordHashConfig"
                     }
                 });
             }).then(done, done);
@@ -205,9 +215,11 @@ describe("registrationManager", () => {
         it("fails on invalid TOTP keys", (done) => {
             totpMock.verifyCurrentAndPrevious.andReturn(false);
             factory().secureAsync("id", {
-                totp: {
-                    current: "000000",
-                    previous: "111111"
+                mfa: {
+                    totp: {
+                        current: "000000",
+                        previous: "111111"
+                    }
                 }
             }, serverMock).then(() => {
                 jasmine.fail();
@@ -222,23 +234,27 @@ describe("registrationManager", () => {
         });
         it("works", (done) => {
             factory().secureAsync("id", {
-                passwordHash: "hashhash",
-                totp: {
-                    current: "000000",
-                    previous: "111111"
-                }
+                mfa: {
+                    totp: {
+                        current: "000000",
+                        previous: "111111"
+                    }
+                },
+                passwordHash: "hashhash"
             }, serverMock).then(() => {
                 expect(totpMock.verifyCurrentAndPrevious).toHaveBeenCalledWith("totp key", "000000", "111111");
                 expect(storageService.putAsync).toHaveBeenCalledWith("id", {
                     confirmationCode: "code",
                     email: "user@example.com",
                     extraProperty: "discarded when saved as an account",
-                    passwordHash: "hashhash",
-                    passwordHashConfig: "passwordHashConfig",
-                    totp: {
-                        key: "totp key"
+                    mfa: {
+                        totp: {
+                            confirmed: true,
+                            key: "totp key"
+                        }
                     },
-                    totpConfirmed: true
+                    passwordHash: "hashhash",
+                    passwordHashConfig: "passwordHashConfig"
                 });
                 expect(emailMock.sendTemplate).toHaveBeenCalledWith("user@example.com", "registration", {
                     confirmUrl: "rendered route: registration-confirm, code:\"code\", id:\"id\""
@@ -248,14 +264,18 @@ describe("registrationManager", () => {
     });
     describe(".secureInfoAsync", () => {
         it("returns filtered information", (done) => {
-            factory().secureInfoAsync("id").then((result) => {
+            factory().getRecordAsync("id").then((result) => {
                 expect(storageService.getAsync).toHaveBeenCalledWith("id");
                 expect(result).toEqual({
                     id: "id",
-                    secureInfo: {
+                    record: {
                         passwordHashConfig: "passwordHashConfig",
-                        totp: {
-                            key: "totp key"
+                        mfa: {
+                            totp: {
+                                keyBase32: "dG90cCBrZXk=",
+                                keyHex: "dG90cCBrZXk=",
+                                keyUri: "url"
+                            }
                         }
                     }
                 });
@@ -266,17 +286,19 @@ describe("registrationManager", () => {
                 confirmationCode: "code",
                 email: "user@example.com",
                 extraProperty: "discarded when saved as an account",
-                passwordHash: "hashed password",
-                passwordHashConfig: "passwordHashConfig",
-                totp: {
-                    key: "totp key"
+                mfa: {
+                    totp: {
+                        confirmed: true,
+                        key: "totp key"
+                    }
                 },
-                totpConfirmed: true
+                passwordHash: "hashed password",
+                passwordHashConfig: "passwordHashConfig"
             }));
-            factory().secureInfoAsync("id").then((result) => {
+            factory().getRecordAsync("id").then((result) => {
                 expect(result).toEqual({
                     id: "id",
-                    secureInfo: {
+                    record: {
                         passwordHashConfig: "passwordHashConfig"
                     }
                 });

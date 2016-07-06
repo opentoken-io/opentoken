@@ -2,6 +2,7 @@
     "type": "string",
     "minLength": 24,
     "format": "challenge-hash",
+    "description": "encode[challengeHashConfig.encoding](hash[challengeHashConfig.algorithm](passwordHash + challengeHashConfig.salt)) - Take the hashed password and append the salt.  Hash the entire string with the chosen hash algorithm, which produces binary data.  Encode the result as a string using the specified encoding method.",
     "allOf": [
         {
             "$ref": "../../meta/base64.json"

@@ -33,30 +33,17 @@ describe("base64", () => {
             name: "DEAD BEEF"
         }
     ].forEach((scenario) => {
-        it(`encodes a string to a string: ${scenario.name}`, () => {
-            var result;
-
-            result = base64.encode(scenario.decoded);
-            expect(result).toEqual(scenario.encoded);
-        });
-        it(`encodes a buffer to a buffer: ${scenario.name}`, () => {
+        it(`encodes a buffer to a string: ${scenario.name}`, () => {
             var result;
 
             result = base64.encode(new Buffer(scenario.decoded, "binary"));
-            expect(result).toEqual(jasmine.any(Buffer));
-            expect(result.toString("binary")).toEqual(scenario.encoded);
+            expect(result).toEqual(scenario.encoded);
         });
         it(`decodes a string from a string: ${scenario.name}`, () => {
             var result;
 
             result = base64.decode(scenario.encoded);
-            expect(result).toEqual(scenario.decoded);
-        });
-        it(`decodes a buffer from a buffer: ${scenario.name}`, () => {
-            var result;
-
-            result = base64.decode(new Buffer(scenario.encoded, "binary"));
-            expect(result).toEqual(jasmine.any(Buffer));
+            expect(Buffer.isBuffer(result)).toBe(true);
             expect(result.toString("binary")).toEqual(scenario.decoded);
         });
     });
@@ -73,9 +60,17 @@ describe("base64", () => {
         expect(result).toBe("cDU-VDQ0ZDM_MTJVaQ");
     });
     it("decodes a string for use in a URI (perfect size)", () => {
-        expect(base64.decodeForUri("cDU-VDQ0ZDM_MTJVaQ")).toBe("p5>T44d3?12Ui");
+        var buff;
+
+        buff = base64.decodeForUri("cDU-VDQ0ZDM_MTJVaQ");
+        expect(Buffer.isBuffer(buff)).toBe(true);
+        expect(buff.toString("binary")).toBe("p5>T44d3?12Ui");
     });
     it("decodes a string for use in a URI (size is not a multiple of four)", () => {
-        expect(base64.decodeForUri("eA==")).toBe("x");
+        var buff;
+
+        buff = base64.decodeForUri("eA==");
+        expect(Buffer.isBuffer(buff)).toBe(true);
+        expect(buff.toString("binary")).toBe("x");
     });
 });

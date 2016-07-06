@@ -20,9 +20,6 @@
                 "secure": true
             }
         },
-        "loginLifetime": {
-            "minutes": 10
-        },
         "passwordHash": {
             "algorithm": "sha512",
             "derivedLength": 48,
@@ -36,7 +33,7 @@
     "challenge": {
         "challengeHash": {
             "algorithm": "sha512",
-            "encoding": "base64"
+            "encoding": "hex"
         },
         "idHash": {
             "algorithm": "sha512",

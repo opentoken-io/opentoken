@@ -1,9 +1,5 @@
 "use strict";
 
-var base64Mock;
-
-base64Mock = require("./base64-mock")();
-
 module.exports = () => {
     /**
      * Blindly decode everything from Base64.
@@ -12,7 +8,7 @@ module.exports = () => {
      * @return {string}
      */
     function decodeFake(input) {
-        return base64Mock.decode(input);
+        return new Buffer(input.toString("binary"), "base64");
     }
 
 
@@ -23,7 +19,7 @@ module.exports = () => {
      * @return {string} base64 of input
      */
     function encodeFake(input) {
-        return base64Mock.encode(input);
+        return new Buffer(input.toString("binary"), "binary").toString("base64");
     }
 
     return {

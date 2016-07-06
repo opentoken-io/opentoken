@@ -4,7 +4,7 @@ describe("mfa/totp", () => {
     var factory, twofaAsyncMock;
 
     beforeEach(() => {
-        var promiseMock;
+        var promiseMock, randomMock;
 
         factory = (override) => {
             var config;
@@ -19,24 +19,23 @@ describe("mfa/totp", () => {
                 }
             };
 
-            return require("../../../lib/mfa/totp")(config, twofaAsyncMock);
+            return require("../../../lib/mfa/totp")(config, randomMock, twofaAsyncMock);
         };
 
         promiseMock = require("../../mock/promise-mock")();
+        randomMock = require("../../mock/random-mock")();
         twofaAsyncMock = jasmine.createSpyObj("twofaAsyncMock", [
-            "generateKeyAsync",
             "generateGoogleQRAsync",
             "verifyTOTP"
         ]);
-        twofaAsyncMock.generateKeyAsync.andReturn(promiseMock.resolve("mfa code"));
         twofaAsyncMock.generateGoogleQRAsync.andReturn(promiseMock.resolve(new Buffer("png data", "binary")));
         twofaAsyncMock.verifyTOTP.andReturn(true);
     });
     describe(".generateSecretAsync()", () => {
         it("returns a generated key", (done) => {
             factory().generateSecretAsync().then((result) => {
-                expect(result).toBe("mfa code");
-                expect(twofaAsyncMock.generateKeyAsync).toHaveBeenCalledWith(99);
+                expect(Buffer.isBuffer(result)).toBe(true);
+                expect(result.length).toBe(99);
             }).then(done, done);
         });
     });

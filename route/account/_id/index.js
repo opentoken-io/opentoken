@@ -8,9 +8,12 @@ module.exports = (server, path, options) => {
 
         return {
             get(req, res, next) {
+                // Check the login session
                 sessionManager.validateAsync(loginCookie.get(req), req.params.id).then(() => {
+                    // Then also load the account record
                     return accountManager.recordAsync(req.params.id);
                 }).then((account) => {
+                    // Session is valid, account loads
                     loginCookie.refresh(req, res);
                     res.links({
                         service: {
@@ -23,6 +26,7 @@ module.exports = (server, path, options) => {
                     });
                     res.send(200, account.record);
                 }, () => {
+                    // Not valid right now
                     loginCookie.clear(req, res);
                     res.links({
                         item: {

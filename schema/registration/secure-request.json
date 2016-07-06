@@ -26,7 +26,7 @@
             ]
         },
         "passwordHash": {
-            "$ref": "../../meta/password-hash.json"
+            "$ref": "../meta/password-hash.json"
         }
     },
     "required": [

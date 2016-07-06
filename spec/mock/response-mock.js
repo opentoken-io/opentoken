@@ -22,7 +22,8 @@ module.exports = () => {
         "links",
         "header",
         "send",
-        "setHeader"
+        "setHeader",
+        "write"
     ]);
     response.contentType = "auto";
     response.header.andCallFake(headerSetter);

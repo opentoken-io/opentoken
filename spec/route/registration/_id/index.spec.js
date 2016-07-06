@@ -54,16 +54,23 @@ jasmine.routeTester("/registration/_id", (container) => {
             var body;
 
             body = {
-                passwordHash: "abcdefghijklmnopqrstuvwxyz",
-                totp: {
-                    current: "000000",
-                    previous: "111111"
-                }
+                mfa: {
+                    totp: {
+                        current: "000000",
+                        previous: "111111"
+                    }
+                },
+                passwordHash: "abcdefghijklmnopqrstuvwxyz"
             };
             routeTester.post(body).then(() => {
                 expect(registrationManagerMock.secureAsync).toHaveBeenCalledWith("id", body, routeTester.server);
                 expect(routeTester.res.send).toHaveBeenCalledWith(204);
-                expect(routeTester.res.linkObjects).toEqual([]);
+                expect(routeTester.res.linkObjects).toEqual([
+                    {
+                        href: "rendered route: registration-secure, id:\"id\"",
+                        rel: "self"
+                    }
+                ]);
             }).then(done, done);
         });
     });

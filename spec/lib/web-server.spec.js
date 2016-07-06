@@ -6,7 +6,7 @@ describe("WebServer", () => {
     var containerMock, fs, loggerMock, middlewareProfiler, promiseMock, restify, restifyRouterMagicMock, restifyServer, restMiddleware, webServer;
 
     beforeEach(() => {
-        var WebServer;
+        var randomMock, WebServer;
 
         /**
          * Set up a fake MiddlewareProfiler object
@@ -29,6 +29,7 @@ describe("WebServer", () => {
         middlewareProfiler = null;
         promiseMock = require("../mock/promise-mock")();
         loggerMock = require("../mock/logger-mock")();
+        randomMock = require("../mock/random-mock")();
         fs = jasmine.createSpyObj("fs", [
             "readFileAsync"
         ]);
@@ -51,8 +52,10 @@ describe("WebServer", () => {
         });
         restMiddleware = jasmine.createSpy("restMiddleware");
         containerMock = {};
-        WebServer = require("../../lib/web-server")(containerMock, fs, loggerMock, MiddlewareProfilerMock, promiseMock, restify, restifyRouterMagicMock, restMiddleware);
-        webServer = new WebServer();
+        WebServer = require("../../lib/web-server")(containerMock, fs, loggerMock, MiddlewareProfilerMock, promiseMock, randomMock, restify, restifyRouterMagicMock, restMiddleware);
+        webServer = new WebServer({
+            exceptionIdLength: 8
+        });
     });
     it("exposes known public methods", () => {
         expect(webServer.addMiddleware).toEqual(jasmine.any(Function));
@@ -156,6 +159,7 @@ describe("WebServer", () => {
         beforeEach(() => {
             defaultConfig = {
                 formatters: {
+                    "application/vnd.error+json; q=0.1": jasmine.any(Function),
                     "image/png; q=0.1": jasmine.any(Function)
                 },
                 handleUncaughtExceptions: true,
@@ -357,18 +361,15 @@ describe("WebServer", () => {
         it("executes the uncaughtException callback", (done) => {
             var args, callback, req, res, route, uncaughtCallback;
 
-            req = jasmine.createSpy("req");
-            res = jasmine.createSpyObj("res", [
-                "send",
-                "write"
-            ]);
+            req = require("../mock/request-mock")();
+            res = require("../mock/response-mock")();
             webServer.startServerAsync().then(() => {
                 callback = restifyServer.listen.mostRecentCall.args[1];
                 expect(() => {
                     callback();
-                });
+                }).not.toThrow();
                 expect(restifyServer.on).toHaveBeenCalled();
-                args = restifyServer.on.mostRecentCall.args;
+                args = restifyServer.on.calls[0].args;
                 expect(args.length).toBe(2);
                 expect(args[0]).toBe("uncaughtException");
                 expect(args[1]).toEqual(jasmine.any(Function));
@@ -379,6 +380,35 @@ describe("WebServer", () => {
                 expect(loggerMock.error).toHaveBeenCalled();
                 expect(res.send).toHaveBeenCalledWith(500);
                 expect(res.write).not.toHaveBeenCalled();
+            }).then(done, done);
+        });
+        it("executes the restifyError callback", (done) => {
+            var args, callback, req, res, uncaughtCallback;
+
+            req = require("../mock/request-mock")();
+            res = require("../mock/response-mock")();
+            webServer.startServerAsync().then(() => {
+                var error;
+
+                callback = restifyServer.listen.mostRecentCall.args[1];
+                expect(() => {
+                    callback();
+                });
+                expect(restifyServer.on).toHaveBeenCalled();
+                args = restifyServer.on.calls[1].args;
+                expect(args.length).toBe(2);
+                expect(args[0]).toBe("restifyError");
+                expect(args[1]).toEqual(jasmine.any(Function));
+                uncaughtCallback = args[1];
+                error = new Error("err");
+                uncaughtCallback(req, res, error, () => {
+                    expect(loggerMock.error).toHaveBeenCalled();
+                    expect(res.contentType).toBe("application/vnd.error+json");
+                    expect(error.message).toBeDefined();
+                    expect(error.logref).toBe("BBBBBBBB");
+                    expect(res.send).not.toHaveBeenCalled();
+                    expect(res.write).not.toHaveBeenCalled();
+                });
             }).then(done, done);
         });
     });
