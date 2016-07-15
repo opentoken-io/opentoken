@@ -9,7 +9,7 @@ module.exports = () => {
         "validateAsync"
     ]);
     mock.createAsync.andReturn(promiseMock.resolve("createdId"));
-    mock.validateAsync.andReturn(promiseMock.resolve(true));
+    mock.validateAsync.andReturn(promiseMock.resolve());
 
     return mock;
 };

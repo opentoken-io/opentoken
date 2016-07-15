@@ -26,9 +26,11 @@ describe("mfa/totp", () => {
         randomMock = require("../../mock/random-mock")();
         twofaAsyncMock = jasmine.createSpyObj("twofaAsyncMock", [
             "generateGoogleQRAsync",
+            "generateUrl",
             "verifyTOTP"
         ]);
         twofaAsyncMock.generateGoogleQRAsync.andReturn(promiseMock.resolve(new Buffer("png data", "binary")));
+        twofaAsyncMock.generateUrl.andReturn("twofaAsyncMock.generateUrl()");
         twofaAsyncMock.verifyTOTP.andReturn(true);
     });
     describe(".generateSecretAsync()", () => {
@@ -48,6 +50,12 @@ describe("mfa/totp", () => {
                     encoding: "buffer"
                 });
             }).then(done, done);
+        });
+    });
+    describe(".generateUrl()", () => {
+        it("generates a URL by calling the library", () => {
+            expect(factory().generateUrl("secret", "email")).toBe("twofaAsyncMock.generateUrl()");
+            expect(twofaAsyncMock.generateUrl).toHaveBeenCalledWith("Testing Name", "email", "secret");
         });
     });
     describe(".verifyCurrent()", () => {

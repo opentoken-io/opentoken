@@ -39,7 +39,20 @@ describe("base64", () => {
             result = base64.encode(new Buffer(scenario.decoded, "binary"));
             expect(result).toEqual(scenario.encoded);
         });
-        it(`decodes a string from a string: ${scenario.name}`, () => {
+        it(`encodes a string to a string: ${scenario.name}`, () => {
+            var result;
+
+            result = base64.encode(scenario.decoded);
+            expect(result).toEqual(scenario.encoded);
+        });
+        it(`decodes a buffer from a buffer: ${scenario.name}`, () => {
+            var result;
+
+            result = base64.decode(new Buffer(scenario.encoded, "binary"));
+            expect(Buffer.isBuffer(result)).toBe(true);
+            expect(result.toString("binary")).toEqual(scenario.decoded);
+        });
+        it(`decodes a buffer from a string: ${scenario.name}`, () => {
             var result;
 
             result = base64.decode(scenario.encoded);

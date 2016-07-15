@@ -32,10 +32,11 @@ module.exports = (config) => {
      *
      * @param {Object} req Request
      * @param {Object} res Response
+     * @throws {Error} No cookie value to refresh
      */
     function refresh(req, res) {
         if (!req.cookies[cookieName]) {
-            return;
+            throw new Error("No login cookie to refresh");
         }
 
         res.setCookie(cookieName, req.cookies[cookieName], cookieSettings);

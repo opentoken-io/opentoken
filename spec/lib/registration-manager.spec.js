@@ -72,7 +72,11 @@ describe("registrationManager", () => {
         it("fails if the record was not secured (passwordHash)", (done) => {
             storageService.getAsync.andReturn(promiseMock.resolve({
                 confirmationCode: "code",
-                totpConfirmed: true
+                mfa: {
+                    totp: {
+                        confirmed: true
+                    }
+                }
             }));
             factory().confirmEmailAsync("id", "code").then(() => {
                 jasmine.fail();
@@ -126,7 +130,7 @@ describe("registrationManager", () => {
                         }
                     },
                     passwordHash: "hashed password",
-                    passwordHashConfig: "passwordHashConfig",
+                    passwordHashConfig: "passwordHashConfig"
                 });
                 expect(storageService.delAsync).not.toHaveBeenCalled();
                 done();
@@ -158,12 +162,23 @@ describe("registrationManager", () => {
             storageService.getAsync.andReturn(promiseMock.reject("err"));
             factory().qrCodeImageAsync("id").then(() => {
                 jasmine.fail();
-                done();
             }, (err) => {
                 expect(totpMock.generateQrCodeAsync).not.toHaveBeenCalled();
                 expect(err).toBe("err");
-                done();
-            });
+            }).then(done, done);
+        });
+        it("does not generate a QR code when already confirmed", (done) => {
+            storageService.getAsync().then((record) => {
+                record.mfa.totp.confirmed = true;
+                storageService.getAsync.andReturn(promiseMock.resolve(record));
+
+                return factory().qrCodeImageAsync("id");
+            }).then(() => {
+                jasmine.fail();
+            }, (err) => {
+                expect(totpMock.generateQrCodeAsync).not.toHaveBeenCalled();
+                expect(err.toString()).toContain("Already confirmed");
+            }).then(done, done);
         });
         it("generates a QR code as a buffer", (done) => {
             factory().qrCodeImageAsync("id").then((result) => {

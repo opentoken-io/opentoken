@@ -48,7 +48,7 @@ module.exports = (server, path, options) => {
                                 title: "account"
                             }
                         });
-                        res.header("location", accountRoute);
+                        res.header("Location", accountRoute);
                         res.send(200, {
                             sessionId: login.sessionId
                         });

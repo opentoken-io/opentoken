@@ -174,6 +174,9 @@ describe("WebServer", () => {
             // This confirms all of the defaults work as expected
             testConfig({}, {}, done);
         });
+        it("works when passing something that is not an object", (done) => {
+            testConfig(12, {}, done);
+        });
         it("does not trigger https without certificateFile", (done) => {
             testConfig({
                 keyFile: "test1"
@@ -270,6 +273,37 @@ describe("WebServer", () => {
             }).then(done, done);
             req = require("../mock/request-mock.js")();
             res = require("../mock/response-mock.js")();
+        });
+        describe("error", () => {
+            var formatter;
+
+            beforeEach(() => {
+                formatter = formatters["application/vnd.error+json; q=0.1"];
+            });
+            it("is a function", () => {
+                expect(formatter).toEqual(jasmine.any(Function));
+            });
+            it("translates an error into a sanitized object", (done) => {
+                formatter(req, res, {
+                    extra: "stuff here - remove me",
+                    logref: "lr",
+                    message: "test"
+                }, (err, data) => {
+                    var parsed;
+
+                    if (!err) {
+                        expect(() => {
+                            parsed = JSON.parse(data);
+                        }).not.toThrow();
+                        expect(parsed).toEqual({
+                            logref: "lr",
+                            message: "test"
+                        });
+                    }
+
+                    done(err);
+                });
+            });
         });
         describe("png", () => {
             var formatter;
