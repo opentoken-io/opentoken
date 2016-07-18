@@ -58,7 +58,7 @@ describe("record", () => {
     it("sets up the encryption key", () => {
         expect(fsMock.readFile).toHaveBeenCalledWith("encryption key file", "binary", jasmine.any(Function));
     });
-    it("freezes data", (done) => {
+    it("freezes data", () => {
         var data, innerKey, promise;
 
         data = {
@@ -67,7 +67,8 @@ describe("record", () => {
         innerKey = new Buffer("This is the inner key", "binary");
         promise = record.freezeAsync(data, innerKey);
         expect(promise.then).toEqual(jasmine.any(Function));
-        promise.then((result) => {
+
+        return promise.then((result) => {
             var args;
 
             // Serialize
@@ -103,17 +104,17 @@ describe("record", () => {
 
             // Done
             expect(result.toString("binary")).toEqual("encrypted-primary-cipher");
-        }).then(done, done);
+        });
     });
     describe("freezing with metadata", () => {
-        it("saves metadata outside the inner encryption", (done) => {
-            record.freezeAsync({}, "", {}, {
+        it("saves metadata outside the inner encryption", () => {
+            return record.freezeAsync({}, "", {}, {
                 meta: "data"
             }).then(() => {
                 expect(bufferSerializerMock.toBuffer.calls[1].args[0].meta).toEqual({
                     meta: "data"
                 });
-            }).then(done, done);
+            });
         });
     });
     describe("freezing with expires", () => {
@@ -127,29 +128,31 @@ describe("record", () => {
                 "isBefore"
             ]);
         });
-        it("uses the passed expire date if it is before the max", (done) => {
+        it("uses the passed expire date if it is before the max", () => {
             expiresOption.isBefore.andReturn(true);
-            record.freezeAsync({}, "", {
+
+            return record.freezeAsync({}, "", {
                 expires: expiresOption
             }).then(() => {
                 expect(bufferSerializerMock.toBuffer.calls[1].args[0].expires).toBe(expiresOption);
-            }).then(done, done);
+            });
         });
-        it("uses the max if the passed expire date is after the max", (done) => {
+        it("uses the max if the passed expire date is after the max", () => {
             expiresOption.isBefore.andReturn(false);
-            record.freezeAsync({}, "", {
+
+            return record.freezeAsync({}, "", {
                 expires: expiresOption
             }).then(() => {
                 expect(bufferSerializerMock.toBuffer.calls[1].args[0].expires).toBe(expiresMax);
-            }).then(done, done);
+            });
         });
-        it("uses the max without an expiration passed", (done) => {
-            record.freezeAsync({}, "").then(() => {
+        it("uses the max without an expiration passed", () => {
+            return record.freezeAsync({}, "").then(() => {
                 expect(bufferSerializerMock.toBuffer.calls[1].args[0].expires).toBe(expiresMax);
-            }).then(done, done);
+            });
         });
     });
-    it("thaws data", (done) => {
+    it("thaws data", () => {
         var data, innerKey, promise;
 
         data = {
@@ -161,7 +164,8 @@ describe("record", () => {
         });
         promise = record.thawAsync(data, innerKey);
         expect(promise.then).toEqual(jasmine.any(Function));
-        promise.then((result) => {
+
+        return promise.then((result) => {
             var args;
 
             // Outer encryption
@@ -189,7 +193,7 @@ describe("record", () => {
             expect(result).toEqual({
                 data: "deserialized data"
             });
-        }).then(done, done);
+        });
     });
     describe("thawing with expires", () => {
         var expires;
@@ -203,21 +207,21 @@ describe("record", () => {
                 expires
             });
         });
-        it("deserializes when expires is after today", (done) => {
+        it("deserializes when expires is after today", () => {
             expires.isBefore.andReturn(false);
-            record.thawAsync({}, "").then((result) => {
+
+            return record.thawAsync({}, "").then((result) => {
                 expect(result).toEqual({
                     data: "deserialized data",
                     expires
                 });
-            }).then(done, done);
+            });
         });
-        it("errors when expires is before today", (done) => {
+        it("errors when expires is before today", () => {
             expires.isBefore.andReturn(true);
-            record.thawAsync({}, "").then(() => {
-                done("Should have not been successful");
-            }, () => {
-                done();
+
+            return record.thawAsync({}, "").then(jasmine.fail, (err) => {
+                expect(err.toString()).toContain("Expired");
             });
         });
     });

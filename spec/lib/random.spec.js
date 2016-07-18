@@ -19,11 +19,11 @@ describe("random", () => {
             expect(result).toEqual(jasmine.any(Object));
             expect(result.then).toEqual(jasmine.any(Function));
         });
-        it("generates appropriately-sized random data Buffer", (done) => {
-            random.bufferAsync(1293).then((buff) => {
+        it("generates appropriately-sized random data Buffer", () => {
+            return random.bufferAsync(1293).then((buff) => {
                 expect(buff).toEqual(jasmine.any(Buffer));
                 expect(buff.length).toBe(1293);
-            }).then(done, done);
+            });
         });
     });
     describe("idAsync", () => {
@@ -49,15 +49,15 @@ describe("random", () => {
                 expected: "abcdwxyzABCDWXYZ0189-_testing--__"
             }
         ].forEach((scenario) => {
-            it(`sends the right amount of binary data to base64: length ${scenario.desiredLength}`, (done) => {
-                random.idAsync(scenario.desiredLength).then(() => {
+            it(`sends the right amount of binary data to base64: length ${scenario.desiredLength}`, () => {
+                return random.idAsync(scenario.desiredLength).then(() => {
                     expect(base64.encode.mostRecentCall.args[0].length).toBe(scenario.binLength);
-                }).then(done, done);
+                });
             });
-            it(`replaced + and /: length ${scenario.desiredLength}`, (done) => {
-                random.idAsync(scenario.desiredLength).then((pass) => {
+            it(`replaced + and /: length ${scenario.desiredLength}`, () => {
+                return random.idAsync(scenario.desiredLength).then((pass) => {
                     expect(pass).toEqual(scenario.expected);
-                }).then(done, done);
+                });
             });
         });
     });

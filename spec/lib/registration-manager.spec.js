@@ -69,7 +69,7 @@ describe("registrationManager", () => {
                 passwordHashConfig: "passwordHashConfig"
             }));
         });
-        it("fails if the record was not secured (passwordHash)", (done) => {
+        it("fails if the record was not secured (passwordHash)", () => {
             storageService.getAsync.andReturn(promiseMock.resolve({
                 confirmationCode: "code",
                 mfa: {
@@ -78,48 +78,36 @@ describe("registrationManager", () => {
                     }
                 }
             }));
-            factory().confirmEmailAsync("id", "code").then(() => {
-                jasmine.fail();
-                done();
-            }, (result) => {
+
+            return factory().confirmEmailAsync("id", "code").then(jasmine.fail, (result) => {
                 expect(result).toEqual(jasmine.any(Error));
                 expect(accountManagerMock.createAsync).not.toHaveBeenCalled();
                 expect(storageService.delAsync).not.toHaveBeenCalled();
-                done();
             });
         });
-        it("fails if the record was not secured (totpConfirmed)", (done) => {
+        it("fails if the record was not secured (totpConfirmed)", () => {
             storageService.getAsync.andReturn(promiseMock.resolve({
                 confirmationCode: "code",
                 passwordHash: "hash"
             }));
-            factory().confirmEmailAsync("id", "code").then(() => {
-                jasmine.fail();
-                done();
-            }, (result) => {
+
+            return factory().confirmEmailAsync("id", "code").then(jasmine.fail, (result) => {
                 expect(result).toEqual(jasmine.any(Error));
                 expect(accountManagerMock.createAsync).not.toHaveBeenCalled();
                 expect(storageService.delAsync).not.toHaveBeenCalled();
-                done();
             });
         });
-        it("fails if confirmation code is wrong", (done) => {
-            factory().confirmEmailAsync("id", "wrong code").then(() => {
-                jasmine.fail();
-                done();
-            }, (result) => {
+        it("fails if confirmation code is wrong", () => {
+            return factory().confirmEmailAsync("id", "wrong code").then(jasmine.fail, (result) => {
                 expect(result).toEqual(jasmine.any(Error));
                 expect(accountManagerMock.createAsync).not.toHaveBeenCalled();
                 expect(storageService.delAsync).not.toHaveBeenCalled();
-                done();
             });
         });
-        it("will not delete if creation goes awry", (done) => {
+        it("will not delete if creation goes awry", () => {
             accountManagerMock.createAsync.andReturn(promiseMock.reject("err"));
-            factory().confirmEmailAsync("id", "code").then(() => {
-                jasmine.fail();
-                done();
-            }, (result) => {
+
+            return factory().confirmEmailAsync("id", "code").then(jasmine.fail, (result) => {
                 expect(result).toBe("err");
                 expect(accountManagerMock.createAsync).toHaveBeenCalledWith({
                     email: "user@example.com",
@@ -133,11 +121,10 @@ describe("registrationManager", () => {
                     passwordHashConfig: "passwordHashConfig"
                 });
                 expect(storageService.delAsync).not.toHaveBeenCalled();
-                done();
             });
         });
-        it("saves successfully", (done) => {
-            factory().confirmEmailAsync("id", "code").then((result) => {
+        it("saves successfully", () => {
+            return factory().confirmEmailAsync("id", "code").then((result) => {
                 expect(storageService.getAsync).toHaveBeenCalledWith("id");
 
                 // Note: some properties have been removed intentionally.
@@ -154,21 +141,20 @@ describe("registrationManager", () => {
                 });
                 expect(storageService.delAsync).toHaveBeenCalledWith("id");
                 expect(result).toEqual("createdId");
-            }).then(done, done);
+            });
         });
     });
     describe(".qrCodeImageAsync", () => {
-        it("does not generate a code if the get fails", (done) => {
+        it("does not generate a code if the get fails", () => {
             storageService.getAsync.andReturn(promiseMock.reject("err"));
-            factory().qrCodeImageAsync("id").then(() => {
-                jasmine.fail();
-            }, (err) => {
+
+            return factory().qrCodeImageAsync("id").then(jasmine.fail, (err) => {
                 expect(totpMock.generateQrCodeAsync).not.toHaveBeenCalled();
                 expect(err).toBe("err");
-            }).then(done, done);
+            });
         });
-        it("does not generate a QR code when already confirmed", (done) => {
-            storageService.getAsync().then((record) => {
+        it("does not generate a QR code when already confirmed", () => {
+            return storageService.getAsync().then((record) => {
                 record.mfa.totp.confirmed = true;
                 storageService.getAsync.andReturn(promiseMock.resolve(record));
 
@@ -178,20 +164,20 @@ describe("registrationManager", () => {
             }, (err) => {
                 expect(totpMock.generateQrCodeAsync).not.toHaveBeenCalled();
                 expect(err.toString()).toContain("Already confirmed");
-            }).then(done, done);
+            });
         });
-        it("generates a QR code as a buffer", (done) => {
-            factory().qrCodeImageAsync("id").then((result) => {
+        it("generates a QR code as a buffer", () => {
+            return factory().qrCodeImageAsync("id").then((result) => {
                 expect(storageService.getAsync).toHaveBeenCalledWith("id");
                 expect(totpMock.generateQrCodeAsync).toHaveBeenCalledWith("totp key", "user@example.com");
                 expect(Buffer.isBuffer(result)).toBe(true);
                 expect(result.toString("binary")).toBe("QR CODE PNG");
-            }).then(done, done);
+            });
         });
     });
     describe(".registerAsync", () => {
-        it("starts a registration", (done) => {
-            factory().registerAsync({
+        it("starts a registration", () => {
+            return factory().registerAsync({
                 email: "someone@example.net"
             }).then((result) => {
                 expect(storageService.putAsync).toHaveBeenCalledWith("BBBBBBBB", {
@@ -218,7 +204,7 @@ describe("registrationManager", () => {
                         passwordHashConfig: "accountManager.passwordHashConfig"
                     }
                 });
-            }).then(done, done);
+            });
         });
     });
     describe(".secureAsync", () => {
@@ -227,28 +213,25 @@ describe("registrationManager", () => {
         beforeEach(() => {
             serverMock = require("../mock/server-mock")();
         });
-        it("fails on invalid TOTP keys", (done) => {
+        it("fails on invalid TOTP keys", () => {
             totpMock.verifyCurrentAndPrevious.andReturn(false);
-            factory().secureAsync("id", {
+
+            return factory().secureAsync("id", {
                 mfa: {
                     totp: {
                         current: "000000",
                         previous: "111111"
                     }
                 }
-            }, serverMock).then(() => {
-                jasmine.fail();
-                done();
-            }, (err) => {
+            }, serverMock).then(jasmine.fail, (err) => {
                 expect(totpMock.verifyCurrentAndPrevious).toHaveBeenCalledWith("totp key", "000000", "111111");
                 expect(storageService.putAsync).not.toHaveBeenCalled();
                 expect(err).toEqual(jasmine.any(Error));
                 expect(err.toString()).toContain("TOTP validation failed");
-                done();
             });
         });
-        it("works", (done) => {
-            factory().secureAsync("id", {
+        it("works", () => {
+            return factory().secureAsync("id", {
                 mfa: {
                     totp: {
                         current: "000000",
@@ -274,11 +257,11 @@ describe("registrationManager", () => {
                 expect(emailMock.sendTemplate).toHaveBeenCalledWith("user@example.com", "registration", {
                     confirmUrl: "rendered route: registration-confirm, code:\"code\", id:\"id\""
                 });
-            }).then(done, done);
+            });
         });
     });
     describe(".secureInfoAsync", () => {
-        it("returns filtered information", (done) => {
+        it("returns filtered information", () => {
             factory().getRecordAsync("id").then((result) => {
                 expect(storageService.getAsync).toHaveBeenCalledWith("id");
                 expect(result).toEqual({
@@ -294,9 +277,9 @@ describe("registrationManager", () => {
                         }
                     }
                 });
-            }).then(done, done);
+            });
         });
-        it("does not return the totp if the record is confirmed", (done) => {
+        it("does not return the totp if the record is confirmed", () => {
             storageService.getAsync.andReturn(promiseMock.resolve({
                 confirmationCode: "code",
                 email: "user@example.com",
@@ -317,7 +300,7 @@ describe("registrationManager", () => {
                         passwordHashConfig: "passwordHashConfig"
                     }
                 });
-            }).then(done, done);
+            });
         });
     });
 });

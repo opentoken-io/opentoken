@@ -64,7 +64,7 @@ describe("WebServer", () => {
         expect(webServer.startServerAsync).toEqual(jasmine.any(Function));
     });
     describe(".addMiddleware()", () => {
-        it("adds middleware without a route", (done) => {
+        it("adds middleware without a route", () => {
             /**
              * Meaningless function used only for testing
              */
@@ -72,11 +72,12 @@ describe("WebServer", () => {
 
             expect(restifyServer.use).not.toHaveBeenCalled();
             webServer.addMiddleware(testFn);
-            webServer.startServerAsync().then(() => {
+
+            return webServer.startServerAsync().then(() => {
                 expect(restifyServer.use).toHaveBeenCalledWith(testFn);
-            }).then(done, done);
+            });
         });
-        it("adds middleware with a route", (done) => {
+        it("adds middleware with a route", () => {
             /**
              * Meaningless function used only for testing
              */
@@ -84,11 +85,12 @@ describe("WebServer", () => {
 
             expect(restifyServer.use).not.toHaveBeenCalled();
             webServer.addMiddleware("/flowers", testFn);
-            webServer.startServerAsync().then(() => {
+
+            return webServer.startServerAsync().then(() => {
                 expect(restifyServer.use).toHaveBeenCalledWith("/flowers", testFn);
-            }).then(done, done);
+            });
         });
-        it("adds more than one middleware", (done) => {
+        it("adds more than one middleware", () => {
             /**
              * Meaningless function used only for testing
              */
@@ -102,17 +104,19 @@ describe("WebServer", () => {
             expect(restifyServer.use).not.toHaveBeenCalled();
             webServer.addMiddleware(testFn1);
             webServer.addMiddleware("/flowers", testFn2);
-            webServer.startServerAsync().then(() => {
+
+            return webServer.startServerAsync().then(() => {
                 expect(restifyServer.use).toHaveBeenCalledWith(testFn1);
                 expect(restifyServer.use).toHaveBeenCalledWith("/flowers", testFn2);
-            }).then(done, done);
+            });
         });
     });
     describe(".addRoutes()", () => {
-        it("calls out to RestifyRouterMagic", (done) => {
+        it("calls out to RestifyRouterMagic", () => {
             expect(restifyServer.get).not.toHaveBeenCalled();
             webServer.addRoutes("/routes");
-            webServer.startServerAsync().then(() => {
+
+            return webServer.startServerAsync().then(() => {
                 expect(restifyRouterMagicMock).toHaveBeenCalled();
                 expect(restifyRouterMagicMock.mostRecentCall.args[1]).toEqual({
                     indexWithSlash: "never",
@@ -122,7 +126,7 @@ describe("WebServer", () => {
                     routesMatch: "**/!(_)*.js",
                     routesPath: "/routes"
                 });
-            }).then(done, done);
+            });
         });
     });
     describe(".configure()", () => {
@@ -133,9 +137,9 @@ describe("WebServer", () => {
          *
          * @param {Object} input What to pass in
          * @param {Object} expected How to override the defaults
-         * @param {Function} done Signal completion of the test
+         * @return {Promise.<*>}
          */
-        function testConfig(input, expected, done) {
+        function testConfig(input, expected) {
             var actual;
 
             // Set defaults in expected
@@ -147,13 +151,14 @@ describe("WebServer", () => {
 
             // Set the config
             webServer.configure(input);
-            webServer.startServerAsync().then(() => {
+
+            return webServer.startServerAsync().then(() => {
                 // test the config passed to restifyServer
                 expect(restify.createServer.callCount).toBe(1);
                 expect(restify.createServer.mostRecentCall.args.length).toBe(1);
                 actual = restify.createServer.mostRecentCall.args[0];
                 expect(actual).toEqual(expected);
-            }).then(done, done);
+            });
         }
 
         beforeEach(() => {
@@ -170,24 +175,24 @@ describe("WebServer", () => {
                 spdy: null
             };
         });
-        it("works with no configuration", (done) => {
+        it("works with no configuration", () => {
             // This confirms all of the defaults work as expected
-            testConfig({}, {}, done);
+            return testConfig({}, {});
         });
-        it("works when passing something that is not an object", (done) => {
-            testConfig(12, {}, done);
+        it("works when passing something that is not an object", () => {
+            return testConfig(12, {});
         });
-        it("does not trigger https without certificateFile", (done) => {
-            testConfig({
+        it("does not trigger https without certificateFile", () => {
+            return testConfig({
                 keyFile: "test1"
-            }, {}, done);
+            }, {});
         });
-        it("does not trigger https without keyFile", (done) => {
-            testConfig({
+        it("does not trigger https without keyFile", () => {
+            return testConfig({
                 certificateFile: "test1"
-            }, {}, done);
+            }, {});
         });
-        it("reads certificate and key files", (done) => {
+        it("reads certificate and key files", () => {
             fs.readFileAsync.andCallFake((fn) => {
                 if (fn === "keyfile") {
                     return promiseMock.resolve("keyfile ok");
@@ -199,53 +204,56 @@ describe("WebServer", () => {
 
                 return promiseMock.reject(`Invalid file: ${fn.toString()}`);
             });
-            testConfig({
+
+            return testConfig({
                 certificateFile: "certfile",
                 keyFile: "keyfile"
             }, {
                 certificate: "certfile ok",
                 key: "keyfile ok"
-            }, done);
+            });
         });
-        it("passes name", (done) => {
-            testConfig({
+        it("passes name", () => {
+            return testConfig({
                 name: "flowers"
             }, {
                 name: "flowers"
-            }, done);
+            });
         });
-        it("passes proxyProtocol", (done) => {
-            testConfig({
+        it("passes proxyProtocol", () => {
+            return testConfig({
                 proxyProtocol: 123
             }, {
                 proxyProtocol: 123
-            }, done);
+            });
         });
-        it("passes spdy", (done) => {
-            testConfig({
+        it("passes spdy", () => {
+            return testConfig({
                 spdy: 123
             }, {
                 spdy: 123
-            }, done);
+            });
         });
-        it("does not trim a baseUrl without a trailing slash", (done) => {
+        it("does not trim a baseUrl without a trailing slash", () => {
             webServer.configure({
                 baseUrl: "/bunnies"
             });
-            webServer.startServerAsync().then(() => {
+
+            return webServer.startServerAsync().then(() => {
                 // Skipping most checks here because they were done
                 // in the previous test.
                 expect(restMiddleware.mostRecentCall.args[0].baseUrl).toBe("/bunnies");
-            }).then(done, done);
+            });
         });
-        it("passes profileMiddleware", (done) => {
+        it("passes profileMiddleware", () => {
             var args;
 
             webServer.configure({
                 profileMiddleware: true
             });
             expect(middlewareProfiler).toBe(null);
-            webServer.startServerAsync().then(() => {
+
+            return webServer.startServerAsync().then(() => {
                 expect(middlewareProfiler.profileServer).toHaveBeenCalled();
                 expect(middlewareProfiler.displayAtInterval).toHaveBeenCalled();
                 args = middlewareProfiler.profileServer.mostRecentCall.args;
@@ -258,21 +266,22 @@ describe("WebServer", () => {
                 expect(() => {
                     args[1]("test");
                 }).not.toThrow();
-            }).then(done, done);
+            });
         });
     });
     describe("restify formatters", () => {
         var formatters, req, res;
 
-        beforeEach((done) => {
+        beforeEach(() => {
+            req = require("../mock/request-mock.js")();
+            res = require("../mock/response-mock.js")();
             webServer.configure({
                 baseUrl: "/"
             });
-            webServer.startServerAsync().then(() => {
+
+            return webServer.startServerAsync().then(() => {
                 formatters = restify.createServer.mostRecentCall.args[0].formatters;
-            }).then(done, done);
-            req = require("../mock/request-mock.js")();
-            res = require("../mock/response-mock.js")();
+            });
         });
         describe("error", () => {
             var formatter;
@@ -367,11 +376,12 @@ describe("WebServer", () => {
         });
     });
     describe(".startServerAsync()", () => {
-        it("calls listen", (done) => {
+        it("calls listen", () => {
             var args;
 
             expect(restifyServer.listen).not.toHaveBeenCalled();
-            webServer.startServerAsync().then(() => {
+
+            return webServer.startServerAsync().then(() => {
                 expect(restifyServer.listen).toHaveBeenCalled();
                 expect(restifyServer.listen.callCount).toBe(1);
                 args = restifyServer.listen.mostRecentCall.args;
@@ -380,24 +390,20 @@ describe("WebServer", () => {
                 expect(args[0]).toBe(8080);
                 expect(args[1]).toEqual(jasmine.any(Function));
                 expect(args.length).toBe(2);
-            }).then(done, done);
+            });
         });
-        it("has a working callback", (done) => {
-            var callback;
-
-            webServer.startServerAsync().then(() => {
-                callback = restifyServer.listen.mostRecentCall.args[1];
-                expect(() => {
-                    callback();
-                }).not.toThrow();
-            }).then(done, done);
+        it("has a working callback", () => {
+            return webServer.startServerAsync().then(() => {
+                restifyServer.listen.mostRecentCall.args[1]();
+            });
         });
-        it("executes the uncaughtException callback", (done) => {
+        it("executes the uncaughtException callback", () => {
             var args, callback, req, res, route, uncaughtCallback;
 
             req = require("../mock/request-mock")();
             res = require("../mock/response-mock")();
-            webServer.startServerAsync().then(() => {
+
+            return webServer.startServerAsync().then(() => {
                 callback = restifyServer.listen.mostRecentCall.args[1];
                 expect(() => {
                     callback();
@@ -414,14 +420,15 @@ describe("WebServer", () => {
                 expect(loggerMock.error).toHaveBeenCalled();
                 expect(res.send).toHaveBeenCalledWith(500);
                 expect(res.write).not.toHaveBeenCalled();
-            }).then(done, done);
+            });
         });
-        it("executes the restifyError callback", (done) => {
+        it("executes the restifyError callback", () => {
             var args, callback, req, res, uncaughtCallback;
 
             req = require("../mock/request-mock")();
             res = require("../mock/response-mock")();
-            webServer.startServerAsync().then(() => {
+
+            return webServer.startServerAsync().then(() => {
                 var error;
 
                 callback = restifyServer.listen.mostRecentCall.args[1];
@@ -443,7 +450,7 @@ describe("WebServer", () => {
                     expect(res.send).not.toHaveBeenCalled();
                     expect(res.write).not.toHaveBeenCalled();
                 });
-            }).then(done, done);
+            });
         });
     });
 });

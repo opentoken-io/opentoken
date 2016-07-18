@@ -77,34 +77,40 @@ describe("schema", () => {
         schema = require("../../lib/schema")(promiseMock.promisifyAll(fs), globMock, path, promiseMock, tv4, validator);
     });
     describe(".getMissingSchemas()", () => {
-        it("reports on missing schemas", (done) => {
-            schema.loadSchemaAsync("./missing-one.json", "./").then(() => {
+        it("reports on missing schemas", () => {
+            return schema.loadSchemaAsync("./missing-one.json", "./").then(() => {
                 expect(schema.getMissingSchemas()).toEqual([
                     "/other-schema"
                 ]);
-            }).then(done, done);
+            });
         });
     });
     describe(".loadSchemaAsync()", () => {
-        it("loads a schema with an ID and validates against it", (done) => {
-            schema.loadSchemaAsync("./email.json", "./").then(() => {
+        it("loads a schema with an ID and validates against it", () => {
+            return schema.loadSchemaAsync("./email.json", "./").then(() => {
                 expect(() => {
                     schema.validate("someone@example.net", "/email.json");
                 }).not.toThrow();
-            }).then(done, done);
+            });
         });
-        it("rejects the promise when a schema has the wrong ID", (done) => {
-            jasmine.testPromiseFailure(schema.loadSchemaAsync("./a/b/c/d/number.json", "./"), "Schema had wrong ID", done);
+        it("rejects the promise when a schema has the wrong ID", () => {
+            return schema.loadSchemaAsync("./a/b/c/d/number.json", "./").then(jasmine.fail, (err) => {
+                expect(err.toString()).toContain("Schema had wrong ID");
+            });
         });
-        it("loads a schema which cannot be parsed", (done) => {
-            jasmine.testPromiseFailure(schema.loadSchemaAsync("./email-parse-error.json", "./"), "Unable to parse file: ./email-parse-error.json", done);
+        it("loads a schema which cannot be parsed", () => {
+            return schema.loadSchemaAsync("./email-parse-error.json", "./").then(jasmine.fail, (err) => {
+                expect(err.toString()).toContain("Unable to parse file: ./email-parse-error.json");
+            });
         });
-        it("tries to a schema which is not present", (done) => {
-            jasmine.testPromiseFailure(schema.loadSchemaAsync("./email-not-there.json", "./"), "Unable to parse file: ./email-not-there.json", done);
+        it("tries to a schema which is not present", () => {
+            return schema.loadSchemaAsync("./email-not-there.json", "./").then(jasmine.fail, (err) => {
+                expect(err.toString()).toContain("Unable to parse file: ./email-not-there.json");
+            });
         });
     });
     describe(".loadSchemaFolderAsync()", () => {
-        it("loads schemas in folder and validates against them", (done) => {
+        it("loads schemas in folder and validates against them", () => {
             path.resolve.andCallFake((a, b) => {
                 return a + b;
             });
@@ -120,7 +126,8 @@ describe("schema", () => {
                     "/folder/folder/number.json"
                 ]);
             });
-            schema.loadSchemaFolderAsync("./folder/").then(() => {
+
+            return schema.loadSchemaFolderAsync("./folder/").then(() => {
                 var result;
 
                 expect(() => {
@@ -131,19 +138,19 @@ describe("schema", () => {
                     result = schema.validate(5, "/folder/folder/number.json");
                 }).not.toThrow();
                 expect(result).toBe(null);
-            }).then(done, done);
+            });
         });
     });
     describe(".validate()", () => {
-        it("loads a schema and validates against it", (done) => {
-            schema.loadSchemaAsync("./email.json", "./").then(() => {
+        it("loads a schema and validates against it", () => {
+            return schema.loadSchemaAsync("./email.json", "./").then(() => {
                 var result;
 
                 expect(schema.validate("someone@example.net", "/email.json")).toBe(null);
                 result = schema.validate("someone", "/email.json");
                 expect(result).toEqual(jasmine.any(Object));
                 expect(result.valid).toBe(false);
-            }).then(done, done);
+            });
         });
         it("tries to validate against a non-present schema", () => {
             expect(() => {

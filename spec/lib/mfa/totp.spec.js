@@ -34,22 +34,22 @@ describe("mfa/totp", () => {
         twofaAsyncMock.verifyTOTP.andReturn(true);
     });
     describe(".generateSecretAsync()", () => {
-        it("returns a generated key", (done) => {
-            factory().generateSecretAsync().then((result) => {
+        it("returns a generated key", () => {
+            return factory().generateSecretAsync().then((result) => {
                 expect(Buffer.isBuffer(result)).toBe(true);
                 expect(result.length).toBe(99);
-            }).then(done, done);
+            });
         });
     });
     describe(".generateQRCodeAsync()", () => {
-        it("returns a PNG in a Buffer", (done) => {
-            factory().generateQrCodeAsync("secret", "email").then((result) => {
+        it("returns a PNG in a Buffer", () => {
+            return factory().generateQrCodeAsync("secret", "email").then((result) => {
                 expect(result instanceof Buffer).toBe(true);
                 expect(result.toString("binary")).toBe("png data");
                 expect(twofaAsyncMock.generateGoogleQRAsync).toHaveBeenCalledWith("Testing Name", "email", "secret", {
                     encoding: "buffer"
                 });
-            }).then(done, done);
+            });
         });
     });
     describe(".generateUrl()", () => {
