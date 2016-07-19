@@ -14,9 +14,10 @@ jasmine.routeTester("/registration/_id", (container) => {
         ]);
     });
     describe("GET", () => {
-        it("returns the registration configuration", (done) => {
+        it("returns the registration configuration", () => {
             routeTester.req.params.id = "id";
-            routeTester.get().then(() => {
+
+            return routeTester.get().then(() => {
                 expect(registrationManagerMock.getRecordAsync).toHaveBeenCalledWith("id");
                 expect(routeTester.res.linkObjects).toEqual([
                     {
@@ -34,23 +35,19 @@ jasmine.routeTester("/registration/_id", (container) => {
                 expect(routeTester.res.send).toHaveBeenCalledWith({
                     secure: "info"
                 });
-            }).then(done, done);
+            });
         });
     });
     describe("POST", () => {
         beforeEach(() => {
             routeTester.req.params.id = "id";
         });
-        it("validates the request", (done) => {
-            routeTester.post({}).then(() => {
-                jasmine.fail();
-                done();
-            }, (err) => {
+        it("validates the request", () => {
+            return routeTester.post({}).then(jasmine.fail, (err) => {
                 expect(err).toBe(false);
-                done();
             });
         });
-        it("secures the account", (done) => {
+        it("secures the account", () => {
             var body;
 
             body = {
@@ -62,7 +59,8 @@ jasmine.routeTester("/registration/_id", (container) => {
                 },
                 passwordHash: "abcdefghijklmnopqrstuvwxyz"
             };
-            routeTester.post(body).then(() => {
+
+            return routeTester.post(body).then(() => {
                 expect(registrationManagerMock.secureAsync).toHaveBeenCalledWith("id", body, routeTester.server);
                 expect(routeTester.res.send).toHaveBeenCalledWith(204);
                 expect(routeTester.res.linkObjects).toEqual([
@@ -71,7 +69,7 @@ jasmine.routeTester("/registration/_id", (container) => {
                         rel: "self"
                     }
                 ]);
-            }).then(done, done);
+            });
         });
     });
 });

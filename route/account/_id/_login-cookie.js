@@ -4,7 +4,7 @@ module.exports = (config) => {
     var cookieName, cookieSettings;
 
     /**
-     * Clears the login cookie
+     * Clears the login cookie.
      *
      * @param {Object} req Request
      * @param {Object} res Response

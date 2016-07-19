@@ -21,26 +21,27 @@ jasmine.routeTester("/account/_id/logout/", null, (routeTester) => {
 
         methodLower = methodUpper.toLowerCase();
         describe(methodUpper, () => {
-            it("has no content", (done) => {
-                routeTester[methodLower]().then(() => {
+            it("has no content", () => {
+                return routeTester[methodLower]().then(() => {
                     expect(routeTester.res.send).toHaveBeenCalledWith(204);
-                }).then(done, done);
+                });
             });
-            it("redirects", (done) => {
-                routeTester[methodLower]().then(() => {
+            it("redirects", () => {
+                return routeTester[methodLower]().then(() => {
                     expect(routeTester.res.header).toHaveBeenCalledWith("Location", jasmine.any(String));
-                }).then(done, done);
+                });
             });
-            it("clears the login cookie when one was set", (done) => {
+            it("clears the login cookie when one was set", () => {
                 routeTester.req.cookies.login = "abcd";
-                routeTester[methodLower]().then(() => {
+
+                return routeTester[methodLower]().then(() => {
                     expect(routeTester.res.setCookie).toHaveBeenCalledWith("login", "");
-                }).then(done, done);
+                });
             });
-            it("does not bother with clearing the login cookie when one was not set", (done) => {
-                routeTester[methodLower]().then(() => {
+            it("does not bother with clearing the login cookie when one was not set", () => {
+                return routeTester[methodLower]().then(() => {
                     expect(routeTester.res.setCookie).not.toHaveBeenCalled();
-                }).then(done, done);
+                });
             });
         });
     });

@@ -105,7 +105,7 @@ describe("accountManager", () => {
                 expect(sessionManagerMock.createAsync).not.toHaveBeenCalled();
             });
         });
-        it("grabs the record and confirms TOTP", () => {
+        it("grabs the record and confirms the challenge matches what is expected", () => {
             return factory().loginAsync("id", {
                 challengeHash: "challengeHash",
                 mfa: {

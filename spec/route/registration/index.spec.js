@@ -13,17 +13,13 @@ jasmine.routeTester("/registration", (container) => {
         ]);
     });
     describe("POST", () => {
-        it("validates against a schema", (done) => {
-            routeTester.post({}).then(() => {
-                jasmine.fail();
-                done();
-            }, (err) => {
+        it("validates against a schema", () => {
+            return routeTester.post({}).then(jasmine.fail, (err) => {
                 expect(err).toBe(false);
-                done();
             });
         });
-        it("registers", (done) => {
-            routeTester.post({
+        it("registers", () => {
+            return routeTester.post({
                 email: "test@example.org"
             }).then(() => {
                 expect(registrationManagerMock.registerAsync).toHaveBeenCalledWith({
@@ -49,7 +45,7 @@ jasmine.routeTester("/registration", (container) => {
                 expect(routeTester.res.send).toHaveBeenCalledWith({
                     secure: "info"
                 });
-            }).then(done, done);
+            });
         });
     });
 });

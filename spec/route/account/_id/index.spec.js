@@ -18,12 +18,12 @@ jasmine.routeTester("/account/_id/", (container) => {
             "name"
         ]);
     });
-
     describe("GET", () => {
         describe("success", () => {
-            beforeEach((done) => {
+            beforeEach(() => {
                 routeTester.req.cookies.login = "asdf";
-                routeTester.get().then(done);
+
+                return routeTester.get();
             });
             it("refreshes the login cookie", () => {
                 expect(routeTester.res.setCookie).toHaveBeenCalledWith("login", "asdf", {
@@ -58,12 +58,12 @@ jasmine.routeTester("/account/_id/", (container) => {
         // are mocked to allow any value, we can simulate this bizarre
         // behavior quite easily.
         describe("no login cookie to refresh", () => {
-            it("errors when refreshing the login cookie", (done) => {
-                routeTester.get().then(() => {
+            it("errors when refreshing the login cookie", () => {
+                return routeTester.get().then(() => {
                     jasmine.fail();
                 }, (err) => {
                     expect(err.toString()).toContain("No login cookie to refresh");
-                }).then(done, done);
+                });
             });
         });
 
@@ -86,19 +86,20 @@ jasmine.routeTester("/account/_id/", (container) => {
                 beforeEach(() => {
                     scenario.getSpy().andReturn(promiseMock.reject(scenario.name));
                 });
-                it("returns an error", (done) => {
-                    routeTester.get().then(() => {
+                it("returns an error", () => {
+                    return routeTester.get().then(() => {
                         expect(routeTester.res.send).toHaveBeenCalledWith(401);
-                    }).then(done, done);
+                    });
                 });
-                it("clears login cookies", (done) => {
+                it("clears login cookies", () => {
                     routeTester.req.cookies.login = "abcd";
-                    routeTester.get().then(() => {
+
+                    return routeTester.get().then(() => {
                         expect(routeTester.res.setCookie).toHaveBeenCalledWith("login", "");
-                    }).then(done, done);
+                    });
                 });
-                it("sets the right links", (done) => {
-                    routeTester.get().then(() => {
+                it("sets the right links", () => {
+                    return routeTester.get().then(() => {
                         expect(routeTester.res.linkObjects).toEqual([
                             {
                                 href: "rendered route: account-login, id:\"account-id\"",
@@ -106,7 +107,7 @@ jasmine.routeTester("/account/_id/", (container) => {
                                 title: "account-login"
                             }
                         ]);
-                    }).then(done, done);
+                    });
                 });
             });
         });
