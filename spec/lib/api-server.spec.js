@@ -7,7 +7,7 @@ describe("ApiServer", () => {
         apiServerFactory = require("../../lib/api-server");
         WebServerMock = require("../mock/web-server-mock")();
     });
-    it("starts a server", (done) => {
+    it("starts a server", () => {
         var apiServer, config;
 
         config = {
@@ -19,9 +19,10 @@ describe("ApiServer", () => {
         apiServer = apiServerFactory(config, WebServerMock);
         expect(apiServer).toEqual(jasmine.any(Function));
         expect(WebServerMock.mostRecentInstance.startServerAsync).not.toHaveBeenCalled();
-        apiServer().then(() => {
+
+        return apiServer().then(() => {
             expect(WebServerMock.mostRecentInstance.startServerAsync).toHaveBeenCalled();
-        }).then(done, done);
+        });
     });
     it("sets up a route", () => {
         apiServerFactory({}, WebServerMock);

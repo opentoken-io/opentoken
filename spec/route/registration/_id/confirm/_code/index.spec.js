@@ -13,10 +13,11 @@ jasmine.routeTester("/registration/_id/confirm/_code", (container) => {
         ]);
     });
     describe("GET", () => {
-        it("confirms the registration", (done) => {
+        it("confirms the registration", () => {
             routeTester.req.params.id = "id";
             routeTester.req.params.code = "code";
-            routeTester.get().then(() => {
+
+            return routeTester.get().then(() => {
                 expect(registrationManagerMock.confirmEmailAsync).toHaveBeenCalledWith("id", "code");
                 expect(routeTester.res.linkObjects).toEqual([
                     {
@@ -33,7 +34,7 @@ jasmine.routeTester("/registration/_id/confirm/_code", (container) => {
                 expect(routeTester.res.send).toHaveBeenCalledWith(201, {
                     accountId: "account id"
                 });
-            }).then(done, done);
+            });
         });
     });
 });

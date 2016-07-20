@@ -1,0 +1,15 @@
+{
+    "type": "object",
+    "properties": {
+        "algorithm": {
+            "$ref": "../meta/hash-method.json"
+        },
+        "encoding": {
+            "$ref": "../meta/encoding-method.json"
+        }
+    },
+    "required": [
+        "algorithm",
+        "encoding"
+    ]
+}

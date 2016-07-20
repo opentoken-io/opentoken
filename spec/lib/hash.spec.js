@@ -32,8 +32,8 @@ describe("hash", () => {
         });
     });
     describe("deriveAsync()", () => {
-        it("hashes a passed in string", (done) => {
-            hash.deriveAsync("rRTcBER_EiFUsRa34Hj5Zpok", {
+        it("hashes a passed in string", () => {
+            return hash.deriveAsync("rRTcBER_EiFUsRa34Hj5Zpok", {
                 algorithm: "sha256",
                 derivedLength: 24,
                 // The encoding is not honored due to it being a mock
@@ -43,10 +43,10 @@ describe("hash", () => {
                 type: "pbkdf2"
             }).then((result) => {
                 expect(result).toBe("PR4ivl87GgN2bqA/tc3wA9O/HVcETOP5");
-            }).then(done, done);
+            });
         });
-        it("hashes a passed in buffer", (done) => {
-            hash.deriveAsync(new Buffer("rRTcBER_EiFUsRa34Hj5Zpok", "binary"), {
+        it("hashes a passed in buffer", () => {
+            return hash.deriveAsync(new Buffer("rRTcBER_EiFUsRa34Hj5Zpok", "binary"), {
                 algorithm: "sha256",
                 derivedLength: 24,
                 encoding: "base64",
@@ -55,30 +55,34 @@ describe("hash", () => {
                 type: "pbkdf2"
             }).then((result) => {
                 expect(result).toBe("PR4ivl87GgN2bqA/tc3wA9O/HVcETOP5");
-            }).then(done, done);
+            });
         });
-        it("rejects when there is no data", (done) => {
-            jasmine.testPromiseFailure(hash.deriveAsync(new Buffer("", "binary"), {
+        it("rejects when there is no data", () => {
+            return hash.deriveAsync(new Buffer("", "binary"), {
                 algorithm: "sha256",
                 derivedLength: 24,
                 encoding: "base64",
                 iterations: 10000,
                 salt: "pinkFluffyUnicornsDancingOnRainbows",
                 type: "pbkdf2"
-            }), "Nothing to hash", done);
+            }).then(jasmine.fail, (err) => {
+                expect(err.toString()).toContain("Nothing to hash");
+            });
         });
-        it("rejects with an invalid type", (done) => {
-            jasmine.testPromiseFailure(hash.deriveAsync("data", {
+        it("rejects with an invalid type", () => {
+            return hash.deriveAsync("data", {
                 algorithm: "sha256",
                 derivedLength: 24,
                 encoding: "base64",
                 iterations: 10000,
                 salt: "salty",
                 type: "unknown"
-            }), "Invalid hash type configuration", done);
+            }).then(jasmine.fail, (err) => {
+                expect(err.toString()).toContain("Invalid hash type configuration");
+            });
         });
-        it("calls the encoding library", (done) => {
-            hash.deriveAsync("data", {
+        it("calls the encoding library", () => {
+            return hash.deriveAsync("data", {
                 algorithm: "sha256",
                 derivedLength: 10,
                 encoding: "base64",
@@ -87,7 +91,22 @@ describe("hash", () => {
             }).then((result) => {
                 expect(result).toBe("NUgunJKn8yBcnQ==");
                 expect(encodingMock.encode).toHaveBeenCalledWith(jasmine.any(Buffer), "base64");
-            }).then(done, done);
+            });
+        });
+    });
+    describe(".hash()", () => {
+        it("hashes a string without a salt", () => {
+            expect(hash.hash("some string", {
+                algorithm: "md5",
+                encoding: "disregard"
+            })).toEqual("WsdJ++7JNgf8KNZmvoXnOg==");
+        });
+        it("hashes a buffer with a salt", () => {
+            expect(hash.hash(new Buffer("buffer goes here", "binary"), {
+                algorithm: "md5",
+                encoding: "disregard",
+                salt: "extra data"
+            })).toEqual("b6M3hBjIlWvSC8rEVMKgPA==");
         });
     });
 });

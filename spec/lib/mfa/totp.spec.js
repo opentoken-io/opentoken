@@ -4,7 +4,7 @@ describe("mfa/totp", () => {
     var factory, twofaAsyncMock;
 
     beforeEach(() => {
-        var promiseMock;
+        var promiseMock, randomMock;
 
         factory = (override) => {
             var config;
@@ -19,36 +19,43 @@ describe("mfa/totp", () => {
                 }
             };
 
-            return require("../../../lib/mfa/totp")(config, twofaAsyncMock);
+            return require("../../../lib/mfa/totp")(config, randomMock, twofaAsyncMock);
         };
 
         promiseMock = require("../../mock/promise-mock")();
+        randomMock = require("../../mock/random-mock")();
         twofaAsyncMock = jasmine.createSpyObj("twofaAsyncMock", [
-            "generateKeyAsync",
             "generateGoogleQRAsync",
+            "generateUrl",
             "verifyTOTP"
         ]);
-        twofaAsyncMock.generateKeyAsync.andReturn(promiseMock.resolve("mfa code"));
         twofaAsyncMock.generateGoogleQRAsync.andReturn(promiseMock.resolve(new Buffer("png data", "binary")));
+        twofaAsyncMock.generateUrl.andReturn("twofaAsyncMock.generateUrl()");
         twofaAsyncMock.verifyTOTP.andReturn(true);
     });
     describe(".generateSecretAsync()", () => {
-        it("returns a generated key", (done) => {
-            factory().generateSecretAsync().then((result) => {
-                expect(result).toBe("mfa code");
-                expect(twofaAsyncMock.generateKeyAsync).toHaveBeenCalledWith(99);
-            }).then(done, done);
+        it("returns a generated key", () => {
+            return factory().generateSecretAsync().then((result) => {
+                expect(Buffer.isBuffer(result)).toBe(true);
+                expect(result.length).toBe(99);
+            });
         });
     });
     describe(".generateQRCodeAsync()", () => {
-        it("returns a PNG in a Buffer", (done) => {
-            factory().generateQrCodeAsync("secret", "email").then((result) => {
+        it("returns a PNG in a Buffer", () => {
+            return factory().generateQrCodeAsync("secret", "email").then((result) => {
                 expect(result instanceof Buffer).toBe(true);
                 expect(result.toString("binary")).toBe("png data");
                 expect(twofaAsyncMock.generateGoogleQRAsync).toHaveBeenCalledWith("Testing Name", "email", "secret", {
                     encoding: "buffer"
                 });
-            }).then(done, done);
+            });
+        });
+    });
+    describe(".generateUrl()", () => {
+        it("generates a URL by calling the library", () => {
+            expect(factory().generateUrl("secret", "email")).toBe("twofaAsyncMock.generateUrl()");
+            expect(twofaAsyncMock.generateUrl).toHaveBeenCalledWith("Testing Name", "email", "secret");
         });
     });
     describe(".verifyCurrent()", () => {

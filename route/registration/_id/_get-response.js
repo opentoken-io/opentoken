@@ -17,6 +17,6 @@ module.exports = (server) => {
                 title: "registration-secure-qr"
             }
         });
-        res.send(secureInfoGroup.secureInfo);
+        res.send(secureInfoGroup.record);
     };
 };

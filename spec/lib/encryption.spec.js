@@ -14,9 +14,9 @@ describe("encryption", () => {
         randomMock = require("../mock/random-mock")();
         encryption = require("../../lib/encryption")(ciphersAndHashes, cryptoAsync, promiseMock, randomMock);
     });
-    it("encrypts from a buffer with a key as a buffer", (done) => {
+    it("encrypts from a buffer with a key as a buffer", () => {
         // The rest of the tests use Buffers because it is WAY easier
-        encryption.encryptAsync(new Buffer("as a string", "binary"), new Buffer("key", "binary"), {
+        return encryption.encryptAsync(new Buffer("as a string", "binary"), new Buffer("key", "binary"), {
             algorithm: "md5",
             digest: "sha1",
             iterations: 50
@@ -26,16 +26,17 @@ describe("encryption", () => {
             iterations: 29
         }).then((result) => {
             expect(result.toString("hex")).toEqual("0001053200000040031d0000000b00000053f8a825e3b1c5e9537c20800324153042424242424242424242424242424242e94cea7494417116671128");
-        }).then(done, done);
+        });
     });
-    it("decrypts from a string with a key as a buffer", (done) => {
+    it("decrypts from a string with a key as a buffer", () => {
         // The rest of the tests use Buffers because it is WAY easier
         var asString;
 
         asString = (new Buffer("0001053200000040031d0000000b00000053f8a825e3b1c5e9537c20800324153042424242424242424242424242424242e94cea7494417116671128", "hex")).toString("binary");
-        encryption.decryptAsync(asString, new Buffer("key")).then((result) => {
+
+        return encryption.decryptAsync(asString, new Buffer("key")).then((result) => {
             expect(result.toString("binary")).toEqual("as a string");
-        }).then(done, done);
+        });
     });
     describe("error handling", () => {
         var buff, cipherConfig, hmacConfig, keySource, plain;
@@ -58,9 +59,12 @@ describe("encryption", () => {
             };
             plain = "as a string";
         });
-        it("errors with invalid HMAC", (done) => {
+        it("errors with invalid HMAC", () => {
             buff[20] ^= 0xF;
-            jasmine.testPromiseFailure(encryption.decryptAsync(buff, keySource), "HMAC invalid", done);
+
+            return encryption.decryptAsync(buff, keySource).then(jasmine.fail, (err) => {
+                expect(err.toString()).toContain("HMAC invalid");
+            });
         });
         [
             {
@@ -88,7 +92,7 @@ describe("encryption", () => {
                 text: "Cipher Key Digest"
             }
         ].forEach((scenario) => {
-            it(`errors with invalid encoding parameters - ${scenario.text}`, (done) => {
+            it(`errors with invalid encoding parameters - ${scenario.text}`, () => {
                 var config;
 
                 config = {
@@ -96,11 +100,17 @@ describe("encryption", () => {
                     cipherConfig
                 };
                 config[scenario.config][scenario.property] = "invalid";
-                jasmine.testPromiseFailure(encryption.encryptAsync(plain, keySource, hmacConfig, cipherConfig), scenario.text, done);
+
+                return encryption.encryptAsync(plain, keySource, hmacConfig, cipherConfig).then(jasmine.fail, (err) => {
+                    expect(err.toString()).toContain(scenario.text);
+                });
             });
-            it(`errors with invalid header config - ${scenario.text}`, (done) => {
+            it(`errors with invalid header config - ${scenario.text}`, () => {
                 buff[scenario.byte] = 0xFF;
-                jasmine.testPromiseFailure(encryption.decryptAsync(buff, keySource), scenario.text, done);
+
+                return encryption.decryptAsync(buff, keySource).then(jasmine.fail, (err) => {
+                    expect(err.toString()).toContain(scenario.text);
+                });
             });
         });
     });
@@ -122,36 +132,35 @@ describe("encryption", () => {
             plain: "abcdefg"
         }
     ].forEach((scenario) => {
-        it(`encrypts in the latest version: ${scenario.name}`, (done) => {
-            encryption.encryptAsync(scenario.plain, scenario.keySource, scenario.hmacConfig, scenario.cipherConfig).then((result) => {
+        it(`encrypts in the latest version: ${scenario.name}`, () => {
+            return encryption.encryptAsync(scenario.plain, scenario.keySource, scenario.hmacConfig, scenario.cipherConfig).then((result) => {
                 expect(result.toString("hex")).toEqual(scenario.encryptedHex);
-            }).then(done, done);
+            });
         });
-        it(`decrypts the latest version: ${scenario.name}`, (done) => {
-            encryption.decryptAsync(new Buffer(scenario.encryptedHex, "hex"), scenario.keySource).then((result) => {
+        it(`decrypts the latest version: ${scenario.name}`, () => {
+            return encryption.decryptAsync(new Buffer(scenario.encryptedHex, "hex"), scenario.keySource).then((result) => {
                 expect(result.toString("binary")).toEqual(scenario.plain);
-            }).then(done, done);
+            });
         });
     });
     describe("backwards compatibility with all versions", () => {
-        it("errors with version 1", (done) => {
+        it("errors with version 1", () => {
             // When you update this test, make sure to add another that checks
             // the new version you've added.
-            encryption.decryptAsync("\x01", "anything").then(() => {
+            return encryption.decryptAsync("\x01", "anything").then(() => {
                 expect(true).toBe(false);
-                done();
             }, (err) => {
                 expect(err.toString()).toContain("Invalid header version");
-                done();
             });
         });
-        it("decrypts version 0", (done) => {
+        it("decrypts version 0", () => {
             var buff;
 
             buff = new Buffer("0001053200000040031d0000000b00000053f8a825e3b1c5e9537c20800324153042424242424242424242424242424242e94cea7494417116671128", "hex");
-            encryption.decryptAsync(buff, "key").then((result) => {
+
+            return encryption.decryptAsync(buff, "key").then((result) => {
                 expect(result.toString()).toEqual("as a string");
-            }).then(done, done);
+            });
         });
     });
 });

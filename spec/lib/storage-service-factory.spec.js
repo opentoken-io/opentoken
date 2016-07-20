@@ -37,13 +37,13 @@ describe("storageServiceFactory", () => {
                 putAsync: jasmine.any(Function)
             });
         });
-        it("deletes", (done) => {
-            storageService.delAsync("id").then(() => {
+        it("deletes", () => {
+            return storageService.delAsync("id").then(() => {
                 expect(storageMock.delAsync).toHaveBeenCalledWith("prefix/hash(id)");
-            }).then(done, done);
+            });
         });
-        it("gets", (done) => {
-            storageService.getAsync("id").then((result) => {
+        it("gets", () => {
+            return storageService.getAsync("id").then((result) => {
                 var args;
 
                 expect(storageMock.getAsync).toHaveBeenCalledWith("prefix/hash(id)");
@@ -53,9 +53,9 @@ describe("storageServiceFactory", () => {
                 expect(args[1]).toBe("id");
                 expect(args.length).toBe(2);
                 expect(result).toBe("thawed");
-            }).then(done, done);
+            });
         });
-        it("puts without metadata", (done) => {
+        it("puts without metadata", () => {
             OtDateMock.stubNow().plus.andCallFake((lifetimeIn) => {
                 expect(lifetimeIn).toEqual({
                     lifetime: true
@@ -63,15 +63,16 @@ describe("storageServiceFactory", () => {
 
                 return "lifetime was tested";
             });
-            storageService.putAsync("id", "record data").then(() => {
+
+            return storageService.putAsync("id", "record data").then(() => {
                 /* eslint no-undefined:"off" */
                 expect(recordMock.freezeAsync).toHaveBeenCalledWith("record data", "id", {
                     expires: "lifetime was tested"
                 }, undefined);
-            }).then(done, done);
+            });
         });
-        it("puts with metadata", (done) => {
-            storageService.putAsync("id", "record data", {
+        it("puts with metadata", () => {
+            return storageService.putAsync("id", "record data", {
                 meta: "data"
             }).then(() => {
                 expect(recordMock.freezeAsync).toHaveBeenCalledWith("record data", "id", {
@@ -79,7 +80,7 @@ describe("storageServiceFactory", () => {
                 }, {
                     meta: "data"
                 });
-            }).then(done, done);
+            });
         });
     });
 });

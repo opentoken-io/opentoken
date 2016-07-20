@@ -13,9 +13,10 @@ jasmine.routeTester("/registration/_id/qr", (container) => {
         ]);
     });
     describe("GET", () => {
-        it("creates a QR code", (done) => {
+        it("creates a QR code", () => {
             routeTester.req.params.id = "id";
-            routeTester.get().then(() => {
+
+            return routeTester.get().then(() => {
                 var args;
 
                 expect(registrationManagerMock.qrCodeImageAsync).toHaveBeenCalledWith("id");
@@ -32,7 +33,7 @@ jasmine.routeTester("/registration/_id/qr", (container) => {
                 expect(Buffer.isBuffer(args[0])).toBe(true);
                 expect(args[0].toString("binary")).toEqual("png data");
                 expect(args.length).toBe(1);
-            }).then(done, done);
+            });
         });
     });
 });

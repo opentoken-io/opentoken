@@ -16,5 +16,8 @@ module.exports = () => {
     request.method = "GET";
     request.params = {};
 
+    // Custom additions to the standard Restify request object
+    request.cookies = {};
+
     return request;
 };

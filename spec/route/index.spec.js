@@ -8,13 +8,13 @@ jasmine.routeTester("/", null, (routeTester) => {
         ]);
     });
     describe("GET", () => {
-        it("has no content", (done) => {
-            routeTester.get().then(() => {
+        it("has no content", () => {
+            return routeTester.get().then(() => {
                 expect(routeTester.res.send).toHaveBeenCalledWith(204);
-            }).then(done, done);
+            });
         });
-        it("adds service links", (done) => {
-            routeTester.get().then(() => {
+        it("adds service links", () => {
+            return routeTester.get().then(() => {
                 expect(routeTester.res.linkObjects).toEqual([
                     {
                         href: "rendered route: registration-register",
@@ -23,12 +23,12 @@ jasmine.routeTester("/", null, (routeTester) => {
                         title: "registration-register"
                     }
                 ]);
-            }).then(done, done);
+            });
         });
-        it("calls server.get to serve static assets", (done) => {
-            routeTester.get().then(() => {
+        it("calls server.get to serve static assets", () => {
+            return routeTester.get().then(() => {
                 expect(routeTester.server.get).toHaveBeenCalledWith(jasmine.any(RegExp), jasmine.any(Function));
-            }).then(done, done);
+            });
         });
     });
 });

@@ -1,15 +1,15 @@
 "use strict";
 
 describe("random", () => {
-    var base64Mock, random;
+    var base64, random;
 
     beforeEach(() => {
         var cryptoAsyncMock;
 
-        base64Mock = require("../mock/base64-mock")();
-        base64Mock.encode.andReturn(new Buffer("abcdwxyzABCDWXYZ0189+/testing++//"));
+        base64 = require("../../lib/base64")();
+        spyOn(base64, "encode").andReturn(new Buffer("abcdwxyzABCDWXYZ0189+/testing++//"));
         cryptoAsyncMock = require("../mock/crypto-async-mock")();
-        random = require("../../lib/random")(base64Mock, cryptoAsyncMock);
+        random = require("../../lib/random")(base64, cryptoAsyncMock);
     });
     describe("bufferAsync", () => {
         it("returns a Promise", () => {
@@ -19,11 +19,11 @@ describe("random", () => {
             expect(result).toEqual(jasmine.any(Object));
             expect(result.then).toEqual(jasmine.any(Function));
         });
-        it("generates appropriately-sized random data Buffer", (done) => {
-            random.bufferAsync(1293).then((buff) => {
+        it("generates appropriately-sized random data Buffer", () => {
+            return random.bufferAsync(1293).then((buff) => {
                 expect(buff).toEqual(jasmine.any(Buffer));
                 expect(buff.length).toBe(1293);
-            }).then(done, done);
+            });
         });
     });
     describe("idAsync", () => {
@@ -49,13 +49,13 @@ describe("random", () => {
                 expected: "abcdwxyzABCDWXYZ0189-_testing--__"
             }
         ].forEach((scenario) => {
-            it(`sends the right amount of binary data to base64: length ${scenario.desiredLength}`, (done) => {
-                random.idAsync(scenario.desiredLength).then(() => {
-                    expect(base64Mock.encode.mostRecentCall.args[0].length).toBe(scenario.binLength);
-                }).then(done, done);
+            it(`sends the right amount of binary data to base64: length ${scenario.desiredLength}`, () => {
+                return random.idAsync(scenario.desiredLength).then(() => {
+                    expect(base64.encode.mostRecentCall.args[0].length).toBe(scenario.binLength);
+                });
             });
             it(`replaced + and /: length ${scenario.desiredLength}`, () => {
-                random.idAsync(scenario.desiredLength).then((pass) => {
+                return random.idAsync(scenario.desiredLength).then((pass) => {
                     expect(pass).toEqual(scenario.expected);
                 });
             });

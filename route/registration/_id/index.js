@@ -8,7 +8,7 @@ module.exports = (server, path, options) => {
 
         return {
             get(req, res, next) {
-                registrationManager.secureInfoAsync(req.params.id).then((secureInfoGroup) => {
+                registrationManager.getRecordAsync(req.params.id).then((secureInfoGroup) => {
                     getResponse(secureInfoGroup, res);
                 }).then(next, next);
             },
@@ -16,7 +16,12 @@ module.exports = (server, path, options) => {
             post: [
                 validateRequestMiddleware("/registration/secure-request.json"),
                 (req, res, next) => {
-                    registrationManager.secureAsync(req.params.id, req.body, server).then(() => {
+                    registrationManager.secureAsync(req.params.id, req.body, server).then((secureInfoGroup) => {
+                        res.links({
+                            self: server.router.render("registration-secure", {
+                                id: secureInfoGroup.id
+                            })
+                        });
                         res.send(204);
                     }).then(next, next);
                 }

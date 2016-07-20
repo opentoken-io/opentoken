@@ -6,23 +6,28 @@ module.exports = () => {
     promiseMock = require("./promise-mock")();
     mock = jasmine.createSpyObj("registrationManagerMock", [
         "confirmEmailAsync",
+        "getRecordAsync",
         "qrCodeImageAsync",
         "registerAsync",
-        "secureAsync",
-        "secureInfoAsync"
+        "secureAsync"
     ]);
     mock.confirmEmailAsync.andReturn(promiseMock.resolve("account id"));
-    mock.qrCodeImageAsync.andReturn(promiseMock.resolve(new Buffer("png data", "binary")));
-    mock.registerAsync.andReturn(promiseMock.resolve({
+    mock.getRecordAsync.andReturn(promiseMock.resolve({
         id: "id",
-        secureInfo: {
+        record: {
             secure: "info"
         }
     }));
-    mock.secureAsync.andReturn(promiseMock.resolve());
-    mock.secureInfoAsync.andReturn(promiseMock.resolve({
+    mock.qrCodeImageAsync.andReturn(promiseMock.resolve(new Buffer("png data", "binary")));
+    mock.registerAsync.andReturn(promiseMock.resolve({
         id: "id",
-        secureInfo: {
+        record: {
+            secure: "info"
+        }
+    }));
+    mock.secureAsync.andReturn(promiseMock.resolve({
+        id: "id",
+        record: {
             secure: "info"
         }
     }));

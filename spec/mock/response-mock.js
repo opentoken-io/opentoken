@@ -22,7 +22,11 @@ module.exports = () => {
         "links",
         "header",
         "send",
-        "setHeader"
+        "setHeader",
+        "write",
+
+        // Custom extensions to Restify response object
+        "setCookie"
     ]);
     response.contentType = "auto";
     response.header.andCallFake(headerSetter);

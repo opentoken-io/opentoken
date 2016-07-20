@@ -1,0 +1,23 @@
+{
+    "type": "object",
+    "properties": {
+        "challengeHash": {
+            "$ref": "../meta/challenge-hash.json"
+        },
+        "mfa": {
+            "type": "object",
+            "properties": {
+                "totp": {
+                    "$ref": "../meta/mfa-totp-code.json"
+                }
+            },
+            "required": [
+                "totp"
+            ]
+        }
+    },
+    "required": [
+        "challengeHash",
+        "mfa"
+    ]
+}

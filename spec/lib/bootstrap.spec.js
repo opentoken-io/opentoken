@@ -24,30 +24,42 @@ describe("bootstrap", () => {
             return real(baseDir);
         };
     });
-    it("passes with stock config", (done) => {
-        bootstrap().then(() => {
+    it("passes with stock config", () => {
+        return bootstrap().then(() => {
             expect(schemaMock.loadSchemaFolderAsync).toHaveBeenCalledWith(`${baseDir}schema`);
-        }).then(done, done);
+        });
     });
-    it("errors when config is a string", (done) => {
+    it("errors when config is a string", () => {
         config = "test";
-        jasmine.testPromiseFailure(bootstrap(), "Configuration is not an object", done);
+
+        return bootstrap().then(jasmine.fail, (err) => {
+            expect(err.toString()).toContain("Configuration is not an object");
+        });
     });
-    it("errors when config is null", (done) => {
+    it("errors when config is null", () => {
         config = null;
-        jasmine.testPromiseFailure(bootstrap(), "Configuration is not an object", done);
+
+        return bootstrap().then(jasmine.fail, (err) => {
+            expect(err.toString()).toContain("Configuration is not an object");
+        });
     });
-    it("errors when schemaPath is undefined", (done) => {
+    it("errors when schemaPath is undefined", () => {
         config = {};
-        jasmine.testPromiseFailure(bootstrap(), "config.schemaPath is not set", done);
+
+        return bootstrap().then(jasmine.fail, (err) => {
+            expect(err.toString()).toContain("config.schemaPath is not set");
+        });
     });
-    it("errors when there are missing schemas", (done) => {
+    it("errors when there are missing schemas", () => {
         schemaMock.getMissingSchemas.andReturn([
             "/schema"
         ]);
-        jasmine.testPromiseFailure(bootstrap(), "Unresolved schema references", done);
+
+        return bootstrap().then(jasmine.fail, (err) => {
+            expect(err.toString()).toContain("Unresolved schema references");
+        });
     });
-    it("errors when the schema does not validate", (done) => {
+    it("errors when the schema does not validate", () => {
         schemaMock.validate.andReturn({
             error: {
                 dataPath: "x/y",
@@ -55,6 +67,9 @@ describe("bootstrap", () => {
                 schemaPath: "x/y"
             }
         });
-        jasmine.testPromiseFailure(bootstrap(), "Config did not validate", done);
+
+        return bootstrap().then(jasmine.fail, (err) => {
+            expect(err.toString()).toContain("Config did not validate");
+        });
     });
 });

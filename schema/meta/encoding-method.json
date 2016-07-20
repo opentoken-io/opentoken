@@ -2,7 +2,10 @@
     "description": "How binary data should be converted to text.  base64-uri replaces + with -, / with _ and eliminates =.",
     "type": "string",
     "enum": [
+        "base32",
+        "base32-uri",
         "base64",
-        "base64-uri"
+        "base64-uri",
+        "hex"
     ]
 }
