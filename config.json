@@ -38,7 +38,7 @@
         "idHash": {
             "algorithm": "sha512",
             "derivedLength": 32,
-            "encoding": "base64",
+            "encoding": "base64-uri",
             "iterations": 5000,
             "salt": "Something to make this different than the account hash.",
             "type": "pbkdf2"

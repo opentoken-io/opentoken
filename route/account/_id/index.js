@@ -9,7 +9,7 @@ module.exports = (server, path, options) => {
         return {
             get(req, res, next) {
                 // Check the login session
-                sessionManager.validateAsync(loginCookie.get(req), req.params.id).then(() => {
+                sessionManager.validateAsync(req.params.id, loginCookie.get(req)).then(() => {
                     // Then also load the account record
                     return accountManager.recordAsync(req.params.id);
                 }).then((account) => {
