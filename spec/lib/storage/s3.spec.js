@@ -93,7 +93,7 @@ describe("storage/s3", () => {
                 });
             });
         });
-        it("get list by passing in a prefix", () => {
+        it("gets a list by passing in a prefix", () => {
             return s3.listAsync("accounts").then((val) => {
                 expect(val).toEqual({
                     Prefix: "accounts"

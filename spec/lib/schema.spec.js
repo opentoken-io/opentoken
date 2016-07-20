@@ -103,7 +103,7 @@ describe("schema", () => {
                 expect(err.toString()).toContain("Unable to parse file: ./email-parse-error.json");
             });
         });
-        it("tries to a schema which is not present", () => {
+        it("tries to load a schema which is not present", () => {
             return schema.loadSchemaAsync("./email-not-there.json", "./").then(jasmine.fail, (err) => {
                 expect(err.toString()).toContain("Unable to parse file: ./email-not-there.json");
             });
