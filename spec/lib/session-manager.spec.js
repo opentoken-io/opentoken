@@ -4,19 +4,23 @@ describe("sessionManager", () => {
     var factory, promiseMock, randomMock, storageService, storageServiceFactoryMock;
 
     beforeEach(() => {
-        var hashMock, OtDateMock;
+        var util;
 
-        hashMock = require("../mock/hash-mock")();
-        OtDateMock = require("../mock/ot-date-mock")();
         promiseMock = require("../mock/promise-mock")();
         randomMock = require("../mock/random-mock")();
         storageServiceFactoryMock = require("../mock/storage-service-factory-mock")();
+        util = require("../../lib/util")();
         storageService = storageServiceFactoryMock.instance;
 
         factory = () => {
             var config;
 
             config = {
+                account: {
+                    idHash: {
+                        idHash: "for the account ID"
+                    }
+                },
                 session: {
                     idHash: {
                         idHash: "goes here"
@@ -29,7 +33,7 @@ describe("sessionManager", () => {
                 }
             };
 
-            return require("../../lib/session-manager")(config, hashMock, OtDateMock, promiseMock, randomMock, storageServiceFactoryMock);
+            return require("../../lib/session-manager")(config, promiseMock, randomMock, storageServiceFactoryMock, util);
         };
     });
     it("exposes known methods", () => {
@@ -40,9 +44,14 @@ describe("sessionManager", () => {
     });
     it("configured the storage service correctly", () => {
         factory();
-        expect(storageServiceFactoryMock).toHaveBeenCalledWith({
-            idHash: "goes here"
-        }, {
+        expect(storageServiceFactoryMock).toHaveBeenCalledWith([
+            {
+                idHash: "for the account ID"
+            },
+            {
+                idHash: "goes here"
+            }
+        ], {
             lifetime: "goes here"
         }, "anything");
     });
@@ -50,7 +59,10 @@ describe("sessionManager", () => {
         it("creates a session", () => {
             return factory().createAsync("accountId").then((result) => {
                 expect(randomMock.idAsync).toHaveBeenCalledWith(10);
-                expect(storageServiceFactoryMock.instance.putAsync).toHaveBeenCalledWith("BBBBBBBBBB", {
+                expect(storageServiceFactoryMock.instance.putAsync).toHaveBeenCalledWith([
+                    "accountId",
+                    "BBBBBBBBBB"
+                ], {
                     accountId: "accountId"
                 });
                 expect(result).toBe("BBBBBBBBBB");
@@ -64,14 +76,14 @@ describe("sessionManager", () => {
             }));
         });
         it("validates a good session", () => {
-            return factory().validateAsync("sessionId", "accountId").then(() => {
+            return factory().validateAsync("accountId", "sessionId").then(() => {
                 expect(storageService.putAsync).toHaveBeenCalledWith("sessionId", {
                     accountId: "accountId"
                 });
             });
         });
         it("rejects when the session ID is empty", () => {
-            return factory().validateAsync("", "accountId").then(() => {
+            return factory().validateAsync("accountId", "").then(() => {
                 jasmine.fail();
             }, (err) => {
                 expect(err.toString()).toContain("No session ID");
@@ -82,7 +94,7 @@ describe("sessionManager", () => {
                 accountId: "wrong"
             }));
 
-            return factory().validateAsync("sessionId", "accountId").then(() => {
+            return factory().validateAsync("accountId", "sessionId").then(() => {
                 jasmine.fail();
             }, (err) => {
                 expect(err.toString()).toContain("Session is for wrong account");
@@ -96,7 +108,7 @@ describe("sessionManager", () => {
             promise = new Promise(() => {});
             storageService.putAsync.andReturn(promise);
 
-            return factory().validateAsync("sessionId", "accountId");
+            return factory().validateAsync("accountId", "sessionId");
         });
     });
 });

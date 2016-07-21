@@ -4,25 +4,29 @@ describe("storageServiceFactory", () => {
     var hashMock, OtDateMock, promiseMock, recordMock, storageMock, storageServiceFactory;
 
     beforeEach(() => {
+        var util;
+
         OtDateMock = require("../mock/ot-date-mock")();
         promiseMock = require("../mock/promise-mock")();
         recordMock = require("../mock/record-mock")();
         hashMock = require("../mock/hash-mock")();
-        hashMock.deriveAsync.andCallFake((input) => {
-            return promiseMock.resolve(`hash(${input})`);
+        util = require("../../lib/util")();
+        hashMock.deriveAsync.andCallFake((input, hashConfig) => {
+            return promiseMock.resolve(`${hashConfig.name}(${input})`);
         });
         storageMock = require("../mock/storage-mock")();
-        storageServiceFactory = require("../../lib/storage-service-factory")(hashMock, OtDateMock, promiseMock, recordMock, storageMock);
+        storageServiceFactory = require("../../lib/storage-service-factory")(hashMock, OtDateMock, promiseMock, recordMock, storageMock, util);
     });
     it("returns a function (hopefully a factory)", () => {
         expect(storageServiceFactory).toEqual(jasmine.any(Function));
     });
-    describe("instance", () => {
+    describe("instance with a single hashConfig", () => {
         var hashConfig, lifetime, storagePrefix, storageService;
 
         beforeEach(() => {
             hashConfig = {
-                hashConfig: true
+                hashConfig: true,
+                name: "hash"
             };
             lifetime = {
                 lifetime: true
@@ -35,6 +39,15 @@ describe("storageServiceFactory", () => {
                 delAsync: jasmine.any(Function),
                 getAsync: jasmine.any(Function),
                 putAsync: jasmine.any(Function)
+            });
+        });
+        it("hashes an ID Array", () => {
+            return storageService.delAsync([
+                "id",
+                "another thing",
+                "last"
+            ]).then(() => {
+                expect(storageMock.delAsync).toHaveBeenCalledWith("prefix/hash(id)/hash(another thing)/hash(last)");
             });
         });
         it("deletes", () => {
