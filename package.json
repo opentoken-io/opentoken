@@ -53,7 +53,7 @@
         "restify-cookies": "^0.2.0",
         "restify-links": "^1.1.0",
         "restify-plugins": "^1.0.2",
-        "restify-router-magic": "^1.0.1",
+        "restify-router-magic": "^1.1.0",
         "thirty-two": "^1.0.1",
         "tv4": "^1.2.7",
         "validator": "^5.2.0"

@@ -2,7 +2,7 @@
 
 var accountManagerMock, promiseMock, sessionManagerMock;
 
-jasmine.routeTester("/account/_id/", (container) => {
+jasmine.routeTester("/account/_account-id/", (container) => {
     accountManagerMock = require("../../../mock/account-manager-mock")();
     promiseMock = require("../../../mock/promise-mock")();
     sessionManagerMock = require("../../../mock/session-manager-mock")();
@@ -10,7 +10,7 @@ jasmine.routeTester("/account/_id/", (container) => {
     container.register("sessionManager", sessionManagerMock);
 }, (routeTester) => {
     beforeEach(() => {
-        routeTester.req.params.id = "account-id";
+        routeTester.req.params.accountId = "account-id";
     });
     it("exports GET and a name", () => {
         expect(Object.keys(routeTester.exports).sort()).toEqual([
@@ -43,8 +43,8 @@ jasmine.routeTester("/account/_id/", (container) => {
             it("creates the right links", () => {
                 expect(routeTester.res.linkObjects).toEqual([
                     {
-                        href: "rendered route: account-logout, id:\"account-id\"",
-                        profile: "/schema/account/logout.json",
+                        href: "rendered route: account-logout, accountId:\"account-id\"",
+                        profile: "/schema/account/logout-request.json",
                         rel: "service",
                         title: "account-logout"
                     }
@@ -102,7 +102,7 @@ jasmine.routeTester("/account/_id/", (container) => {
                     return routeTester.get().then(() => {
                         expect(routeTester.res.linkObjects).toEqual([
                             {
-                                href: "rendered route: account-login, id:\"account-id\"",
+                                href: "rendered route: account-login, accountId:\"account-id\"",
                                 rel: "item",
                                 title: "account-login"
                             }

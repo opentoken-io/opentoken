@@ -15,7 +15,7 @@ module.exports = (server, path, options) => {
             loginCookie.clear(req, res);
             res.header("Location", config.server.baseUrl);
             res.send(204);
-            next();
+            accountManager.logoutAsync(req.params.accountId, loginCookie.get(req)).then(next, next);
         }
 
         loginCookie = require("../_login-cookie")(config);
