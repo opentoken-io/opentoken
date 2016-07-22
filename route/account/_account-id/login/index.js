@@ -10,17 +10,17 @@ module.exports = (server, path, options) => {
             get(req, res, next) {
                 // Clear any existing cookies
                 loginCookie.clear(req, res);
-                accountManager.loginHashConfigAsync(req.params.id).then((passwordHashConfig) => {
+                accountManager.loginHashConfigAsync(req.params.accountId).then((passwordHashConfig) => {
                     res.links({
                         item: {
                             href: server.router.render("account", {
-                                id: req.params.id
+                                accountId: req.params.accountId
                             }),
                             title: "account"
                         },
                         service: {
                             href: server.router.render("account-login", {
-                                id: req.params.id
+                                accountId: req.params.accountId
                             }),
                             profile: "/schema/account/login-request.json",
                             title: "account-login"
@@ -35,11 +35,11 @@ module.exports = (server, path, options) => {
             post: [
                 validateRequestMiddleware("/account/login-request.json"),
                 (req, res, next) => {
-                    accountManager.loginAsync(req.params.id, req.body).then((login) => {
+                    accountManager.loginAsync(req.params.accountId, req.body).then((login) => {
                         var accountRoute;
 
                         accountRoute = server.router.render("account", {
-                            id: req.params.id
+                            accountId: req.params.accountId
                         });
                         loginCookie.set(res, login.sessionId);
                         res.links({

@@ -9,18 +9,18 @@ module.exports = (server, path, options) => {
         return {
             get(req, res, next) {
                 // Check the login session
-                sessionManager.validateAsync(req.params.id, loginCookie.get(req)).then(() => {
+                sessionManager.validateAsync(req.params.accountId, loginCookie.get(req)).then(() => {
                     // Then also load the account record
-                    return accountManager.recordAsync(req.params.id);
+                    return accountManager.recordAsync(req.params.accountId);
                 }).then((account) => {
                     // Session is valid, account loads
                     loginCookie.refresh(req, res);
                     res.links({
                         service: {
                             href: server.router.render("account-logout", {
-                                id: req.params.id
+                                accountId: req.params.accountId
                             }),
-                            profile: "/schema/account/logout.json",
+                            profile: "/schema/account/logout-request.json",
                             title: "account-logout"
                         }
                     });
@@ -31,7 +31,7 @@ module.exports = (server, path, options) => {
                     res.links({
                         item: {
                             href: server.router.render("account-login", {
-                                id: req.params.id
+                                accountId: req.params.accountId
                             }),
                             title: "account-login"
                         }

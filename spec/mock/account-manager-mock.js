@@ -8,6 +8,7 @@ module.exports = () => {
         "createAsync",
         "loginAsync",
         "loginHashConfigAsync",
+        "logoutAsync",
         "passwordHashConfigAsync",
         "recordAsync"
     ]);
@@ -16,6 +17,7 @@ module.exports = () => {
         sessionId: "login-session-id"
     }));
     mock.loginHashConfigAsync.andReturn(promiseMock.resolve("loginHashConfig"));
+    mock.logoutAsync.andReturn(promiseMock.resolve());
     mock.passwordHashConfigAsync.andReturn(promiseMock.resolve("accountManager.passwordHashConfig"));
     mock.recordAsync.andReturn(promiseMock.resolve({
         id: "record-id",

@@ -37,8 +37,11 @@ describe("sessionManager", () => {
         };
     });
     it("exposes known methods", () => {
+        // This detects when a function is added or removed.  When it is
+        // added, make sure to add tests.
         expect(factory()).toEqual({
             createAsync: jasmine.any(Function),
+            destroyAsync: jasmine.any(Function),
             validateAsync: jasmine.any(Function)
         });
     });
@@ -59,13 +62,23 @@ describe("sessionManager", () => {
         it("creates a session", () => {
             return factory().createAsync("accountId").then((result) => {
                 expect(randomMock.idAsync).toHaveBeenCalledWith(10);
-                expect(storageServiceFactoryMock.instance.putAsync).toHaveBeenCalledWith([
+                expect(storageService.putAsync).toHaveBeenCalledWith([
                     "accountId",
                     "BBBBBBBBBB"
                 ], {
                     accountId: "accountId"
                 });
                 expect(result).toBe("BBBBBBBBBB");
+            });
+        });
+    });
+    describe(".destroyAsync()", () => {
+        it("issues a delete", () => {
+            return factory().destroyAsync("accountId", "sessionId").then(() => {
+                expect(storageService.delAsync).toHaveBeenCalledWith([
+                    "accountId",
+                    "sessionId"
+                ]);
             });
         });
     });

@@ -1,8 +1,13 @@
 "use strict";
 
-jasmine.routeTester("/account/_id/logout/", null, (routeTester) => {
+jasmine.routeTester("/account/_account-id/logout/", (container) => {
+    var accountManagerMock;
+
+    accountManagerMock = require("../../../../mock/account-manager-mock")();
+    container.register("accountManager", accountManagerMock);
+}, (routeTester) => {
     beforeEach(() => {
-        routeTester.req.params.id = "account-id";
+        routeTester.req.params.accountId = "account-id";
     });
     it("exports GET, POST and a name", () => {
         expect(Object.keys(routeTester.exports).sort()).toEqual([

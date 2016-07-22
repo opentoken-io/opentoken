@@ -2,13 +2,13 @@
 
 var accountManagerMock, promiseMock;
 
-jasmine.routeTester("/account/_id/login/", (container) => {
+jasmine.routeTester("/account/_account-id/login/", (container) => {
     promiseMock = require("../../../../mock/promise-mock")();
     accountManagerMock = require("../../../../mock/account-manager-mock")();
     container.register("accountManager", accountManagerMock);
 }, (routeTester) => {
     beforeEach(() => {
-        routeTester.req.params.id = "account-id";
+        routeTester.req.params.accountId = "account-id";
     });
     it("exports GET, POST and a name", () => {
         expect(Object.keys(routeTester.exports).sort()).toEqual([
@@ -41,12 +41,12 @@ jasmine.routeTester("/account/_id/login/", (container) => {
             return routeTester.get().then(() => {
                 expect(routeTester.res.linkObjects).toEqual([
                     {
-                        href: "rendered route: account, id:\"account-id\"",
+                        href: "rendered route: account, accountId:\"account-id\"",
                         rel: "item",
                         title: "account"
                     },
                     {
-                        href: "rendered route: account-login, id:\"account-id\"",
+                        href: "rendered route: account-login, accountId:\"account-id\"",
                         profile: "/schema/account/login-request.json",
                         rel: "service",
                         title: "account-login"
@@ -86,14 +86,14 @@ jasmine.routeTester("/account/_id/login/", (container) => {
             it("creates the right links", () => {
                 expect(routeTester.res.linkObjects).toEqual([
                     {
-                        href: "rendered route: account, id:\"account-id\"",
+                        href: "rendered route: account, accountId:\"account-id\"",
                         rel: "item",
                         title: "account"
                     }
                 ]);
             });
             it("redirects to the account page", () => {
-                expect(routeTester.res.header).toHaveBeenCalledWith("Location", "rendered route: account, id:\"account-id\"");
+                expect(routeTester.res.header).toHaveBeenCalledWith("Location", "rendered route: account, accountId:\"account-id\"");
             });
         });
         describe("with failed login", () => {

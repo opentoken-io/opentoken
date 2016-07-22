@@ -42,10 +42,13 @@ describe("accountManager", () => {
         };
     });
     it("exposes known methods", () => {
+        // This detects when methods are added.  When there are changes here,
+        // make sure that those functions are tested.
         expect(factory()).toEqual({
             createAsync: jasmine.any(Function),
             loginAsync: jasmine.any(Function),
             loginHashConfigAsync: jasmine.any(Function),
+            logoutAsync: jasmine.any(Function),
             passwordHashConfigAsync: jasmine.any(Function),
             recordAsync: jasmine.any(Function)
         });
@@ -152,6 +155,13 @@ describe("accountManager", () => {
                     },
                     passwordHashConfig: "passwordHashConfig"
                 });
+            });
+        });
+    });
+    describe(".logoutAsync()", () => {
+        it("calls the session manager to destroy the session", () => {
+            return factory().logoutAsync("accountId", "sessionId").then(() => {
+                expect(sessionManagerMock.destroyAsync).toHaveBeenCalledWith("accountId", "sessionId");
             });
         });
     });
