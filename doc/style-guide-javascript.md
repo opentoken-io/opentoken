@@ -13,7 +13,7 @@ This extends the [general programming](style-guide-programming.md) portion of th
     * Variables and methods should use `camelCase` style formatting.
     * Only constructors should use `UpperCamelCase` formatting, such as `Date` and `Promise`.
     * No underscore before, within, nor after variables, functions, or properties.
-    * Functions shall be named (eg. `function MyFunc()`) only if they are not ever supposed to be overridden.  Anonymous functions don't need a name.
+    * Functions shall be named (eg. `function myFunc()`) only if they are not ever supposed to be overridden.  Anonymous functions don't need a name.  Other functions that may be overridden shall be assigned to a variable (eg. `handler = function () {}`).
     * We use arrow functions for unnamed anonymous functions unless you need to use a different context (`this`) or `arguments`.
     * `Array` and `array` are two different things.  The former is an object and the latter is a basic data type.  It's more prominent if you are using `String` vs `string` or `Boolean` vs `boolean`.
     * When declaring multiple variables, they should be declared alphabetically and any symbols at the front of variable names should be ignored. Where there is a conflict between two matching variable names, capitalised variable names should be listed first (but that's often indicating you could have a problem).
@@ -51,7 +51,7 @@ This extends the [general programming](style-guide-programming.md) portion of th
     * Property names should be unquoted unless it is necessary to wrap it in quotes.
     * When defining a class, its methods are all alphabetized.
 * Order of items within a function
-    * ESLint flags (only if necessary)
+    * ESLint flags (only if necessary).
     * `var` declarations:
         * One declaration only.
         * Variables will be alphabetized.
