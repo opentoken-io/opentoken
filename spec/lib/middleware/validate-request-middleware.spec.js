@@ -12,7 +12,7 @@ describe("validateRequestMiddleware", () => {
             "validate"
         ]);
         schemaMock.validate.andReturn(null);
-        validateRequestMiddleware = require("../../lib/validate-request-middleware")(chainMiddlewareMock, restifyPluginsMock, schemaMock);
+        validateRequestMiddleware = require("../../../lib/middleware/validate-request-middleware")(chainMiddlewareMock, restifyPluginsMock, schemaMock);
     });
     it("parses the body", () => {
         validateRequestMiddleware("schema");
@@ -24,8 +24,8 @@ describe("validateRequestMiddleware", () => {
         beforeEach(() => {
             validateRequestMiddleware("schema");
             middleware = chainMiddlewareMock.mostRecentCall.args[1];
-            req = require("../mock/request-mock")();
-            res = require("../mock/response-mock")();
+            req = require("../../mock/request-mock")();
+            res = require("../../mock/response-mock")();
         });
         it("calls schema.validate()", (done) => {
             req.body = {

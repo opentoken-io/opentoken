@@ -1,34 +1,28 @@
 "use strict";
 
 module.exports = (server, path, options) => {
-    return options.container.call((accountManager, config, validateRequestMiddleware) => {
-        var loginCookie;
-
-        loginCookie = require("../_login-cookie")(config);
-
+    return options.container.call((accountManager, config, loginCookie, validateRequestMiddleware) => {
         return {
             get(req, res, next) {
                 // Clear any existing cookies
                 loginCookie.clear(req, res);
                 accountManager.loginHashConfigAsync(req.params.accountId).then((passwordHashConfig) => {
                     res.links({
-                        item: {
-                            href: server.router.render("account", {
-                                accountId: req.params.accountId
-                            }),
-                            title: "account"
-                        },
                         service: {
                             href: server.router.render("account-login", {
                                 accountId: req.params.accountId
                             }),
                             profile: "/schema/account/login-request.json",
                             title: "account-login"
+                        },
+                        up: {
+                            href: server.router.render("account", {
+                                accountId: req.params.accountId
+                            }),
+                            title: "account"
                         }
                     });
-                    res.send(200, {
-                        passwordHashConfig
-                    });
+                    res.send(200, passwordHashConfig);
                 }).then(next, next);
             },
             name: "account-login",
@@ -43,7 +37,7 @@ module.exports = (server, path, options) => {
                         });
                         loginCookie.set(res, login.sessionId);
                         res.links({
-                            item: {
+                            up: {
                                 href: accountRoute,
                                 title: "account"
                             }

@@ -1,44 +1,35 @@
 "use strict";
 
 module.exports = (server, path, options) => {
-    return options.container.call((accountManager, config, sessionManager) => {
-        var loginCookie;
-
-        loginCookie = require("./_login-cookie")(config);
-
+    return options.container.call((accountManager, validateSessionMiddleware) => {
         return {
-            get(req, res, next) {
-                // Check the login session
-                sessionManager.validateAsync(req.params.accountId, loginCookie.get(req)).then(() => {
-                    // Then also load the account record
-                    return accountManager.recordAsync(req.params.accountId);
-                }).then((account) => {
-                    // Session is valid, account loads
-                    loginCookie.refresh(req, res);
-                    res.links({
-                        service: {
-                            href: server.router.render("account-logout", {
-                                accountId: req.params.accountId
-                            }),
-                            profile: "/schema/account/logout-request.json",
-                            title: "account-logout"
-                        }
-                    });
-                    res.send(200, account.record);
-                }, () => {
-                    // Not valid right now
-                    loginCookie.clear(req, res);
-                    res.links({
-                        item: {
-                            href: server.router.render("account-login", {
-                                accountId: req.params.accountId
-                            }),
-                            title: "account-login"
-                        }
-                    });
-                    res.send(401);
-                }).then(next, next);
-            },
+            get: [
+                validateSessionMiddleware(server),
+                (req, res, next) => {
+                    // Load the account record
+                    return accountManager.recordAsync(req.params.accountId).then((account) => {
+                        res.links({
+                            service: [
+                                {
+                                    href: server.router.render("account-accessCode", {
+                                        accountId: req.params.accountId
+                                    }),
+                                    profile: "/schema/account/access-code-request.json",
+                                    title: "account-accessCode"
+                                },
+                                {
+                                    href: server.router.render("account-logout", {
+                                        accountId: req.params.accountId
+                                    }),
+                                    profile: "/schema/account/logout-request.json",
+                                    title: "account-logout"
+                                }
+                            ]
+                        });
+                        res.send(200, account.record);
+                    }).then(next, next);
+                }
+            ],
             name: "account"
         };
     });

@@ -1,5 +1,6 @@
 instrumentation:
     excludes:
+        - example/**/*.js
         - debug/**/*.js
         - spec/**/*.js
     include-all-sources: true

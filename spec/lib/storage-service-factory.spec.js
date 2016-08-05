@@ -41,15 +41,6 @@ describe("storageServiceFactory", () => {
                 putAsync: jasmine.any(Function)
             });
         });
-        it("hashes an ID Array", () => {
-            return storageService.delAsync([
-                "id",
-                "another thing",
-                "last"
-            ]).then(() => {
-                expect(storageMock.delAsync).toHaveBeenCalledWith("prefix/hash(id)/hash(another thing)/hash(last)");
-            });
-        });
         it("deletes", () => {
             return storageService.delAsync("id").then(() => {
                 expect(storageMock.delAsync).toHaveBeenCalledWith("prefix/hash(id)");
@@ -93,6 +84,62 @@ describe("storageServiceFactory", () => {
                 }, {
                     meta: "data"
                 });
+            });
+        });
+    });
+    describe("multiple hash configs", () => {
+        var storageService;
+
+        beforeEach(() => {
+            var hashConfig, lifetime, storagePrefix;
+
+            hashConfig = [
+                {
+                    hashConfig: true,
+                    name: "hash"
+                },
+                {
+                    hashConfig: true,
+                    name: "hash2"
+                }
+            ];
+            lifetime = {
+                lifetime: true
+            };
+            storagePrefix = "prefix/";
+            storageService = storageServiceFactory(hashConfig, lifetime, storagePrefix);
+        });
+        it("hashes an ID Array in order", () => {
+            return storageService.delAsync([
+                "id",
+                "another thing"
+            ]).then(() => {
+                expect(storageMock.delAsync).toHaveBeenCalledWith("prefix/hash(id)/hash2(another thing)");
+            });
+        });
+        it("loops if there are more inputs than hash configs", () => {
+            return storageService.delAsync([
+                "id",
+                "another thing",
+                "three"
+            ]).then(() => {
+                expect(storageMock.delAsync).toHaveBeenCalledWith("prefix/hash(id)/hash2(another thing)/hash(three)");
+            });
+        });
+        it("decrypts with the right key", () => {
+            return storageService.getAsync([
+                "id-one",
+                "id-two"
+            ]).then((result) => {
+                var args;
+
+                expect(storageMock.getAsync).toHaveBeenCalledWith("prefix/hash(id-one)/hash2(id-two)");
+                args = recordMock.thawAsync.mostRecentCall.args;
+                expect(Buffer.isBuffer(args[0])).toBe(true);
+                expect(args[0].toString("binary")).toBe("record data");
+                expect(args[1]).toBe("id-two");
+                expect(args.length).toBe(2);
+                expect(result).toBe("thawed");
             });
         });
     });

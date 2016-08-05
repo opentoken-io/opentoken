@@ -19,18 +19,18 @@ jasmine.routeTester("/registration/_id/confirm/_code", (container) => {
 
             return routeTester.get().then(() => {
                 expect(registrationManagerMock.confirmEmailAsync).toHaveBeenCalledWith("id", "code");
-                expect(routeTester.res.linkObjects).toEqual([
+                jasmine.checkLinks([
                     {
-                        href: "rendered route: account, id:\"account id\"",
+                        href: "rendered route: account, accountId:\"account id\"",
                         rel: "self"
                     },
                     {
-                        href: "rendered route: account-login, id:\"account id\"",
+                        href: "rendered route: account-login, accountId:\"account id\"",
                         profile: "/schema/account/login-request.json",
                         rel: "service",
                         title: "account-login"
                     }
-                ]);
+                ], routeTester.res.linkObjects);
                 expect(routeTester.res.send).toHaveBeenCalledWith(201, {
                     accountId: "account id"
                 });

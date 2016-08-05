@@ -1,0 +1,31 @@
+{
+    "type": "object",
+    "properties": {
+        "codeHash": {
+            "$ref": "../meta/hash-derivation.json"
+        },
+        "codeLength": {
+            "description": "Number of bytes for generated codes.",
+            "type": "integer",
+            "minimum": 8
+        },
+        "lifetime": {
+            "$ref": "time-offset.json"
+        },
+        "secretLength": {
+            "description": "Number of bytes for generated secrets.",
+            "type": "integer",
+            "minimum": 8
+        },
+        "storagePrefix": {
+            "$ref": "storage-prefix.json"
+        }
+    },
+    "required": [
+        "codeHash",
+        "codeLength",
+        "lifetime",
+        "secretLength",
+        "storagePrefix"
+    ]
+}

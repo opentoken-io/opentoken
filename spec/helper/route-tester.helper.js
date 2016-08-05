@@ -6,16 +6,16 @@ path = require("path");
 
 /**
  * @typedef {Object} routeTester~routeTester
- * @prop {Object} container The dependency injection container
- * @prop {Object} exports The exported methods and possibly name from factory
- * @prop {Function} [get] Method
- * @prop {Function} [head] Method
- * @prop {Function} [post] Method
- * @prop {Function} [put] Method
- * @prop {Object} req Mock request object
- * @prop {Object} res Mock response object
- * @prop {Object} server Mock server object
- * @prop {(Object|null)} validationResult From validating against a schema
+ * @prop {Object} container The dependency injection container.
+ * @prop {Object} exports The exported methods and possibly name from factory.
+ * @prop {Function} [get] Method to issue a GET request if a handler exists.
+ * @prop {Function} [head] Method to issue a HEAD request if a handler exists.
+ * @prop {Function} [post] Method to issue a POST request if a handler exists.
+ * @prop {Function} [put] Method to issue a PUT request if a handler exists.
+ * @prop {Object} req Mock request object.
+ * @prop {Object} res Mock response object.
+ * @prop {Object} server Mock server object.
+ * @prop {(Object|null)} validationResult From validating against a schema.
  */
 
 /**
@@ -47,6 +47,8 @@ function addRouteMethods(routeTester) {
         }
 
         if (typeof middleware === "function") {
+            // Wrap the middleware so it returns a promise.
+            middleware = jasmine.middlewareToPromise(middleware);
             routeTester[methodName] = (body) => {
                 var schema;
 
@@ -62,18 +64,7 @@ function addRouteMethods(routeTester) {
                 schema = routeTester.container.resolve("schema");
 
                 return schema.loadSchemaFolderAsync(path.resolve(__dirname, "../../schema")).then(() => {
-                    return new Promise((resolve, reject) => {
-                        middleware(routeTester.req, routeTester.res, (val) => {
-                            // This does not match normal promise behavior,
-                            // so I must manually handle it here instead of
-                            // using promisifyAll().
-                            if (typeof val === "undefined") {
-                                resolve();
-                            } else {
-                                reject(val);
-                            }
-                        });
-                    });
+                    return middleware(routeTester.req, routeTester.res);
                 });
             };
         }

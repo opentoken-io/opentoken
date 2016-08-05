@@ -7,11 +7,11 @@ module.exports = (server, path, options) => {
                 registrationManager.confirmEmailAsync(req.params.id, req.params.code).then((accountId) => {
                     res.links({
                         self: server.router.render("account", {
-                            id: accountId
+                            accountId
                         }),
                         service: {
                             href: server.router.render("account-login", {
-                                id: accountId
+                                accountId
                             }),
                             profile: "/schema/account/login-request.json",
                             title: "account-login"
