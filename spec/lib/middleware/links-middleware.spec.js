@@ -58,5 +58,30 @@ describe("linksMiddleware", () => {
                 ], res.linkObjects);
             });
         });
+        describe("link caching", () => {
+            beforeEach((done) => {
+                middleware(req, res, done);
+            });
+            describe("second request", () => {
+                beforeEach((done) => {
+                    // Flush the link objects
+                    res.linkObjects = [];
+
+                    // Break server route rendering
+                    serverMock.router.render.andReturn("BROKEN");
+                    req.method = "POST";
+                    middleware(req, res, done);
+                });
+                it("caches links", () => {
+                    jasmine.checkLinks([
+                        {
+                            href: "rendered route: self-discovery",
+                            rel: "up",
+                            title: "self-discovery"
+                        }
+                    ], res.linkObjects);
+                });
+            });
+        });
     });
 });
