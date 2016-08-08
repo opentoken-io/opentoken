@@ -31,6 +31,8 @@ module.exports = (server, path, options) => {
                 validateSessionMiddleware(server),
                 (req, res, next) => {
                     accessCodeManager.createAsync(req.params.accountId, req.body).then((codeInfo) => {
+                        // Convert the OtDate to a string
+                        codeInfo.expires = codeInfo.expires.toString();
                         res.send(201, codeInfo);
                     }).then(next, next);
                 }

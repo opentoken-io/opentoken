@@ -64,7 +64,11 @@ jasmine.routeTester("/account/_account-id/access-code/", (container) => {
         });
         it("creates a resource", () => {
             return routeTester.post({}).then(() => {
-                expect(routeTester.res.send).toHaveBeenCalledWith(201, "createdId and other info");
+                expect(routeTester.res.send).toHaveBeenCalledWith(201, {
+                    code: "access code",
+                    expires: "2010-01-23T02:30:00.000Z",
+                    secret: "access code secret"
+                });
             });
         });
         it("works without a description", () => {
