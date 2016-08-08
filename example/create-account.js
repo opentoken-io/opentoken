@@ -4,7 +4,7 @@
 var container, exampleLib, hash, neodoc;
 
 /**
- * Returns the usage instructions
+ * Returns the usage instructions.
  *
  * @return {string}
  */
