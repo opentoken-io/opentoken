@@ -6,16 +6,16 @@ path = require("path");
 
 /**
  * @typedef {Object} routeTester~routeTester
- * @prop {Object} container The dependency injection container.
- * @prop {Object} exports The exported methods and possibly name from factory.
- * @prop {Function} [get] Method to issue a GET request if a handler exists.
- * @prop {Function} [head] Method to issue a HEAD request if a handler exists.
- * @prop {Function} [post] Method to issue a POST request if a handler exists.
- * @prop {Function} [put] Method to issue a PUT request if a handler exists.
- * @prop {Object} req Mock request object.
- * @prop {Object} res Mock response object.
- * @prop {Object} server Mock server object.
- * @prop {(Object|null)} validationResult From validating against a schema.
+ * @property {Object} container The dependency injection container.
+ * @property {Object} exports Exported methods and possibly name from factory.
+ * @property {Function} [get] Issue a GET request if a handler exists.
+ * @property {Function} [head] Issue a HEAD request if a handler exists.
+ * @property {Function} [post] Issue a POST request if a handler exists.
+ * @property {Function} [put] Issue a PUT request if a handler exists.
+ * @property {Object} req Mock request object.
+ * @property {Object} res Mock response object.
+ * @property {Object} server Mock server object.
+ * @property {(Object|null)} validationResult From validating against a schema.
  */
 
 /**
