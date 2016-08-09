@@ -15,14 +15,21 @@ jasmine.routeTester("/", null, (routeTester) => {
         });
         it("adds service links", () => {
             return routeTester.get().then(() => {
-                expect(routeTester.res.linkObjects).toEqual([
+                jasmine.checkLinks([
+                    {
+                        href: "rendered route: account-login, accountId:\"{accountId}\"",
+                        profile: "/schema/account/login-request.json",
+                        rel: "service",
+                        templated: true,
+                        title: "account-login"
+                    },
                     {
                         href: "rendered route: registration-register",
                         profile: "/schema/registration/register-request.json",
                         rel: "service",
                         title: "registration-register"
                     }
-                ]);
+                ], routeTester.res.linkObjects);
             });
         });
         it("calls server.get to serve static assets", () => {

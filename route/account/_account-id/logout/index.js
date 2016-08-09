@@ -1,9 +1,7 @@
 "use strict";
 
 module.exports = (server, path, options) => {
-    return options.container.call((accountManager, config) => {
-        var loginCookie;
-
+    return options.container.call((accountManager, config, loginCookie) => {
         /**
          * Logs a user out of the system.
          *
@@ -17,8 +15,6 @@ module.exports = (server, path, options) => {
             res.send(204);
             accountManager.logoutAsync(req.params.accountId, loginCookie.get(req)).then(next, next);
         }
-
-        loginCookie = require("../_login-cookie")(config);
 
         return {
             get: logout,

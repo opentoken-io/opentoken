@@ -1,6 +1,9 @@
 {
     "type": "object",
     "properties": {
+        "accessCode": {
+            "$ref": "access-code.json"
+        },
         "account": {
             "$ref": "account.json"
         },
@@ -33,6 +36,7 @@
         }
     },
     "required": [
+        "accessCode",
         "account",
         "mfa",
         "registration",

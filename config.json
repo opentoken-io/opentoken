@@ -1,4 +1,19 @@
 {
+    "accessCode": {
+        "codeHash": {
+            "algorithm": "sha512",
+            "derivedLength": 32,
+            "encoding": "base64-uri",
+            "iterations": 1500,
+            "type": "pbkdf2"
+        },
+        "codeLength": 32,
+        "lifetime": {
+            "months": 6
+        },
+        "secretLength": 32,
+        "storagePrefix": "access-code/"
+    },
     "account": {
         "idHash": {
             "algorithm": "sha512",
@@ -17,7 +32,7 @@
                 "httpOnly": true,
                 "maxAge": 600,
                 "path": "/account/",
-                "secure": true
+                "secure": false
             }
         },
         "passwordHash": {

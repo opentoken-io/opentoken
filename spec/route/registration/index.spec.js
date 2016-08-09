@@ -25,11 +25,7 @@ jasmine.routeTester("/registration", (container) => {
                 expect(registrationManagerMock.registerAsync).toHaveBeenCalledWith({
                     email: "test@example.org"
                 });
-                expect(routeTester.res.linkObjects).toEqual([
-                    {
-                        href: "rendered route: registration-secure, id:\"id\"",
-                        rel: "self"
-                    },
+                jasmine.checkLinks([
                     {
                         href: "rendered route: registration-secure, id:\"id\"",
                         profile: "/schema/registration/secure-request.json",
@@ -40,8 +36,12 @@ jasmine.routeTester("/registration", (container) => {
                         href: "rendered route: registration-secure-qr, id:\"id\"",
                         rel: "item",
                         title: "registration-secure-qr"
+                    },
+                    {
+                        href: "rendered route: registration-secure, id:\"id\"",
+                        rel: "self"
                     }
-                ]);
+                ], routeTester.res.linkObjects);
                 expect(routeTester.res.send).toHaveBeenCalledWith({
                     secure: "info"
                 });

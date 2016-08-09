@@ -19,7 +19,7 @@ jasmine.routeTester("/registration/_id", (container) => {
 
             return routeTester.get().then(() => {
                 expect(registrationManagerMock.getRecordAsync).toHaveBeenCalledWith("id");
-                expect(routeTester.res.linkObjects).toEqual([
+                jasmine.checkLinks([
                     {
                         href: "rendered route: registration-secure, id:\"id\"",
                         profile: "/schema/registration/secure-request.json",
@@ -31,7 +31,7 @@ jasmine.routeTester("/registration/_id", (container) => {
                         rel: "item",
                         title: "registration-secure-qr"
                     }
-                ]);
+                ], routeTester.res.linkObjects);
                 expect(routeTester.res.send).toHaveBeenCalledWith({
                     secure: "info"
                 });
@@ -63,12 +63,12 @@ jasmine.routeTester("/registration/_id", (container) => {
             return routeTester.post(body).then(() => {
                 expect(registrationManagerMock.secureAsync).toHaveBeenCalledWith("id", body, routeTester.server);
                 expect(routeTester.res.send).toHaveBeenCalledWith(204);
-                expect(routeTester.res.linkObjects).toEqual([
+                jasmine.checkLinks([
                     {
                         href: "rendered route: registration-secure, id:\"id\"",
                         rel: "self"
                     }
-                ]);
+                ], routeTester.res.linkObjects);
             });
         });
     });
