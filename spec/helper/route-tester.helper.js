@@ -96,29 +96,12 @@ jasmine.routeTester = (routePath, containerOverrideFn, callback) => {
             routeTester = {};
 
             beforeEach(() => {
-                var config, container, serverMock, validateRequestMiddleware;
+                var config, container, serverMock;
 
                 container = require("../../lib/dependencies");
-                validateRequestMiddleware = jasmine.createSpy("validateRequestMiddleware").andCallFake((schemaPath) => {
-                    return (req, res, next) => {
-                        var result;
-
-                        result = container.resolve("schema").validate(req.body, schemaPath);
-                        routeTester.validationResult = result;
-
-                        if (result) {
-                            res.send(400, new Error(`Did not validate against schema: ${schemaPath}`));
-
-                            return next(false);
-                        }
-
-                        return next();
-                    };
-                });
                 config = container.resolve("config");
                 config.baseDir = "/";
                 container.register("config", config);
-                container.register("validateRequestMiddleware", validateRequestMiddleware);
 
                 if (containerOverrideFn) {
                     containerOverrideFn(container);

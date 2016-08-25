@@ -1,7 +1,7 @@
 "use strict";
 
 module.exports = (server, path, options) => {
-    return options.container.call((accountManager, config, loginCookie, validateRequestMiddleware) => {
+    return options.container.call((accountManager, config, loginCookie, validateRequestBodyMiddleware) => {
         return {
             get(req, res, next) {
                 // Clear any existing cookies
@@ -27,7 +27,7 @@ module.exports = (server, path, options) => {
             },
             name: "account-login",
             post: [
-                validateRequestMiddleware("/account/login-request.json"),
+                validateRequestBodyMiddleware("/account/login-request.json"),
                 (req, res, next) => {
                     accountManager.loginAsync(req.params.accountId, req.body).then((login) => {
                         var accountRoute;
