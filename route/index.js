@@ -11,11 +11,21 @@ module.exports = (server, pathUrl, options) => {
         return {
             get(req, res, next) {
                 res.links({
-                    service: {
-                        href: server.router.render("registration-register"),
-                        profile: "/schema/registration/register-request.json",
-                        title: "registration-register"
-                    }
+                    service: [
+                        {
+                            href: server.router.render("account-login", {
+                                accountId: "TEMPLATED"
+                            }).replace("TEMPLATED", "{accountId}"),
+                            profile: "/schema/account/login-request.json",
+                            templated: true,
+                            title: "account-login"
+                        },
+                        {
+                            href: server.router.render("registration-register"),
+                            profile: "/schema/registration/register-request.json",
+                            title: "registration-register"
+                        }
+                    ]
                 });
                 res.send(204);
                 next();

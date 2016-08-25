@@ -44,6 +44,10 @@ module.exports = () => {
                     };
                 }
 
+                if (typeof linkVal !== "object" || !linkVal) {
+                    console.log("Invalid link value!", linkVal);
+                }
+
                 linkVal.rel = rel;
                 response.linkObjects.push(linkVal);
             });

@@ -1,13 +1,13 @@
 "use strict";
 
-var accountManagerMock, promiseMock, sessionManagerMock;
+var accountManagerMock, promiseMock, validateSessionMiddlewareMock;
 
 jasmine.routeTester("/account/_account-id/", (container) => {
     accountManagerMock = require("../../../mock/account-manager-mock")();
     promiseMock = require("../../../mock/promise-mock")();
-    sessionManagerMock = require("../../../mock/session-manager-mock")();
+    validateSessionMiddlewareMock = require("../../../mock/middleware/validate-session-middleware-mock")();
     container.register("accountManager", accountManagerMock);
-    container.register("sessionManager", sessionManagerMock);
+    container.register("validateSessionMiddleware", validateSessionMiddlewareMock);
 }, (routeTester) => {
     beforeEach(() => {
         routeTester.req.params.accountId = "account-id";
@@ -25,13 +25,8 @@ jasmine.routeTester("/account/_account-id/", (container) => {
 
                 return routeTester.get();
             });
-            it("refreshes the login cookie", () => {
-                expect(routeTester.res.setCookie).toHaveBeenCalledWith("login", "asdf", {
-                    httpOnly: true,
-                    maxAge: jasmine.any(Number),
-                    path: "/account/",
-                    secure: true
-                });
+            it("validated the session", () => {
+                expect(validateSessionMiddlewareMock()).toHaveBeenCalled();
             });
             it("returns the account record", () => {
                 expect(routeTester.res.send).toHaveBeenCalledWith(200, {
@@ -41,73 +36,32 @@ jasmine.routeTester("/account/_account-id/", (container) => {
                 });
             });
             it("creates the right links", () => {
-                expect(routeTester.res.linkObjects).toEqual([
+                jasmine.checkLinks([
+                    {
+                        href: "rendered route: account-accessCode, accountId:\"account-id\"",
+                        profile: "/schema/account/access-code-request.json",
+                        rel: "service",
+                        title: "account-accessCode"
+                    },
                     {
                         href: "rendered route: account-logout, accountId:\"account-id\"",
                         profile: "/schema/account/logout-request.json",
                         rel: "service",
                         title: "account-logout"
                     }
-                ]);
+                ], routeTester.res.linkObjects);
             });
         });
 
-        // This can't happen because the cookie value is used for login.
-        // However, assuming it *could* happen, let's make sure that
-        // we do not permit this sort of behavior.  Because the managers
-        // are mocked to allow any value, we can simulate this bizarre
-        // behavior quite easily.
-        describe("no login cookie to refresh", () => {
-            it("errors when refreshing the login cookie", () => {
-                return routeTester.get().then(() => {
-                    jasmine.fail();
-                }, (err) => {
-                    expect(err.toString()).toContain("No login cookie to refresh");
-                });
+        describe("invalid account", () => {
+            // Really, this shouldn't happen.  If the session exists,
+            // the account should exist as well.
+            beforeEach(() => {
+                accountManagerMock.recordAsync.andReturn(promiseMock.reject(new Error("something is wrong")));
             });
-        });
-
-        // Failure scenarios
-        [
-            {
-                getSpy: () => {
-                    return sessionManagerMock.validateAsync;
-                },
-                name: "invalid session"
-            },
-            {
-                getSpy: () => {
-                    return accountManagerMock.recordAsync;
-                },
-                name: "invalid account"
-            }
-        ].forEach((scenario) => {
-            describe(scenario.name, () => {
-                beforeEach(() => {
-                    scenario.getSpy().andReturn(promiseMock.reject(scenario.name));
-                });
-                it("returns an error", () => {
-                    return routeTester.get().then(() => {
-                        expect(routeTester.res.send).toHaveBeenCalledWith(401);
-                    });
-                });
-                it("clears login cookies", () => {
-                    routeTester.req.cookies.login = "abcd";
-
-                    return routeTester.get().then(() => {
-                        expect(routeTester.res.setCookie).toHaveBeenCalledWith("login", "");
-                    });
-                });
-                it("sets the right links", () => {
-                    return routeTester.get().then(() => {
-                        expect(routeTester.res.linkObjects).toEqual([
-                            {
-                                href: "rendered route: account-login, accountId:\"account-id\"",
-                                rel: "item",
-                                title: "account-login"
-                            }
-                        ]);
-                    });
+            it("returns an error", () => {
+                return routeTester.get().then(jasmine.fail, () => {
+                    expect(routeTester.res.send).not.toHaveBeenCalled();
                 });
             });
         });

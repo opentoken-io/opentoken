@@ -21,13 +21,13 @@ jasmine.routeTester("/registration/_id/qr", (container) => {
 
                 expect(registrationManagerMock.qrCodeImageAsync).toHaveBeenCalledWith("id");
                 expect(routeTester.res.contentType).toEqual("image/png");
-                expect(routeTester.res.linkObjects).toEqual([
+                jasmine.checkLinks([
                     {
                         href: "rendered route: registration-secure, id:\"id\"",
                         rel: "item",
                         title: "registration-secure"
                     }
-                ]);
+                ], routeTester.res.linkObjects);
                 expect(routeTester.res.send).toHaveBeenCalled();
                 args = routeTester.res.send.mostRecentCall.args;
                 expect(Buffer.isBuffer(args[0])).toBe(true);
