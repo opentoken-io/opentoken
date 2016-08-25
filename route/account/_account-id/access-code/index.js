@@ -1,7 +1,7 @@
 "use strict";
 
 module.exports = (server, path, options) => {
-    return options.container.call((accessCodeManager, config, sessionManager, validateRequestMiddleware, validateSessionMiddleware) => {
+    return options.container.call((accessCodeManager, config, sessionManager, validateRequestBodyMiddleware, validateSessionMiddleware) => {
         return {
             get: [
                 validateSessionMiddleware(server),
@@ -27,7 +27,7 @@ module.exports = (server, path, options) => {
             ],
             name: "account-accessCode",
             post: [
-                validateRequestMiddleware("/account/access-code-request.json"),
+                validateRequestBodyMiddleware("/account/access-code-request.json"),
                 validateSessionMiddleware(server),
                 (req, res, next) => {
                     accessCodeManager.createAsync(req.params.accountId, req.body).then((codeInfo) => {

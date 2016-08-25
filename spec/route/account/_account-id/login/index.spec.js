@@ -3,11 +3,15 @@
 var accountManagerMock, loginCookieMock, promiseMock;
 
 jasmine.routeTester("/account/_account-id/login/", (container) => {
-    promiseMock = require("../../../../mock/promise-mock")();
+    var validateRequestBodyMiddlewareMock;
+
     accountManagerMock = require("../../../../mock/account-manager-mock")();
     loginCookieMock = require("../../../../mock/login-cookie-mock")();
+    promiseMock = require("../../../../mock/promise-mock")();
+    validateRequestBodyMiddlewareMock = require("../../../../mock/middleware/validate-request-body-middleware-mock")();
     container.register("accountManager", accountManagerMock);
     container.register("loginCookie", loginCookieMock);
+    container.register("validateRequestBodyMiddleware", validateRequestBodyMiddlewareMock);
 }, (routeTester) => {
     beforeEach(() => {
         routeTester.req.params.accountId = "account-id";
