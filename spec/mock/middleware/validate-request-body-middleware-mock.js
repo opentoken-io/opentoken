@@ -7,7 +7,7 @@ container = require("../../../lib/dependencies");
 module.exports = () => {
     var middleware, middlewareFactory;
 
-    middleware = jasmine.createSpy("validate-request-body-middleware-mock-middleware").andCallFake((req, res, next) => {
+    middleware = jasmine.createSpy("validateRequestBodyMiddlewareMockMiddleware").andCallFake((req, res, next) => {
         var result;
 
         result = container.resolve("schema").validate(req.body, middleware.schemaPath);
@@ -22,7 +22,7 @@ module.exports = () => {
     });
 
     // This factory only returns the same middleware over and over.
-    middlewareFactory = jasmine.createSpy("validate-request-body-middleware-mock-factory").andCallFake((schemaPath) => {
+    middlewareFactory = jasmine.createSpy("validateRequestBodyMiddlewareMock").andCallFake((schemaPath) => {
         middleware.schemaPath = schemaPath;
 
         return middleware;
