@@ -1,7 +1,7 @@
 "use strict";
 
 module.exports = (server, path, options) => {
-    return options.container.call((registrationManager, validateRequestMiddleware) => {
+    return options.container.call((registrationManager, validateRequestBodyMiddleware) => {
         var getResponse;
 
         getResponse = require("./_id/_get-response")(server);
@@ -9,7 +9,7 @@ module.exports = (server, path, options) => {
         return {
             name: "registration-register",
             post: [
-                validateRequestMiddleware("/registration/register-request.json"),
+                validateRequestBodyMiddleware("/registration/register-request.json"),
                 (req, res, next) => {
                     registrationManager.registerAsync(req.body).then((secureInfoGroup) => {
                         var url;

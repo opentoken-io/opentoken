@@ -1,7 +1,7 @@
 "use strict";
 
-describe("validateRequestMiddleware", () => {
-    var chainMiddlewareMock, restifyPluginsMock, schemaMock, validateRequestMiddleware;
+describe("validateRequestBodyMiddleware", () => {
+    var chainMiddlewareMock, restifyPluginsMock, schemaMock, validateRequestBodyMiddleware;
 
     beforeEach(() => {
         chainMiddlewareMock = jasmine.createSpy("chainMiddlewareMock");
@@ -12,17 +12,17 @@ describe("validateRequestMiddleware", () => {
             "validate"
         ]);
         schemaMock.validate.andReturn(null);
-        validateRequestMiddleware = require("../../../lib/middleware/validate-request-middleware")(chainMiddlewareMock, restifyPluginsMock, schemaMock);
+        validateRequestBodyMiddleware = require("../../../lib/middleware/validate-request-body-middleware")(chainMiddlewareMock, restifyPluginsMock, schemaMock);
     });
     it("parses the body", () => {
-        validateRequestMiddleware("schema");
+        validateRequestBodyMiddleware("schema");
         expect(restifyPluginsMock.bodyParser).toHaveBeenCalled();
     });
     describe("validation against schema", () => {
         var middleware, req, res;
 
         beforeEach(() => {
-            validateRequestMiddleware("schema");
+            validateRequestBodyMiddleware("schema");
             middleware = chainMiddlewareMock.mostRecentCall.args[1];
             req = require("../../mock/request-mock")();
             res = require("../../mock/response-mock")();
