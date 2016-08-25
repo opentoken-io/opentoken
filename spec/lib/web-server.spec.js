@@ -6,7 +6,7 @@ describe("WebServer", () => {
     var containerMock, fs, loggerMock, middlewareProfiler, promiseMock, restify, restifyRouterMagicMock, restifyServer, restMiddleware, webServer;
 
     beforeEach(() => {
-        var randomMock, WebServer;
+        var errorResponseMock, formattersMock, randomMock, WebServer;
 
         /**
          * Set up a fake MiddlewareProfiler object
@@ -27,8 +27,10 @@ describe("WebServer", () => {
         }
 
         middlewareProfiler = null;
-        promiseMock = require("../mock/promise-mock")();
+        errorResponseMock = require("../mock/error-response-mock")();
+        formattersMock = require("../mock/formatters-mock")();
         loggerMock = require("../mock/logger-mock")();
+        promiseMock = require("../mock/promise-mock")();
         randomMock = require("../mock/random-mock")();
         fs = jasmine.createSpyObj("fs", [
             "readFileAsync"
@@ -52,7 +54,7 @@ describe("WebServer", () => {
         });
         restMiddleware = jasmine.createSpy("restMiddleware");
         containerMock = {};
-        WebServer = require("../../lib/web-server")(containerMock, fs, loggerMock, MiddlewareProfilerMock, promiseMock, randomMock, restify, restifyRouterMagicMock, restMiddleware);
+        WebServer = require("../../lib/web-server")(containerMock, errorResponseMock, formattersMock, fs, loggerMock, MiddlewareProfilerMock, promiseMock, randomMock, restify, restifyRouterMagicMock, restMiddleware);
         webServer = new WebServer({
             exceptionIdLength: 8
         });
@@ -162,10 +164,7 @@ describe("WebServer", () => {
 
         beforeEach(() => {
             defaultConfig = {
-                formatters: {
-                    "application/vnd.error+json; q=0.1": jasmine.any(Function),
-                    "image/png; q=0.1": jasmine.any(Function)
-                },
+                formatters: jasmine.any(Object),
                 handleUncaughtExceptions: true,
                 handleUpgrades: false,
                 httpsServerOptions: null,
@@ -268,112 +267,6 @@ describe("WebServer", () => {
             });
         });
     });
-    describe("restify formatters", () => {
-        var formatters, req, res;
-
-        beforeEach(() => {
-            req = require("../mock/request-mock.js")();
-            res = require("../mock/response-mock.js")();
-            webServer.configure({
-                baseUrl: "/"
-            });
-
-            return webServer.startServerAsync().then(() => {
-                formatters = restify.createServer.mostRecentCall.args[0].formatters;
-            });
-        });
-        describe("error", () => {
-            var formatter;
-
-            beforeEach(() => {
-                formatter = formatters["application/vnd.error+json; q=0.1"];
-            });
-            it("is a function", () => {
-                expect(formatter).toEqual(jasmine.any(Function));
-            });
-            it("translates an error into a sanitized object", (done) => {
-                formatter(req, res, {
-                    extra: "stuff here - remove me",
-                    logref: "lr",
-                    message: "test"
-                }, (err, data) => {
-                    var parsed;
-
-                    if (!err) {
-                        expect(() => {
-                            parsed = JSON.parse(data);
-                        }).not.toThrow();
-                        expect(parsed).toEqual({
-                            logref: "lr",
-                            message: "test"
-                        });
-                    }
-
-                    done(err);
-                });
-            });
-        });
-        describe("png", () => {
-            var formatter;
-
-            beforeEach(() => {
-                formatter = formatters["image/png; q=0.1"];
-            });
-            it("is a function", () => {
-                expect(formatter).toEqual(jasmine.any(Function));
-            });
-            it("converts an Error without a status code", (done) => {
-                formatter(req, res, new Error("x"), (err, data) => {
-                    if (!err) {
-                        expect(Buffer.isBuffer(data)).toBe(true);
-                        expect(data.toString("binary")).toBe("Error: x");
-                        expect(res.statusCode).toBe(500);
-                    }
-
-                    done(err);
-                });
-            });
-            it("converts an Error with a status code", (done) => {
-                var errorObject;
-
-                errorObject = new Error("x");
-                errorObject.statusCode = 999;
-                formatter(req, res, errorObject, (err, data) => {
-                    if (!err) {
-                        expect(Buffer.isBuffer(data)).toBe(true);
-                        expect(data.toString("binary")).toBe("Error: x");
-                        expect(res.statusCode).toBe(999);
-                    }
-
-                    done(err);
-                });
-            });
-            it("handles a string", (done) => {
-                res.statusCode = 200;
-                formatter(req, res, "abcdefg", (err, data) => {
-                    if (!err) {
-                        expect(Buffer.isBuffer(data)).toBe(true);
-                        expect(data.toString("binary")).toBe("abcdefg");
-                        expect(res.statusCode).toBe(200);
-                    }
-
-                    done(err);
-                });
-            });
-            it("handles a buffer", (done) => {
-                res.statusCode = 200;
-                formatter(req, res, new Buffer("buff", "binary"), (err, data) => {
-                    if (!err) {
-                        expect(Buffer.isBuffer(data)).toBe(true);
-                        expect(data.toString("binary")).toBe("buff");
-                        expect(res.statusCode).toBe(200);
-                    }
-
-                    done(err);
-                });
-            });
-        });
-    });
     describe(".startServerAsync()", () => {
         it("calls listen", () => {
             var args;
@@ -413,11 +306,17 @@ describe("WebServer", () => {
                 expect(args[0]).toBe("uncaughtException");
                 expect(args[1]).toEqual(jasmine.any(Function));
                 uncaughtCallback = args[1];
-                uncaughtCallback(req, res, route, {
+
+                return uncaughtCallback(req, res, route, {
                     error: true
                 });
+            }).then(() => {
                 expect(loggerMock.error).toHaveBeenCalled();
-                expect(res.send).toHaveBeenCalledWith(500);
+                expect(res.send).toHaveBeenCalledWith(500, {
+                    logRef: "fakeLogref",
+                    message: "Uncaught Exception: [object Object]",
+                    code: "tD2G3B7o"
+                });
                 expect(res.write).not.toHaveBeenCalled();
             });
         });
@@ -441,14 +340,12 @@ describe("WebServer", () => {
                 expect(args[1]).toEqual(jasmine.any(Function));
                 uncaughtCallback = args[1];
                 error = new Error("err");
-                uncaughtCallback(req, res, error, () => {
-                    expect(loggerMock.error).toHaveBeenCalled();
-                    expect(res.contentType).toBe("application/vnd.error+json");
-                    expect(error.message).toBeDefined();
-                    expect(error.logref).toBe("BBBBBBBB");
-                    expect(res.send).not.toHaveBeenCalled();
-                    expect(res.write).not.toHaveBeenCalled();
-                });
+
+                return promiseMock.promisify(uncaughtCallback)(req, res, error);
+            }).then(() => {
+                expect(loggerMock.error).toHaveBeenCalled();
+                expect(res.send).not.toHaveBeenCalled();
+                expect(res.write).not.toHaveBeenCalled();
             });
         });
     });
