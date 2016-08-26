@@ -21,7 +21,7 @@ describe("errorResponse", () => {
             "rejectedPromiseAsync"
         ]);
     });
-    describe("ErrorResponse objet", () => {
+    describe("ErrorResponse object", () => {
         var errorObject;
 
         beforeEach(() => {
