@@ -106,7 +106,7 @@ function main() {
 
         return exampleLib.postLinkAsync(res.link.service.account_accessCode, accessCodeRequest);
     }).then((res) => {
-        console.log(`OPENTOKEN_KEY=${res.body.code}`);
+        console.log(`OPENTOKEN_CODE=${res.body.code}`);
         console.log(`OPENTOKEN_SECRET=${res.body.secret}`);
         console.log("Expires:", res.body.expires);
         console.log("Done");
