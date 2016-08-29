@@ -36,14 +36,14 @@ describe("storageServiceFactory", () => {
         });
         it("exposes known methods", () => {
             expect(storageService).toEqual({
-                delAsync: jasmine.any(Function),
+                deleteAsync: jasmine.any(Function),
                 getAsync: jasmine.any(Function),
                 putAsync: jasmine.any(Function)
             });
         });
         it("deletes", () => {
-            return storageService.delAsync("id").then(() => {
-                expect(storageMock.delAsync).toHaveBeenCalledWith("prefix/hash(id)");
+            return storageService.deleteAsync("id").then(() => {
+                expect(storageMock.deleteAsync).toHaveBeenCalledWith("prefix/hash(id)");
             });
         });
         it("gets", () => {
@@ -110,20 +110,20 @@ describe("storageServiceFactory", () => {
             storageService = storageServiceFactory(hashConfig, lifetime, storagePrefix);
         });
         it("hashes an ID Array in order", () => {
-            return storageService.delAsync([
+            return storageService.deleteAsync([
                 "id",
                 "another thing"
             ]).then(() => {
-                expect(storageMock.delAsync).toHaveBeenCalledWith("prefix/hash(id)/hash2(another thing)");
+                expect(storageMock.deleteAsync).toHaveBeenCalledWith("prefix/hash(id)/hash2(another thing)");
             });
         });
         it("loops if there are more inputs than hash configs", () => {
-            return storageService.delAsync([
+            return storageService.deleteAsync([
                 "id",
                 "another thing",
                 "three"
             ]).then(() => {
-                expect(storageMock.delAsync).toHaveBeenCalledWith("prefix/hash(id)/hash2(another thing)/hash(three)");
+                expect(storageMock.deleteAsync).toHaveBeenCalledWith("prefix/hash(id)/hash2(another thing)/hash(three)");
             });
         });
         it("decrypts with the right key", () => {

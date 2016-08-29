@@ -69,9 +69,9 @@ describe("storage/s3", () => {
             expect(awsSdkMock.S3.calls.length).toBe(1);
         });
     });
-    describe(".delAsync()", () => {
+    describe(".deleteAsync()", () => {
         it("deletes a file", () => {
-            return s3.delAsync("afile").then((val) => {
+            return s3.deleteAsync("afile").then((val) => {
                 expect(val).toEqual({
                     Key: "afile"
                 });

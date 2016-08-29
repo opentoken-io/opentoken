@@ -92,13 +92,46 @@ describe("accessCodeManager", () => {
             });
         });
     });
-    describe(".destroyAsync()", () => {
+    describe(".deleteAsync()", () => {
         it("deletes from the storage service", () => {
-            return manager.destroyAsync("accountId", "code").then(() => {
-                expect(storageService.delAsync).toHaveBeenCalledWith([
+            return manager.deleteAsync("accountId", "code").then(() => {
+                expect(storageService.deleteAsync).toHaveBeenCalledWith([
                     "accountId",
                     "code"
                 ]);
+            });
+        });
+        it("requires an account ID", () => {
+            return manager.deleteAsync("", "code").then(jasmine.fail, (err) => {
+                expect(err.toString()).toContain("Account ID must not be empty");
+            });
+        });
+        it("requires a code", () => {
+            return manager.deleteAsync("accountId", "").then(jasmine.fail, (err) => {
+                expect(err.toString()).toContain("Code must not be empty");
+            });
+        });
+    });
+    describe(".getAsync()", () => {
+        it("gets from the storage service", () => {
+            storageService.getAsync.andReturn(promiseMock.resolve("record data"));
+
+            return manager.getAsync("accountId", "code").then((result) => {
+                expect(storageService.getAsync).toHaveBeenCalledWith([
+                    "accountId",
+                    "code"
+                ]);
+                expect(result).toEqual("record data");
+            });
+        });
+        it("requires an account ID", () => {
+            return manager.deleteAsync("", "code").then(jasmine.fail, (err) => {
+                expect(err.toString()).toContain("Account ID must not be empty");
+            });
+        });
+        it("requires a code", () => {
+            return manager.deleteAsync("accountId", "").then(jasmine.fail, (err) => {
+                expect(err.toString()).toContain("Code must not be empty");
             });
         });
     });
