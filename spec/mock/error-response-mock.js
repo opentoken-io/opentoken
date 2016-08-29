@@ -13,7 +13,7 @@ module.exports = () => {
     ]);
     mock.createAsync.andCallFake((message, code) => {
         return promiseMock.resolve({
-            logRef: "fakeLogref",
+            logRef: "fakeLogRef",
             message,
             code
         });

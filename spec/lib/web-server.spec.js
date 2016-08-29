@@ -313,7 +313,7 @@ describe("WebServer", () => {
             }).then(() => {
                 expect(loggerMock.error).toHaveBeenCalled();
                 expect(res.send).toHaveBeenCalledWith(500, {
-                    logRef: "fakeLogref",
+                    logRef: "fakeLogRef",
                     message: "Uncaught Exception: [object Object]",
                     code: "tD2G3B7o"
                 });
