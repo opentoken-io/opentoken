@@ -82,7 +82,7 @@ describe("registrationManager", () => {
             return factory().confirmEmailAsync("id", "code").then(jasmine.fail, (result) => {
                 expect(result).toEqual(jasmine.any(Error));
                 expect(accountManagerMock.createAsync).not.toHaveBeenCalled();
-                expect(storageService.delAsync).not.toHaveBeenCalled();
+                expect(storageService.deleteAsync).not.toHaveBeenCalled();
             });
         });
         it("fails if the record was not secured (totpConfirmed)", () => {
@@ -94,14 +94,14 @@ describe("registrationManager", () => {
             return factory().confirmEmailAsync("id", "code").then(jasmine.fail, (result) => {
                 expect(result).toEqual(jasmine.any(Error));
                 expect(accountManagerMock.createAsync).not.toHaveBeenCalled();
-                expect(storageService.delAsync).not.toHaveBeenCalled();
+                expect(storageService.deleteAsync).not.toHaveBeenCalled();
             });
         });
         it("fails if confirmation code is wrong", () => {
             return factory().confirmEmailAsync("id", "wrong code").then(jasmine.fail, (result) => {
                 expect(result).toEqual(jasmine.any(Error));
                 expect(accountManagerMock.createAsync).not.toHaveBeenCalled();
-                expect(storageService.delAsync).not.toHaveBeenCalled();
+                expect(storageService.deleteAsync).not.toHaveBeenCalled();
             });
         });
         it("will not delete if creation goes awry", () => {
@@ -120,7 +120,7 @@ describe("registrationManager", () => {
                     passwordHash: "hashed password",
                     passwordHashConfig: "passwordHashConfig"
                 });
-                expect(storageService.delAsync).not.toHaveBeenCalled();
+                expect(storageService.deleteAsync).not.toHaveBeenCalled();
             });
         });
         it("saves successfully", () => {
@@ -139,7 +139,7 @@ describe("registrationManager", () => {
                     passwordHash: "hashed password",
                     passwordHashConfig: "passwordHashConfig"
                 });
-                expect(storageService.delAsync).toHaveBeenCalledWith("id");
+                expect(storageService.deleteAsync).toHaveBeenCalledWith("id");
                 expect(result).toEqual("createdId");
             });
         });

@@ -125,6 +125,7 @@ describe("WebServer", () => {
                     options: {
                         container: containerMock
                     },
+                    routesMatch: "**/!(_)*.js",
                     routesPath: "/routes"
                 });
             });

@@ -4,10 +4,13 @@ describe("validateSessionMiddleware", () => {
     var loginCookieMock, middlewareFactory, promiseMock, sessionManagerMock;
 
     beforeEach(() => {
+        var errorResponseMock;
+
+        errorResponseMock = require("../../mock/error-response-mock")();
         loginCookieMock = require("../../mock/login-cookie-mock")();
         sessionManagerMock = require("../../mock/session-manager-mock")();
         promiseMock = require("../../mock/promise-mock")();
-        middlewareFactory = require("../../../lib/middleware/validate-session-middleware")(loginCookieMock, sessionManagerMock);
+        middlewareFactory = require("../../../lib/middleware/validate-session-middleware")(errorResponseMock, loginCookieMock, sessionManagerMock);
     });
     describe("middleware", () => {
         var middlewareAsync, req, res, serverMock;
@@ -33,7 +36,11 @@ describe("validateSessionMiddleware", () => {
             });
             it("sends an error response", () => {
                 return middlewareAsync(req, res).then(jasmine.fail, () => {
-                    expect(res.send).toHaveBeenCalledWith(401);
+                    expect(res.send).toHaveBeenCalledWith(403, {
+                        code: "8gzh4j1A",
+                        logRef: "fakeLogRef",
+                        message: "Session is invalid."
+                    });
                 });
             });
             it("passes a value to \"next\"", () => {

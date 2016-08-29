@@ -4,10 +4,18 @@ var promiseMock;
 
 promiseMock = require("./promise-mock")();
 module.exports = () => {
-    return {
-        configure: jasmine.createSpy("storageMock.configure"),
-        delAsync: jasmine.createSpy("storageMock.delAsync").andReturn(promiseMock.resolve(true)),
-        getAsync: jasmine.createSpy("storageMock.getAsync").andReturn(promiseMock.resolve(new Buffer("record data"))),
-        putAsync: jasmine.createSpy("storageMock.putAsync").andReturn(promiseMock.resolve(true))
-    };
+    var mock;
+
+    mock = jasmine.createSpyObj("storageMock", [
+        "configure",
+        "deleteAsync",
+        "getAsync",
+        "putAsync"
+    ]);
+
+    mock.deleteAsync.andReturn(promiseMock.resolve(true));
+    mock.getAsync.andReturn(promiseMock.resolve(new Buffer("record data")));
+    mock.putAsync.andReturn(promiseMock.resolve(true));
+
+    return mock;
 };

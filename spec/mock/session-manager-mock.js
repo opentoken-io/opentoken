@@ -6,11 +6,11 @@ module.exports = () => {
     promiseMock = require("./promise-mock")();
     mock = jasmine.createSpyObj("sessionManagerMock", [
         "createAsync",
-        "destroyAsync",
+        "deleteAsync",
         "validateAsync"
     ]);
     mock.createAsync.andReturn(promiseMock.resolve("createdId"));
-    mock.destroyAsync.andReturn(promiseMock.resolve());
+    mock.deleteAsync.andReturn(promiseMock.resolve());
     mock.validateAsync.andReturn(promiseMock.resolve());
 
     return mock;
