@@ -12,14 +12,14 @@ module.exports = (server, path, options) => {
                 validateRequestBodyMiddleware("/registration/register-request.json"),
                 (req, res, next) => {
                     registrationManager.registerAsync(req.body).then((secureInfoGroup) => {
-                        var url;
+                        var uri;
 
-                        url = server.router.render("registration-secure", {
+                        uri = server.router.render("registration-secure", {
                             id: secureInfoGroup.id
                         });
-                        res.header("Location", url);
+                        res.header("Location", uri);
                         res.links({
-                            self: url
+                            self: uri
                         });
                         getResponse(secureInfoGroup, res);
                     }).then(next, next);
