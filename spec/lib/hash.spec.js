@@ -109,4 +109,20 @@ describe("hash", () => {
             })).toEqual("b6M3hBjIlWvSC8rEVMKgPA==");
         });
     });
+    describe(".hmac()", () => {
+        it("hashes a string", () => {
+            expect(hash.hmac("string", {
+                algorithm: "md5",
+                encoding: "disregard",
+                secret: "abcdefg"
+            })).toEqual("dssLj28qkxcaS3zIlf2G/w==");
+        });
+        it("hashes a buffer", () => {
+            expect(hash.hmac(new Buffer("buffer", "binary"), {
+                algorithm: "sha256",
+                encoding: "disregard",
+                secret: "tuvwxyz"
+            })).toEqual("6K/ZpOB78cIOfZqlwEpU+vcMZNtsjR4lWssEvbYGehI=");
+        });
+    });
 });
