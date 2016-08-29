@@ -69,6 +69,16 @@ describe("registrationManager", () => {
                 passwordHashConfig: "passwordHashConfig"
             }));
         });
+        it("requires an id", () => {
+            return factory().confirmEmailAsync("", "code").then(jasmine.fail, (err) => {
+                expect(err.toString()).toContain("Registration ID must not be empty");
+            });
+        });
+        it("requires a code", () => {
+            return factory().confirmEmailAsync("id", "").then(jasmine.fail, (err) => {
+                expect(err.toString()).toContain("Confirmation code must not be empty");
+            });
+        });
         it("fails if the record was not secured (passwordHash)", () => {
             storageService.getAsync.andReturn(promiseMock.resolve({
                 confirmationCode: "code",
@@ -145,6 +155,11 @@ describe("registrationManager", () => {
         });
     });
     describe(".qrCodeImageAsync", () => {
+        it("requires an id", () => {
+            return factory().qrCodeImageAsync("").then(jasmine.fail, (err) => {
+                expect(err.toString()).toContain("Registration ID must not be empty");
+            });
+        });
         it("does not generate a code if the get fails", () => {
             storageService.getAsync.andReturn(promiseMock.reject("err"));
 
@@ -176,6 +191,11 @@ describe("registrationManager", () => {
         });
     });
     describe(".registerAsync", () => {
+        it("requires an email in the request", () => {
+            return factory().registerAsync({}).then(jasmine.fail, (err) => {
+                expect(err.toString()).toContain("Email is required");
+            });
+        });
         it("starts a registration", () => {
             return factory().registerAsync({
                 email: "someone@example.net"
@@ -213,6 +233,37 @@ describe("registrationManager", () => {
         beforeEach(() => {
             serverMock = require("../mock/server-mock")();
         });
+        it("requires an id", () => {
+            return factory().secureAsync("", {}).then(jasmine.fail, (err) => {
+                expect(err.toString()).toContain("Registration ID must not be empty");
+            });
+        });
+        it("catches errors for when the request doesn't have MFA properties", () => {
+            return factory().secureAsync("id", {}).then(jasmine.fail, (err) => {
+                expect(err).toEqual(jasmine.any(TypeError));
+            });
+        });
+        it("requires the request's MFA", () => {
+            return factory().secureAsync("id", {
+                mfa: {
+                    totp: {}
+                }
+            }).then(jasmine.fail, (err) => {
+                expect(err.toString()).toContain("MFA current and previous");
+            });
+        });
+        it("requires a password hash", () => {
+            return factory().secureAsync("id", {
+                mfa: {
+                    totp: {
+                        current: "000000",
+                        previous: "111111"
+                    }
+                }
+            }).then(jasmine.fail, (err) => {
+                expect(err.toString()).toContain("Password hash");
+            });
+        });
         it("fails on invalid TOTP keys", () => {
             totpMock.verifyCurrentAndPrevious.andReturn(false);
 
@@ -222,7 +273,8 @@ describe("registrationManager", () => {
                         current: "000000",
                         previous: "111111"
                     }
-                }
+                },
+                passwordHash: "abcdefg"
             }, serverMock).then(jasmine.fail, (err) => {
                 expect(totpMock.verifyCurrentAndPrevious).toHaveBeenCalledWith("totp key", "000000", "111111");
                 expect(storageService.putAsync).not.toHaveBeenCalled();
@@ -260,7 +312,12 @@ describe("registrationManager", () => {
             });
         });
     });
-    describe(".secureInfoAsync", () => {
+    describe(".getRecordAsync", () => {
+        it("requires an id", () => {
+            return factory().getRecordAsync("").then(jasmine.fail, (err) => {
+                expect(err.toString()).toContain("Registration ID must not be empty");
+            });
+        });
         it("returns filtered information", () => {
             factory().getRecordAsync("id").then((result) => {
                 expect(storageService.getAsync).toHaveBeenCalledWith("id");

@@ -59,6 +59,11 @@ describe("sessionManager", () => {
         }, "anything");
     });
     describe(".createAsync()", () => {
+        it("requires an account ID", () => {
+            return factory().createAsync("").then(jasmine.fail, (err) => {
+                expect(err.toString()).toContain("Account ID must not be empty");
+            });
+        });
         it("creates a session", () => {
             return factory().createAsync("accountId").then((result) => {
                 expect(randomMock.idAsync).toHaveBeenCalledWith(10);
@@ -73,6 +78,16 @@ describe("sessionManager", () => {
         });
     });
     describe(".deleteAsync()", () => {
+        it("requires an account ID", () => {
+            return factory().deleteAsync("", "sessionId").then(jasmine.fail, (err) => {
+                expect(err.toString()).toContain("Account ID must not be empty");
+            });
+        });
+        it("requires a session ID", () => {
+            return factory().deleteAsync("accountId", "").then(jasmine.fail, (err) => {
+                expect(err.toString()).toContain("Session ID must not be empty");
+            });
+        });
         it("issues a delete", () => {
             return factory().deleteAsync("accountId", "sessionId").then(() => {
                 expect(storageService.deleteAsync).toHaveBeenCalledWith([
@@ -87,6 +102,16 @@ describe("sessionManager", () => {
             storageService.getAsync.andReturn(promiseMock.resolve({
                 accountId: "accountId"
             }));
+        });
+        it("requires an account ID", () => {
+            return factory().validateAsync("", "sessionId").then(jasmine.fail, (err) => {
+                expect(err.toString()).toContain("Account ID must not be empty");
+            });
+        });
+        it("requires a session ID", () => {
+            return factory().validateAsync("accountId", "").then(jasmine.fail, (err) => {
+                expect(err.toString()).toContain("Session ID must not be empty");
+            });
         });
         it("validates a good session", () => {
             return factory().validateAsync("accountId", "sessionId").then(() => {

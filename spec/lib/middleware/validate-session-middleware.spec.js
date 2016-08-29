@@ -91,6 +91,19 @@ describe("validateSessionMiddleware", () => {
                         expect(res.header).toHaveBeenCalledWith("Location", "rendered route: self-discovery");
                     });
                 });
+                it("caches the self-discovery link for speed", () => {
+                    return middlewareAsync(req, res).then(jasmine.fail, () => {
+                        // This will prove that the route is not rendered again
+                        serverMock.router.render.andReturn("If this is returned the result was not cached");
+
+                        // Replace the spy to remove the previous calls
+                        res.header = jasmine.createSpy("response header");
+
+                        return middlewareAsync(req, res);
+                    }).then(jasmine.fail, () => {
+                        expect(res.header).toHaveBeenCalledWith("Location", "rendered route: self-discovery");
+                    });
+                });
             });
         });
     });
