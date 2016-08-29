@@ -31,6 +31,9 @@
         "session": {
             "$ref": "session.json"
         },
+        "signature": {
+            "$ref": "signature.json"
+        },
         "storage": {
             "$ref": "storage.json"
         }
