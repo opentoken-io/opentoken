@@ -1,0 +1,14 @@
+{
+    "type": "object",
+    "properties": {
+        "public": {
+            "type": "string",
+            "description": "If set to true, the token will be made public.  Default is 'false'.",
+            "enum": [
+                "false",
+                "true"
+            ]
+        }
+    },
+    "required": []
+}

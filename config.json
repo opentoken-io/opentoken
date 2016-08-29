@@ -158,5 +158,19 @@
             "bucket": "opentoken-io-test-s3",
             "region": "us-east-1"
         }
+    },
+    "token": {
+        "idHash": {
+            "algorithm": "sha512",
+            "derivedLength": 32,
+            "encoding": "base64-uri",
+            "iterations": 4000,
+            "type": "pbkdf2"
+        },
+        "idLength": 32,
+        "lifetime": {
+            "months": 6
+        },
+        "storagePrefix": "token/"
     }
 }
