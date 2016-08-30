@@ -75,6 +75,7 @@ describe("accessCodeManager", () => {
                         "accountId",
                         "BBBBBBBBBBBB"
                     ], {
+                        description: "some description",
                         secret: "BBBBBBBBBBBBBB"
                     }, {
                         description: "some description"
