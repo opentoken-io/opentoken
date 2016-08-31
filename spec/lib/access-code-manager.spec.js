@@ -101,16 +101,6 @@ describe("accessCodeManager", () => {
                 ]);
             });
         });
-        it("requires an account ID", () => {
-            return manager.deleteAsync("", "code").then(jasmine.fail, (err) => {
-                expect(err.toString()).toContain("Account ID must not be empty");
-            });
-        });
-        it("requires a code", () => {
-            return manager.deleteAsync("accountId", "").then(jasmine.fail, (err) => {
-                expect(err.toString()).toContain("Code must not be empty");
-            });
-        });
     });
     describe(".getAsync()", () => {
         it("gets from the storage service", () => {
@@ -122,16 +112,6 @@ describe("accessCodeManager", () => {
                     "code"
                 ]);
                 expect(result).toEqual("record data");
-            });
-        });
-        it("requires an account ID", () => {
-            return manager.deleteAsync("", "code").then(jasmine.fail, (err) => {
-                expect(err.toString()).toContain("Account ID must not be empty");
-            });
-        });
-        it("requires a code", () => {
-            return manager.deleteAsync("accountId", "").then(jasmine.fail, (err) => {
-                expect(err.toString()).toContain("Code must not be empty");
             });
         });
     });
