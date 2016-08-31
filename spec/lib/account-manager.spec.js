@@ -91,11 +91,6 @@ describe("accountManager", () => {
             }));
             challengeManagerMock.validateAsync.andReturn(promiseMock.resolve());
         });
-        it("requires an account ID", () => {
-            return factory().loginAsync("", {}).then(jasmine.fail, (err) => {
-                expect(err.toString()).toContain("Account ID must not be empty");
-            });
-        });
         it("fails if TOTP does not validate", () => {
             totpMock.verifyCurrent.andReturn(false);
 
@@ -162,16 +157,6 @@ describe("accountManager", () => {
         });
     });
     describe(".logoutAsync()", () => {
-        it("requires an account ID", () => {
-            return factory().logoutAsync("", "sessionId").then(jasmine.fail, (err) => {
-                expect(err.toString()).toContain("Account ID must not be empty");
-            });
-        });
-        it("requires a session ID", () => {
-            return factory().logoutAsync("accountId", "").then(jasmine.fail, (err) => {
-                expect(err.toString()).toContain("Session ID must not be empty");
-            });
-        });
         it("calls the session manager to destroy the session", () => {
             return factory().logoutAsync("accountId", "sessionId").then(() => {
                 expect(sessionManagerMock.deleteAsync).toHaveBeenCalledWith("accountId", "sessionId");
@@ -193,11 +178,6 @@ describe("accountManager", () => {
         });
     });
     describe(".recordAsync()", () => {
-        it("requires an account ID", () => {
-            return factory().recordAsync("").then(jasmine.fail, (err) => {
-                expect(err.toString()).toContain("Account ID must not be empty");
-            });
-        });
         it("filters the record to only return select values", () => {
             storageService.getAsync.andReturn(promiseMock.resolve({
                 email: "emailAddress",

@@ -90,21 +90,6 @@ describe("challengeManager", () => {
                 }
             ]));
         });
-        it("requires an account ID", () => {
-            return factory().validateAsync("", "does-not-matter", "whatever").then(jasmine.fail, (err) => {
-                expect(err.toString()).toContain("Account ID must not be empty");
-            });
-        });
-        it("requires a password hash", () => {
-            return factory().validateAsync("accountId", "", "whatever").then(jasmine.fail, (err) => {
-                expect(err.toString()).toContain("Password hash must not be empty");
-            });
-        });
-        it("requires a challenge hash", () => {
-            return factory().validateAsync("accountId", "does-not-matter", "").then(jasmine.fail, (err) => {
-                expect(err.toString()).toContain("Challenge hash must not be empty");
-            });
-        });
         it("fails when no challenge IDs match", () => {
             return factory().validateAsync("accountId", "does-not-matter", "wrong").then(jasmine.fail, (err) => {
                 expect(err.toString()).toContain("Did not match any known challenge result");
