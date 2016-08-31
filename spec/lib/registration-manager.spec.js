@@ -350,6 +350,7 @@ describe("registrationManager", () => {
                 passwordHash: "hashed password",
                 passwordHashConfig: "passwordHashConfig"
             }));
+
             return factory().getRecordAsync("id").then((result) => {
                 expect(result).toEqual({
                     id: "id",
