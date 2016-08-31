@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Make a signed request to an OpenToken API.
+# Make a signed request to an OpenToken API.  This is a proof of concept
+# illustrating that signed requests can be made using only the Bash shell.
 #
 # Requires the following environment variables:
 #
@@ -19,17 +20,16 @@
 #     echo "" | ./signed-request.sh GET /
 #
 #     # Create a public token
-#     echo "" |
+#     echo "data goes here to be tokenized" | \
+#         ./signed-request.sh POST '/account/YOUR_ACCOUNT_ID/token/?public=true'
+#
+#     # Retrieve a token
+#     echo "" | ./signed-request.sh GET /account/YOUR_ACCOUNT_ID/token/TOKEN_ID
 
 errorExit=false
 
 if [[ -z "$OPENTOKEN_API" ]]; then
     echo "Missing environment variable: OPENTOKEN_API"
-    errorExit=true
-fi
-
-if [[ -z "$OPENTOKEN_ACCOUNT" ]]; then
-    echo "Missing environment variable: OPENTOKEN_ACCOUNT"
     errorExit=true
 fi
 
