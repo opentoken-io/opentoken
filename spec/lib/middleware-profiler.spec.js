@@ -79,18 +79,37 @@ describe("MiddlewareProfiler", () => {
                     next();
                 }
 
+                /**
+                 * Create a fake middleware spy.
+                 *
+                 * @param {string} spyName
+                 * @return {Function}
+                 */
+                function createFakeMiddleware(spyName) {
+                    var spy;
+
+                    spy = jasmine.createSpy(spyName);
+
+                    // Fix for Node 6.5 to make it act like older versions.
+                    if (spy.name) {
+                        delete spy.name;
+                    }
+
+                    spy.andCallFake(fakeMiddleware);
+
+                    return spy;
+                }
+
                 // No route
-                middle1 = jasmine.createSpy("middle1");
+                middle1 = createFakeMiddleware("middle1");
                 usePatched(middle1);
                 args1 = useSpy.mostRecentCall.args;
                 wrap1 = args1[0];
-                middle1.andCallFake(fakeMiddleware);
 
                 // With a route
-                middle2 = jasmine.createSpy("middle2");
+                middle2 = createFakeMiddleware("middle2");
                 usePatched("/middle2", middle2);
                 args2 = useSpy.mostRecentCall.args;
-                middle2.andCallFake(fakeMiddleware);
             });
             it("used no route for the first middleware", () => {
                 expect(args1.length).toEqual(1);
