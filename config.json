@@ -141,6 +141,17 @@
         "profileMiddleware": false,
         "proxyProtocol": false
     },
+    "signature": {
+        "dateWindowFuture": {
+            "minutes": 1
+        },
+        "dateWindowPast": {
+            "minutes": 5
+        },
+        "host": "opentoken.io",
+        "method": "OT1-HMAC-SHA256-HEX",
+        "relatedLink": "insert-url-here-for-related-link"
+    },
     "storage": {
         "engine": "s3",
         "s3": {

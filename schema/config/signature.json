@@ -1,0 +1,31 @@
+{
+    "type": "object",
+    "properties": {
+        "dateWindowFuture": {
+            "$ref": "time-offset.json"
+        },
+        "dateWindowPast": {
+            "$ref": "time-offset.json"
+        },
+        "host": {
+            "type": "string"
+        },
+        "method": {
+            "type": "string",
+            "enum": [
+                "OT1-HMAC-SHA256-HEX"
+            ]
+        },
+        "relatedLink": {
+            "type": "string",
+            "format": "uri"
+        }
+    },
+    "required": [
+        "dateWindowFuture",
+        "dateWindowPast",
+        "host",
+        "method",
+        "relatedLink"
+    ]
+}
