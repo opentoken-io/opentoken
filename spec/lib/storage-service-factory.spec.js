@@ -86,6 +86,11 @@ describe("storageServiceFactory", () => {
                 });
             });
         });
+        it("requires non-empty strings", () => {
+            return storageService.getAsync("").then(jasmine.fail, (err) => {
+                expect(err.toString()).toContain("Empty ID for storage key, index 0");
+            });
+        });
     });
     describe("multiple hash configs", () => {
         var storageService;
@@ -115,6 +120,14 @@ describe("storageServiceFactory", () => {
                 "another thing"
             ]).then(() => {
                 expect(storageMock.deleteAsync).toHaveBeenCalledWith("prefix/hash(id)/hash2(another thing)");
+            });
+        });
+        it("requires non-empty strings", () => {
+            return storageService.deleteAsync([
+                "id",
+                ""
+            ]).then(jasmine.fail, (err) => {
+                expect(err.toString()).toContain("Empty ID for storage key, index 1");
             });
         });
         it("loops if there are more inputs than hash configs", () => {
