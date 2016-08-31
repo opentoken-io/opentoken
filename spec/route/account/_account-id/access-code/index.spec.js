@@ -3,11 +3,15 @@
 var accessCodeManagerMock, sessionManagerMock, validateSessionMiddlewareMock;
 
 jasmine.routeTester("/account/_account-id/access-code/", (container) => {
+    var validateRequestBodyMiddlewareMock;
+
     accessCodeManagerMock = require("../../../../mock/access-code-manager-mock")();
     sessionManagerMock = require("../../../../mock/session-manager-mock")();
+    validateRequestBodyMiddlewareMock = require("../../../../mock/middleware/validate-request-body-middleware-mock")();
     validateSessionMiddlewareMock = require("../../../../mock/middleware/validate-session-middleware-mock")();
     container.register("accessCodeManager", accessCodeManagerMock);
     container.register("sessionManager", sessionManagerMock);
+    container.register("validateRequestBodyMiddleware", validateRequestBodyMiddlewareMock);
     container.register("validateSessionMiddleware", validateSessionMiddlewareMock);
 }, (routeTester) => {
     beforeEach(() => {
