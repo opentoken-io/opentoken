@@ -319,7 +319,7 @@ describe("registrationManager", () => {
             });
         });
         it("returns filtered information", () => {
-            factory().getRecordAsync("id").then((result) => {
+            return factory().getRecordAsync("id").then((result) => {
                 expect(storageService.getAsync).toHaveBeenCalledWith("id");
                 expect(result).toEqual({
                     id: "id",
@@ -350,7 +350,7 @@ describe("registrationManager", () => {
                 passwordHash: "hashed password",
                 passwordHashConfig: "passwordHashConfig"
             }));
-            factory().getRecordAsync("id").then((result) => {
+            return factory().getRecordAsync("id").then((result) => {
                 expect(result).toEqual({
                     id: "id",
                     record: {
