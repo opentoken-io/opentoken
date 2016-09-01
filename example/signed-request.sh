@@ -1,30 +1,101 @@
 #!/usr/bin/env bash
-# Make a signed request to an OpenToken API.  This is a proof of concept
-# illustrating that signed requests can be made using only the Bash shell.
+#/ Make a signed request to an OpenToken API.  This is a proof of concept
+#/ illustrating that signed requests can be made using only the Bash shell.
+#/
+#/ Requires the following environment variables:
+#/
+#/ * OPENTOKEN_API: URL typically used for self discovery.
+#/   eg. http://api.example.com/
+#/ * OPENTOKEN_CODE: The API code.
+#/ * OPENTOKEN_SECRET: The API secret.
+#/ * DEBUG: When set to a non-empty value, this turns on some debugging.
+#/
+#/ --help - Show this message.
+#/ $1     - HTTP verb to use.
+#/ $2     - Path you're accessing.
+#/ $3     - Optional, the content-type for the data.
+#/ stdin  - Data is passed in via stdin.
+#/
+#/ Examples:
+#/
+#/     # Issue a GET on the self-discovery URL
+#/     echo -n "" | ./signed-request.sh GET /
+#/
+#/     # Create a public token
+#/     echo "data goes here to be tokenized" | \
+#/     ./signed-request.sh POST "/account/$OPENTOKEN_ACCOUNT/token/?public=true"
+#/
+#/     # Retrieve a token
+#/     echo -n "" | \
+#/     ./signed-request.sh GET "/account/$OPENTOKEN_ACCOUNT/token/TOKEN_ID"
+
+# Scan a list of values.  Returns true (0) if the value is in the array.
 #
-# Requires the following environment variables:
+# $1    - Value to find.
+# $2-$@ - Array of values to search.
 #
-# * OPENTOKEN_API: URL typically used for self discovery.
-#   eg. http://api.example.com/
-# * OPENTOKEN_CODE: The API code.
-# * OPENTOKEN_SECRET: The API secret.
+# Examples
 #
-# The first parameter is the HTTP verb to use.
-# The second is the path you're accessing.
-# The optional third parameter is the content-type for the data.
-# Data should be passed in via stdin.
+#   arr=(a b c d e)
 #
-# Examples:
+#   if !arrayContainsValue x "${arr[@]}"; then
+#       echo "x was not found within the array"
+#   fi
 #
-#     # Issue a GET on the self-discovery URL
-#     echo "" | ./signed-request.sh GET /
+# Returns 0 when the value is found, 1 otherwise.
+arrayContainsValue() {
+    local val
+
+    val=$1
+    shift
+
+    while [[ $# -gt 0 ]]; do
+        if [[ "$1" == "$val" ]]; then
+            return 0
+        fi
+
+        shift
+    done
+
+    return 1
+}
+
+# Delete temp files that are used by this script.  Set the EXIT trap to
+# call this function first, then define the temp variables by creating
+# the temp files in a secure way.  Then just forget about it - this script
+# will now clean up its own temp file.
 #
-#     # Create a public token
-#     echo "data goes here to be tokenized" | \
-#         ./signed-request.sh POST '/account/YOUR_ACCOUNT_ID/token/?public=true'
+# Example
 #
-#     # Retrieve a token
-#     echo "" | ./signed-request.sh GET /account/YOUR_ACCOUNT_ID/token/TOKEN_ID
+#   trap deleteTempFile EXIT
+#   tempFileBody=$(mktemp)
+#   tempFileSignature=$(mktemp)
+#
+# Returns nothing.
+deleteTempFile() {
+    if [[ -n "$tempFileBody" ]]; then
+        rm "$tempFileBody"
+    fi
+
+    if [[ -n "$tempFileSignature" ]]; then
+        rm "$tempFileSignature"
+    fi
+}
+
+
+# Enable strict error checking
+set -eEuo pipefail
+
+# Check for -h or --help
+if arrayContainsValue --help "$@" || arrayContainsValue -h "$@"; then
+    grep "^#/" "$0" | cut -b 4-
+
+    exit 0
+fi
+
+if [[ -n "${DEBUG-}" ]]; then
+    set -x
+fi
 
 errorExit=false
 
@@ -44,11 +115,17 @@ if [[ -z "$OPENTOKEN_SECRET" ]]; then
 fi
 
 if [[ -z "$1" ]]; then
+    echo "Missing verb"
+    errorExit=true
+fi
+
+if [[ -z "$2" ]]; then
     echo "Missing path/query string"
     errorExit=true
 fi
 
 if $errorExit; then
+    echo "Use --help for usage instructions"
     exit 1
 fi
 
@@ -76,17 +153,39 @@ verb=$(echo "$verb" | tr "[:lower:]" "[:upper:]")
 
 path=${path:0:${#path}-(${#queryString}+${#querySep})}
 
-# Capture stdin
-tempFile=$(mktemp)
-cat > "$tempFile"
+trap deleteTempFile EXIT
+tempFileSignature=$(mktemp)
+tempFileBody=$(mktemp)
 
-signature=$(echo "$verb
-$path
-$queryString
-host:$host
-content-type:$contentType
-x-opentoken-date:$dateStr
+# Capture stdin for the body of the request
+cat > "$tempFileBody"
 
-$(cat "$tempFile")" | openssl dgst -sha256 -hmac "$OPENTOKEN_SECRET" | cut -d " " -f 2 | tr "[:upper:]" "[:lower:]")
+# Make the content we wish to sign
+{
+    echo "$verb"
+    echo "$path"
+    echo "$queryString"
+    echo "host:$host"
+    echo "content-type:$contentType"
+    echo "x-opentoken-date:$dateStr"
+    echo ""
+    cat "$tempFileBody"
+} >> "$tempFileSignature"
 
-curl -X "$verb" -H "host: $host" -H "content-type: $contentType" -H "x-opentoken-date: $dateStr" -H "Authorization: OT1-HMAC-SHA256-HEX; access-code=$OPENTOKEN_CODE; signed-headers=host content-type x-opentoken-date; signature=$signature" --data-binary "@$tempFile" "$protocol//$host$path$querySep$queryString"
+# Sign the content and ensure it is a lowercase hex string
+signature=$(openssl dgst -sha256 -hmac "$OPENTOKEN_SECRET" < "$tempFileSignature" | cut -d " " -f 2 | tr "[:upper:]" "[:lower:]")
+
+verbose=""
+
+if [[ -n "${DEBUG-}" ]]; then
+    verbose="-v"
+fi
+
+curl $verbose \
+    -X "$verb" \
+    -H "host: $host" \
+    -H "content-type: $contentType" \
+    -H "x-opentoken-date: $dateStr" \
+    -H "Authorization: OT1-HMAC-SHA256-HEX; access-code=$OPENTOKEN_CODE; signed-headers=host content-type x-opentoken-date; signature=$signature" \
+    --data-binary "@$tempFileBody" \
+    "$protocol//$host$path$querySep$queryString"
