@@ -148,7 +148,7 @@
         "dateWindowPast": {
             "minutes": 5
         },
-        "host": "opentoken.io",
+        "host": "localhost:8443",
         "method": "OT1-HMAC-SHA256-HEX",
         "relatedLink": "insert-url-here-for-related-link"
     },
