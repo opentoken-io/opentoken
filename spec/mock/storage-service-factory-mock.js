@@ -10,11 +10,11 @@ module.exports = () => {
     // This does not return a real factory.  It just returns a provider for
     // an instance.
     instance = jasmine.createSpyObj("storageServiceFactory", [
-        "delAsync",
+        "deleteAsync",
         "getAsync",
         "putAsync"
     ]);
-    instance.delAsync.andReturn(promise.resolve());
+    instance.deleteAsync.andReturn(promise.resolve());
     instance.getAsync.andReturn(promise.reject(new Error("Not configured to be successful")));
     instance.putAsync.andReturn(promise.resolve());
     factory = jasmine.createSpy("storageServiceFactoryMock").andCallFake((idHash, lifetime, storagePrefix) => {

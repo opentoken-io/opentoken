@@ -10,7 +10,7 @@ module.exports = () => {
     promiseMock = require("./promise-mock")();
     mock = jasmine.createSpyObj("accessCodeManagerMock", [
         "createAsync",
-        "destroyAsync",
+        "deleteAsync",
         "getAsync"
     ]);
     mock.createAsync.andReturn(promiseMock.resolve({
@@ -18,7 +18,7 @@ module.exports = () => {
         expires: OtDateMock.fromString("2010-01-23T02:30:00Z"),
         secret: "access code secret"
     }));
-    mock.destroyAsync.andReturn(promiseMock.resolve());
+    mock.deleteAsync.andReturn(promiseMock.resolve());
     mock.getAsync.andReturn(promiseMock.resolve({
         description: "This is a fake access code for tests",
         secret: "Secret key"

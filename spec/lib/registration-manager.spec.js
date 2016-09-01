@@ -82,7 +82,7 @@ describe("registrationManager", () => {
             return factory().confirmEmailAsync("id", "code").then(jasmine.fail, (result) => {
                 expect(result).toEqual(jasmine.any(Error));
                 expect(accountManagerMock.createAsync).not.toHaveBeenCalled();
-                expect(storageService.delAsync).not.toHaveBeenCalled();
+                expect(storageService.deleteAsync).not.toHaveBeenCalled();
             });
         });
         it("fails if the record was not secured (totpConfirmed)", () => {
@@ -94,14 +94,14 @@ describe("registrationManager", () => {
             return factory().confirmEmailAsync("id", "code").then(jasmine.fail, (result) => {
                 expect(result).toEqual(jasmine.any(Error));
                 expect(accountManagerMock.createAsync).not.toHaveBeenCalled();
-                expect(storageService.delAsync).not.toHaveBeenCalled();
+                expect(storageService.deleteAsync).not.toHaveBeenCalled();
             });
         });
         it("fails if confirmation code is wrong", () => {
             return factory().confirmEmailAsync("id", "wrong code").then(jasmine.fail, (result) => {
                 expect(result).toEqual(jasmine.any(Error));
                 expect(accountManagerMock.createAsync).not.toHaveBeenCalled();
-                expect(storageService.delAsync).not.toHaveBeenCalled();
+                expect(storageService.deleteAsync).not.toHaveBeenCalled();
             });
         });
         it("will not delete if creation goes awry", () => {
@@ -120,7 +120,7 @@ describe("registrationManager", () => {
                     passwordHash: "hashed password",
                     passwordHashConfig: "passwordHashConfig"
                 });
-                expect(storageService.delAsync).not.toHaveBeenCalled();
+                expect(storageService.deleteAsync).not.toHaveBeenCalled();
             });
         });
         it("saves successfully", () => {
@@ -139,7 +139,7 @@ describe("registrationManager", () => {
                     passwordHash: "hashed password",
                     passwordHashConfig: "passwordHashConfig"
                 });
-                expect(storageService.delAsync).toHaveBeenCalledWith("id");
+                expect(storageService.deleteAsync).toHaveBeenCalledWith("id");
                 expect(result).toEqual("createdId");
             });
         });
@@ -176,6 +176,11 @@ describe("registrationManager", () => {
         });
     });
     describe(".registerAsync", () => {
+        it("requires an email in the request", () => {
+            return factory().registerAsync({}).then(jasmine.fail, (err) => {
+                expect(err.toString()).toContain("Email is required");
+            });
+        });
         it("starts a registration", () => {
             return factory().registerAsync({
                 email: "someone@example.net"
@@ -213,6 +218,32 @@ describe("registrationManager", () => {
         beforeEach(() => {
             serverMock = require("../mock/server-mock")();
         });
+        it("catches errors for when the request doesn't have MFA properties", () => {
+            return factory().secureAsync("id", {}).then(jasmine.fail, (err) => {
+                expect(err).toEqual(jasmine.any(TypeError));
+            });
+        });
+        it("requires the request's MFA", () => {
+            return factory().secureAsync("id", {
+                mfa: {
+                    totp: {}
+                }
+            }).then(jasmine.fail, (err) => {
+                expect(err).toEqual(jasmine.any(TypeError));
+            });
+        });
+        it("requires a password hash", () => {
+            return factory().secureAsync("id", {
+                mfa: {
+                    totp: {
+                        current: "000000",
+                        previous: "111111"
+                    }
+                }
+            }).then(jasmine.fail, (err) => {
+                expect(err).toEqual(jasmine.any(TypeError));
+            });
+        });
         it("fails on invalid TOTP keys", () => {
             totpMock.verifyCurrentAndPrevious.andReturn(false);
 
@@ -222,7 +253,8 @@ describe("registrationManager", () => {
                         current: "000000",
                         previous: "111111"
                     }
-                }
+                },
+                passwordHash: "abcdefg"
             }, serverMock).then(jasmine.fail, (err) => {
                 expect(totpMock.verifyCurrentAndPrevious).toHaveBeenCalledWith("totp key", "000000", "111111");
                 expect(storageService.putAsync).not.toHaveBeenCalled();
@@ -260,9 +292,9 @@ describe("registrationManager", () => {
             });
         });
     });
-    describe(".secureInfoAsync", () => {
+    describe(".getRecordAsync", () => {
         it("returns filtered information", () => {
-            factory().getRecordAsync("id").then((result) => {
+            return factory().getRecordAsync("id").then((result) => {
                 expect(storageService.getAsync).toHaveBeenCalledWith("id");
                 expect(result).toEqual({
                     id: "id",
@@ -293,7 +325,8 @@ describe("registrationManager", () => {
                 passwordHash: "hashed password",
                 passwordHashConfig: "passwordHashConfig"
             }));
-            factory().getRecordAsync("id").then((result) => {
+
+            return factory().getRecordAsync("id").then((result) => {
                 expect(result).toEqual({
                     id: "id",
                     record: {

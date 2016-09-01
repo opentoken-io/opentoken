@@ -4,10 +4,13 @@ describe("validateSessionMiddleware", () => {
     var loginCookieMock, middlewareFactory, promiseMock, sessionManagerMock;
 
     beforeEach(() => {
+        var errorResponseMock;
+
+        errorResponseMock = require("../../mock/error-response-mock")();
         loginCookieMock = require("../../mock/login-cookie-mock")();
         sessionManagerMock = require("../../mock/session-manager-mock")();
         promiseMock = require("../../mock/promise-mock")();
-        middlewareFactory = require("../../../lib/middleware/validate-session-middleware")(loginCookieMock, sessionManagerMock);
+        middlewareFactory = require("../../../lib/middleware/validate-session-middleware")(errorResponseMock, loginCookieMock, sessionManagerMock);
     });
     describe("middleware", () => {
         var middlewareAsync, req, res, serverMock;
@@ -33,7 +36,11 @@ describe("validateSessionMiddleware", () => {
             });
             it("sends an error response", () => {
                 return middlewareAsync(req, res).then(jasmine.fail, () => {
-                    expect(res.send).toHaveBeenCalledWith(401);
+                    expect(res.send).toHaveBeenCalledWith(403, {
+                        code: "8gzh4j1A",
+                        logRef: "fakeLogRef",
+                        message: "Session is invalid."
+                    });
                 });
             });
             it("passes a value to \"next\"", () => {
@@ -81,6 +88,19 @@ describe("validateSessionMiddleware", () => {
                 });
                 it("sends a Location header to the self-discovery endpoint", () => {
                     return middlewareAsync(req, res).then(jasmine.fail, () => {
+                        expect(res.header).toHaveBeenCalledWith("Location", "rendered route: self-discovery");
+                    });
+                });
+                it("caches the self-discovery link for speed", () => {
+                    return middlewareAsync(req, res).then(jasmine.fail, () => {
+                        // This will prove that the route is not rendered again
+                        serverMock.router.render.andReturn("If this is returned the result was not cached");
+
+                        // Replace the spy to remove the previous calls
+                        res.header = jasmine.createSpy("response header");
+
+                        return middlewareAsync(req, res);
+                    }).then(jasmine.fail, () => {
                         expect(res.header).toHaveBeenCalledWith("Location", "rendered route: self-discovery");
                     });
                 });

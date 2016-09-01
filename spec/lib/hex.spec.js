@@ -18,11 +18,13 @@ describe("hex", () => {
             name: "one null"
         },
         {
+            // Must be lowercase!
             decoded: "hello",
             encoded: "68656c6c6f",
             name: "hello"
         },
         {
+            // Must encode as lowercase!
             decoded: "\xDE\xAD\xBE\xEF",
             encoded: "deadbeef",
             name: "DEAD BEEF"
