@@ -1,13 +1,14 @@
 "use strict";
 
 module.exports = (server, path, options) => {
-    return options.container.call((tokenManager, validateSignatureMiddleware) => {
+    return options.container.call((readBodyBufferMiddleware, tokenManager, validateSignatureMiddleware) => {
         return {
             get: [
+                readBodyBufferMiddleware(),
                 validateSignatureMiddleware(true),
                 (req, res, next) => {
                     // Load the token
-                    return tokenManager.getAsync(req.params.accountId, req.params.tokenId).then((tokenRecord) => {
+                    return tokenManager.getRecordAsync(req.params.accountId, req.params.tokenId).then((tokenRecord) => {
                         res.links({
                             up: [
                                 {
@@ -28,7 +29,7 @@ module.exports = (server, path, options) => {
                     }).then(next, next);
                 }
             ],
-            name: "account"
+            name: "account-token"
         };
     });
 };
