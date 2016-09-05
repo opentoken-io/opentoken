@@ -24,11 +24,11 @@ describe("accessCodeManager", () => {
                 }
             }
         };
-        promiseMock = require("../mock/promise-mock")();
-        randomMock = require("../mock/random-mock")();
-        storageServiceFactoryMock = require("../mock/storage-service-factory-mock")();
+        promiseMock = require("../../mock/promise-mock")();
+        randomMock = require("../../mock/random-mock")();
+        storageServiceFactoryMock = require("../../mock/storage-service-factory-mock")();
         storageService = storageServiceFactoryMock.instance;
-        manager = require("../../lib/access-code-manager")(fakeConfig, promiseMock, randomMock, storageServiceFactoryMock);
+        manager = require("../../../lib/manager/access-code-manager")(fakeConfig, promiseMock, randomMock, storageServiceFactoryMock);
     });
     it("creates the right storage service", () => {
         expect(storageServiceFactoryMock).toHaveBeenCalledWith([
