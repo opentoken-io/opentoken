@@ -1,9 +1,12 @@
 "use strict";
 
-module.exports = () => {
-    var mock, promiseMock;
+var promiseMock;
 
-    promiseMock = require("./promise-mock")();
+promiseMock = require("../promise-mock")();
+
+module.exports = () => {
+    var mock;
+
     mock = jasmine.createSpyObj("accountManagerMock", [
         "createAsync",
         "loginAsync",

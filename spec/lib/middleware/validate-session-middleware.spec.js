@@ -8,7 +8,7 @@ describe("validateSessionMiddleware", () => {
 
         errorResponseMock = require("../../mock/error-response-mock")();
         loginCookieMock = require("../../mock/login-cookie-mock")();
-        sessionManagerMock = require("../../mock/session-manager-mock")();
+        sessionManagerMock = require("../../mock/manager/session-manager-mock")();
         promiseMock = require("../../mock/promise-mock")();
         middlewareFactory = require("../../../lib/middleware/validate-session-middleware")(errorResponseMock, loginCookieMock, sessionManagerMock);
     });

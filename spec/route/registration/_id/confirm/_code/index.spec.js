@@ -3,7 +3,7 @@
 var registrationManagerMock;
 
 jasmine.routeTester("/registration/_id/confirm/_code", (container) => {
-    registrationManagerMock = require("../../../../../mock/registration-manager-mock")();
+    registrationManagerMock = require("../../../../../mock/manager/registration-manager-mock")();
     container.register("registrationManager", registrationManagerMock);
 }, (routeTester) => {
     it("exports the right methods", () => {

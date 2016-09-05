@@ -85,7 +85,7 @@ describe("middleware/validateSignatureMiddleware", () => {
                 middlewareAsync = jasmine.middlewareToPromise(middleware);
 
                 if (signature) {
-                    reqMock.headers.authorized = signature;
+                    reqMock.headers.authorization = signature;
                 }
 
                 return middlewareAsync(reqMock, resMock);
@@ -103,7 +103,7 @@ describe("middleware/validateSignatureMiddleware", () => {
                 });
             });
             it("disallows an invalid signed request", () => {
-                reqMock.headers.authorized = "blah blah";
+                reqMock.headers.authorization = "blah blah";
 
                 return runMiddlewareAsync().then(jasmine.fail, assertError("Invalid format of signature identifier.", "9iYNSNlY"));
             });

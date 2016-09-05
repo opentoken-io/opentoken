@@ -6,10 +6,10 @@ describe("sessionManager", () => {
     beforeEach(() => {
         var util;
 
-        promiseMock = require("../mock/promise-mock")();
-        randomMock = require("../mock/random-mock")();
-        storageServiceFactoryMock = require("../mock/storage-service-factory-mock")();
-        util = require("../../lib/util")();
+        promiseMock = require("../../mock/promise-mock")();
+        randomMock = require("../../mock/random-mock")();
+        storageServiceFactoryMock = require("../../mock/storage-service-factory-mock")();
+        util = require("../../../lib/util")();
         storageService = storageServiceFactoryMock.instance;
 
         factory = () => {
@@ -33,7 +33,7 @@ describe("sessionManager", () => {
                 }
             };
 
-            return require("../../lib/session-manager")(config, promiseMock, randomMock, storageServiceFactoryMock, util);
+            return require("../../../lib/manager/session-manager")(config, promiseMock, randomMock, storageServiceFactoryMock, util);
         };
     });
     it("exposes known methods", () => {
