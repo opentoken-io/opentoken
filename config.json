@@ -134,7 +134,7 @@
         "storagePrefix": "session/"
     },
     "server": {
-        "baseUrl": "https://localhost:8080",
+        "baseUrl": "https://localhost:8443",
         "exceptionIdLength": 12,
         "name": "OpenToken.io",
         "port": 8443,

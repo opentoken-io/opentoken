@@ -3,7 +3,7 @@
 var accountManagerMock, promiseMock, validateSessionMiddlewareMock;
 
 jasmine.routeTester("/account/_account-id/", (container) => {
-    accountManagerMock = require("../../../mock/account-manager-mock")();
+    accountManagerMock = require("../../../mock/manager/account-manager-mock")();
     promiseMock = require("../../../mock/promise-mock")();
     validateSessionMiddlewareMock = require("../../../mock/middleware/validate-session-middleware-mock")();
     container.register("accountManager", accountManagerMock);

@@ -6,12 +6,12 @@ describe("accountManager", () => {
     beforeEach(() => {
         var utilMock;
 
-        challengeManagerMock = require("../../mock/challenge-manager-mock")();
+        challengeManagerMock = require("../../mock/manager/challenge-manager-mock")();
         promiseMock = require("../../mock/promise-mock")();
         randomMock = require("../../mock/random-mock")();
         storageServiceFactoryMock = require("../../mock/storage-service-factory-mock")();
         storageService = storageServiceFactoryMock.instance;
-        sessionManagerMock = require("../../mock/session-manager-mock")();
+        sessionManagerMock = require("../../mock/manager/session-manager-mock")();
         totpMock = require("../../mock/mfa/totp-mock")();
         utilMock = require("../../mock/util-mock")();
         factory = () => {

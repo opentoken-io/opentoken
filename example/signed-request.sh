@@ -15,6 +15,8 @@
 #/ $2     - Path you're accessing.
 #/ $3     - Optional, the content-type for the data.
 #/ stdin  - Data is passed in via stdin.
+#/ stdout - Resulting response body is sent out this way.
+#/ stderr - Headers and debug information.
 #/
 #/ Examples:
 #/
@@ -175,17 +177,18 @@ cat > "$tempFileBody"
 # Sign the content and ensure it is a lowercase hex string
 signature=$(openssl dgst -sha256 -hmac "$OPENTOKEN_SECRET" < "$tempFileSignature" | cut -d " " -f 2 | tr "[:upper:]" "[:lower:]")
 
-verbose=""
+curlCmd=(curl -s)
+curlCmd+=(--dump-header /dev/stderr)
+curlCmd+=(-X "$verb")
+curlCmd+=(-H "host: $host")
+curlCmd+=(-H "x-opentoken-date: $dateStr")
+curlCmd+=(-H "content-type: $contentType")
+curlCmd+=(-H "Authorization: OT1-HMAC-SHA256-HEX; access-code=$OPENTOKEN_CODE; signed-headers=host content-type x-opentoken-date; signature=$signature")
+curlCmd+=(--data-binary "@$tempFileBody")
+curlCmd+=("$protocol//$host$path$querySep$queryString")
 
 if [[ -n "${DEBUG-}" ]]; then
-    verbose="-v"
+    echo "${curlCmd[@]}" > /dev/stderr
 fi
 
-curl $verbose \
-    -X "$verb" \
-    -H "host: $host" \
-    -H "content-type: $contentType" \
-    -H "x-opentoken-date: $dateStr" \
-    -H "Authorization: OT1-HMAC-SHA256-HEX; access-code=$OPENTOKEN_CODE; signed-headers=host content-type x-opentoken-date; signature=$signature" \
-    --data-binary "@$tempFileBody" \
-    "$protocol//$host$path$querySep$queryString"
+"${curlCmd[@]}"

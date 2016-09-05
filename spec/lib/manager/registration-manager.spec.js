@@ -8,7 +8,7 @@ describe("registrationManager", () => {
 
         encodingMock = require("../../mock/encoding-mock")();
         promiseMock = require("../../mock/promise-mock")();
-        accountManagerMock = require("../../mock/account-manager-mock")();
+        accountManagerMock = require("../../mock/manager/account-manager-mock")();
         emailMock = require("../../mock/email-mock")();
         randomMock = require("../../mock/random-mock")();
         storageServiceFactoryMock = require("../../mock/storage-service-factory-mock")();

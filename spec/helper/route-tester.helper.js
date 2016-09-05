@@ -53,12 +53,16 @@ function addRouteMethods(routeTester) {
                 var schema;
 
                 if (body) {
-                    routeTester.req.body = body;
-
                     if (!Buffer.isBuffer(body)) {
-                        body = new Buffer(JSON.stringify(body), "binary");
-                        routeTester.req.getContentLength.andReturn(body.length);
+                        if (typeof body === "string") {
+                            body = new Buffer(body, "binary");
+                        } else {
+                            routeTester.req.body = new Buffer(JSON.stringify(body), "binary");
+                        }
                     }
+
+                    routeTester.req.body = body;
+                    routeTester.req.internalContentLength = body.length;
                 }
 
                 schema = routeTester.container.resolve("schema");
