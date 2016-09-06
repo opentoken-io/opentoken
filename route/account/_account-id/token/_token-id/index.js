@@ -21,6 +21,7 @@ module.exports = (server, path, options) => {
                             });
 
                             res.header("Content-Type", tokenRecord.contentType);
+                            res.header("Content-Length", tokenRecord.data.length);
                             res.send(200, tokenRecord.data);
                         } else {
                             res.send(403);

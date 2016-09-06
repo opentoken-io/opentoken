@@ -134,10 +134,9 @@
         "storagePrefix": "session/"
     },
     "server": {
-        "baseUrl": "https://localhost:8443",
+        "baseUrl": "https://api.opentoken.io",
         "exceptionIdLength": 12,
-        "name": "OpenToken.io",
-        "port": 8443,
+        "port": 8080,
         "profileMiddleware": false,
         "proxyProtocol": false
     },
@@ -148,14 +147,14 @@
         "dateWindowPast": {
             "minutes": 5
         },
-        "host": "localhost:8443",
+        "host": "api.opentoken.io",
         "method": "OT1-HMAC-SHA256-HEX",
-        "relatedLink": "insert-url-here-for-related-link"
+        "relatedLink": "http://opentoken.io/request-signature/"
     },
     "storage": {
         "engine": "s3",
         "s3": {
-            "bucket": "opentoken-io-test-s3",
+            "bucket": "opentoken-io-api",
             "region": "us-east-1"
         }
     },

@@ -25,11 +25,12 @@ describe("signatureOt1", () => {
     }
 
     beforeEach(() => {
-        var errorResponseMock, utilMock;
+        var binaryBufferMock, errorResponseMock, utilMock;
 
         accessCodeManagerMock = require("../mock/manager/access-code-manager-mock")();
-        hashMock = require("../mock/hash-mock")();
+        binaryBufferMock = require("../mock/binary-buffer-mock")();
         errorResponseMock = require("../mock/error-response-mock")();
+        hashMock = require("../mock/hash-mock")();
         promiseMock = require("../mock/promise-mock")();
         requestMock = require("../mock/request-mock")();
         utilMock = require("../mock/util-mock")();
@@ -38,7 +39,7 @@ describe("signatureOt1", () => {
         requestMock.headers.host = "example.com";
         requestMock.headers["x-opentoken-date"] = "2010-01-01T01:23:45Z";
         requestMock.headers["content-type"] = "text/plain";
-        signatureLib = require("../../lib/signature-ot1")(accessCodeManagerMock, errorResponseMock, hashMock, promiseMock, utilMock);
+        signatureLib = require("../../lib/signature-ot1")(accessCodeManagerMock, binaryBufferMock, errorResponseMock, hashMock, promiseMock, utilMock);
         kvPairs = {
             "access-code": "FakeAccessCode",
             signature: "FakeSignature",
@@ -161,6 +162,31 @@ describe("signatureOt1", () => {
                     "host",
                     "x-opentoken-date"
                 ]);
+            });
+        });
+        it("converts a body Buffer as binary", () => {
+            var content;
+
+            // Easier to represent individual lines as an array
+            content = [
+                "GET",
+                "/path",
+                "",
+                "host:example.com",
+                "x-opentoken-date:2010-01-01T01:23:45Z",
+                "content-type:text/plain",
+                "",
+
+                // If you see \xf1 (ñ in extended ASCII) then the test
+                // is screwed up somehow.
+                "\xc3\xb1\x0a"
+            ];
+
+            // The buffer is "ñ\n" encoded as UTF-8
+            requestMock.body = new Buffer("c3b10a", "hex");
+
+            return verifySignature().then(() => {
+                expect(hashMock.hmac).toHaveBeenCalledWith(content.join("\n"), jasmine.any(Object));
             });
         });
     });

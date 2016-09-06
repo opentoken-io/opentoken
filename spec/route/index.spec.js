@@ -24,6 +24,11 @@ jasmine.routeTester("/", null, (routeTester) => {
                         title: "account-login"
                     },
                     {
+                        href: "rendered route: health-check",
+                        rel: "service",
+                        title: "health-check"
+                    },
+                    {
                         href: "rendered route: registration-register",
                         profile: "/schema/registration/register-request.json",
                         rel: "service",

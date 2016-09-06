@@ -14,7 +14,7 @@ Example script to create an OpenToken account.
 
 Usage:
 
-    create-login [OPTIONS]
+    create-account.js [OPTIONS]
 
 Options:
 

@@ -31,3 +31,8 @@ nbproject/
 /node_modules/
 npm-debug.log
 encryption.key
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
