@@ -1,7 +1,7 @@
 "use strict";
 
 describe("binaryBuffer", () => {
-    var binaryBuffer, copy;
+    var binaryBuffer;
 
     beforeEach(() => {
         binaryBuffer = require("../../lib/binary-buffer")();
@@ -9,31 +9,22 @@ describe("binaryBuffer", () => {
     [
         "some string",
         "",
-        new Buffer("some buffer"),
-        123
+        new Buffer("some buffer")
     ].forEach((scenario) => {
         describe(".toBuffer()", () => {
-            it("should convert a string to a buffer", () => {
-                scenario = binaryBuffer.toBuffer(scenario);
-                expect(scenario).toEqual(jasmine.any(Buffer));
+            it("converts a string to a buffer", () => {
+                expect(binaryBuffer.toBuffer(scenario)).toEqual(jasmine.any(Buffer));
             });
-            it("should not alter the stringOrBuffer if it is already a buffer", () => {
-                copy = scenario;
-                scenario = binaryBuffer.toBuffer(scenario);
-                expect(scenario).toEqual(jasmine.any(Buffer));
-                expect(scenario).toBe(copy);
+            it("preserves the input when it is already a buffer", () => {
+                expect(binaryBuffer.toBuffer(new Buffer(scenario, "binary"))).toEqual(jasmine.any(Buffer));
             });
         });
         describe(".toString()", () => {
-            it("should convert a buffer to a string", () => {
-                scenario = binaryBuffer.toString(scenario);
-                expect(scenario).toEqual(jasmine.any(String));
+            it("converts a buffer to a string", () => {
+                expect(binaryBuffer.toString(scenario)).toEqual(jasmine.any(String));
             });
-            it("should not alter the stringOrBuffer if it is already a string", () => {
-                copy = scenario;
-                scenario = binaryBuffer.toString(scenario);
-                expect(scenario).toEqual(jasmine.any(String));
-                expect(scenario).toBe(copy);
+            it("preserves the input if it is already a string", () => {
+                expect(binaryBuffer.toString(scenario.toString("binary"))).toEqual(jasmine.any(String));
             });
         });
     });
