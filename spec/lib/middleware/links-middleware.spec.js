@@ -18,16 +18,19 @@ describe("linksMiddleware", () => {
         expect(middlewareFactory(serverMock)).toEqual(jasmine.any(Function));
     });
     describe("middleware", () => {
-        var middleware, req, res;
+        var middlewareAsync, req, res;
 
         beforeEach(() => {
+            var middleware;
+
             req = require("../../mock/request-mock")();
             res = require("../../mock/response-mock")();
             middleware = middlewareFactory(serverMock);
+            middlewareAsync = jasmine.middlewareToPromise(middleware);
         });
         describe("GET", () => {
-            beforeEach((done) => {
-                middleware(req, res, done);
+            beforeEach(() => {
+                return middlewareAsync(req, res);
             });
             it("adds appropriate links", () => {
                 jasmine.checkLinks([
@@ -44,9 +47,10 @@ describe("linksMiddleware", () => {
             });
         });
         describe("POST", () => {
-            beforeEach((done) => {
+            beforeEach(() => {
                 req.method = "POST";
-                middleware(req, res, done);
+
+                return middlewareAsync(req, res);
             });
             it("adds appropriate links", () => {
                 jasmine.checkLinks([
@@ -59,18 +63,19 @@ describe("linksMiddleware", () => {
             });
         });
         describe("link caching", () => {
-            beforeEach((done) => {
-                middleware(req, res, done);
+            beforeEach(() => {
+                return middlewareAsync(req, res);
             });
             describe("second request", () => {
-                beforeEach((done) => {
+                beforeEach(() => {
                     // Flush the link objects
                     res.linkObjects = [];
 
                     // Break server route rendering
                     serverMock.router.render.andReturn("BROKEN");
                     req.method = "POST";
-                    middleware(req, res, done);
+
+                    return middlewareAsync(req, res);
                 });
                 it("caches links", () => {
                     jasmine.checkLinks([

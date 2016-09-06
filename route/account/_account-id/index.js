@@ -23,6 +23,13 @@ module.exports = (server, path, options) => {
                                     }),
                                     profile: "/schema/account/logout-request.json",
                                     title: "account-logout"
+                                },
+                                {
+                                    href: server.router.render("account-token-create", {
+                                        accountId: req.params.accountId
+                                    }),
+                                    profile: "/schema/account/token-create-request.json",
+                                    title: "account-token-create"
                                 }
                             ]
                         });

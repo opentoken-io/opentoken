@@ -5,7 +5,7 @@ var accountManagerMock, loginCookieMock, promiseMock;
 jasmine.routeTester("/account/_account-id/login/", (container) => {
     var validateRequestBodyMiddlewareMock;
 
-    accountManagerMock = require("../../../../mock/account-manager-mock")();
+    accountManagerMock = require("../../../../mock/manager/account-manager-mock")();
     loginCookieMock = require("../../../../mock/login-cookie-mock")();
     promiseMock = require("../../../../mock/promise-mock")();
     validateRequestBodyMiddlewareMock = require("../../../../mock/middleware/validate-request-body-middleware-mock")();

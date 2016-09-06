@@ -1,13 +1,13 @@
 "use strict";
 
-var OtDateMock;
+var OtDateMock, promiseMock;
 
-OtDateMock = require("./ot-date-mock")();
+OtDateMock = require("../ot-date-mock")();
+promiseMock = require("../promise-mock")();
 
 module.exports = () => {
-    var mock, promiseMock;
+    var mock;
 
-    promiseMock = require("./promise-mock")();
     mock = jasmine.createSpyObj("accessCodeManagerMock", [
         "createAsync",
         "deleteAsync",

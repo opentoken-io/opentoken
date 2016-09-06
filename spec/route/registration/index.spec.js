@@ -5,7 +5,7 @@ var registrationManagerMock;
 jasmine.routeTester("/registration", (container) => {
     var validateRequestBodyMiddlewareMock;
 
-    registrationManagerMock = require("../../mock/registration-manager-mock")();
+    registrationManagerMock = require("../../mock/manager/registration-manager-mock")();
     validateRequestBodyMiddlewareMock = require("../../mock/middleware/validate-request-body-middleware-mock")();
     container.register("registrationManager", registrationManagerMock);
     container.register("validateRequestBodyMiddleware", validateRequestBodyMiddlewareMock);

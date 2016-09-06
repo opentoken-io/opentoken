@@ -2,7 +2,7 @@
 
 var promiseMock;
 
-promiseMock = require("./promise-mock")();
+promiseMock = require("../promise-mock")();
 
 module.exports = () => {
     var mock;

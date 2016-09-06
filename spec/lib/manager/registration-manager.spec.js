@@ -6,12 +6,12 @@ describe("registrationManager", () => {
     beforeEach(() => {
         var encodingMock, storageServiceFactoryMock;
 
-        encodingMock = require("../mock/encoding-mock")();
-        promiseMock = require("../mock/promise-mock")();
-        accountManagerMock = require("../mock/account-manager-mock")();
-        emailMock = require("../mock/email-mock")();
-        randomMock = require("../mock/random-mock")();
-        storageServiceFactoryMock = require("../mock/storage-service-factory-mock")();
+        encodingMock = require("../../mock/encoding-mock")();
+        promiseMock = require("../../mock/promise-mock")();
+        accountManagerMock = require("../../mock/manager/account-manager-mock")();
+        emailMock = require("../../mock/email-mock")();
+        randomMock = require("../../mock/random-mock")();
+        storageServiceFactoryMock = require("../../mock/storage-service-factory-mock")();
         storageService = storageServiceFactoryMock.instance;
         storageService.getAsync.andReturn(promiseMock.resolve({
             confirmationCode: "code",
@@ -26,7 +26,7 @@ describe("registrationManager", () => {
             passwordHash: "hashed password",
             passwordHashConfig: "passwordHashConfig"
         }));
-        totpMock = require("../mock/mfa/totp-mock")();
+        totpMock = require("../../mock/mfa/totp-mock")();
         factory = (override) => {
             var config;
 
@@ -42,7 +42,7 @@ describe("registrationManager", () => {
                 }
             };
 
-            return require("../../lib/registration-manager")(accountManagerMock, config, emailMock, encodingMock, promiseMock, randomMock, storageServiceFactoryMock, totpMock);
+            return require("../../../lib/manager/registration-manager")(accountManagerMock, config, emailMock, encodingMock, promiseMock, randomMock, storageServiceFactoryMock, totpMock);
         };
     });
     it("exposes known functions", () => {
@@ -216,7 +216,7 @@ describe("registrationManager", () => {
         var serverMock;
 
         beforeEach(() => {
-            serverMock = require("../mock/server-mock")();
+            serverMock = require("../../mock/server-mock")();
         });
         it("catches errors for when the request doesn't have MFA properties", () => {
             return factory().secureAsync("id", {}).then(jasmine.fail, (err) => {

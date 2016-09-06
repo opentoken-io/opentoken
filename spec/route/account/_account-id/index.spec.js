@@ -3,7 +3,7 @@
 var accountManagerMock, promiseMock, validateSessionMiddlewareMock;
 
 jasmine.routeTester("/account/_account-id/", (container) => {
-    accountManagerMock = require("../../../mock/account-manager-mock")();
+    accountManagerMock = require("../../../mock/manager/account-manager-mock")();
     promiseMock = require("../../../mock/promise-mock")();
     validateSessionMiddlewareMock = require("../../../mock/middleware/validate-session-middleware-mock")();
     container.register("accountManager", accountManagerMock);
@@ -48,6 +48,12 @@ jasmine.routeTester("/account/_account-id/", (container) => {
                         profile: "/schema/account/logout-request.json",
                         rel: "service",
                         title: "account-logout"
+                    },
+                    {
+                        href: "rendered route: account-token-create, accountId:\"account-id\"",
+                        profile: "/schema/account/token-create-request.json",
+                        rel: "service",
+                        title: "account-token-create"
                     }
                 ], routeTester.res.linkObjects);
             });
