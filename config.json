@@ -4,7 +4,7 @@
             "algorithm": "sha512",
             "derivedLength": 32,
             "encoding": "base64-uri",
-            "iterations": 1500,
+            "iterations": 15000,
             "type": "pbkdf2"
         },
         "codeLength": 32,
@@ -19,7 +19,7 @@
             "algorithm": "sha512",
             "derivedLength": 32,
             "encoding": "base64-uri",
-            "iterations": 5000,
+            "iterations": 11000,
             "type": "pbkdf2"
         },
         "idLength": 32,
@@ -54,7 +54,7 @@
             "algorithm": "sha512",
             "derivedLength": 32,
             "encoding": "base64-uri",
-            "iterations": 5000,
+            "iterations": 12000,
             "salt": "Something to make this different than the account hash.",
             "type": "pbkdf2"
         },
@@ -75,19 +75,19 @@
             "hmac": {
                 "algorithm": "sha512",
                 "digest": "sha512",
-                "iterations": 10000
+                "iterations": 13000
             }
         },
         "secondary": {
             "cipher": {
                 "algorithm": "bf-cbc",
                 "digest": "whirlpool",
-                "iterations": 10000
+                "iterations": 17000
             },
             "hmac": {
                 "algorithm": "whirlpool",
                 "digest": "whirlpool",
-                "iterations": 10000
+                "iterations": 14000
             }
         }
     },
@@ -109,7 +109,7 @@
             "algorithm": "sha512",
             "derivedLength": 48,
             "encoding": "base64-uri",
-            "iterations": 100000,
+            "iterations": 120000,
             "type": "pbkdf2"
         },
         "idLength": 32,
@@ -124,7 +124,7 @@
             "algorithm": "sha512",
             "derivedLength": 48,
             "encoding": "base64-uri",
-            "iterations": 5000,
+            "iterations": 9000,
             "type": "pbkdf2"
         },
         "idLength": 32,
@@ -134,7 +134,7 @@
         "storagePrefix": "session/"
     },
     "server": {
-        "baseUrl": "https://localhost:8080",
+        "baseUrl": "https://localhost:8443",
         "exceptionIdLength": 12,
         "name": "OpenToken.io",
         "port": 8443,
@@ -148,7 +148,7 @@
         "dateWindowPast": {
             "minutes": 5
         },
-        "host": "opentoken.io",
+        "host": "localhost:8443",
         "method": "OT1-HMAC-SHA256-HEX",
         "relatedLink": "insert-url-here-for-related-link"
     },
@@ -158,5 +158,19 @@
             "bucket": "opentoken-io-test-s3",
             "region": "us-east-1"
         }
+    },
+    "token": {
+        "idHash": {
+            "algorithm": "sha512",
+            "derivedLength": 32,
+            "encoding": "base64-uri",
+            "iterations": 18000,
+            "type": "pbkdf2"
+        },
+        "idLength": 32,
+        "lifetime": {
+            "months": 6
+        },
+        "storagePrefix": "token/"
     }
 }

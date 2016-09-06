@@ -6,12 +6,12 @@ describe("challengeManager", () => {
     beforeEach(() => {
         var randomMock, util;
 
-        hashMock = require("../mock/hash-mock")();
-        OtDateMock = require("../mock/ot-date-mock")();
-        promiseMock = require("../mock/promise-mock")();
-        randomMock = require("../mock/random-mock")();
-        storageServiceFactoryMock = require("../mock/storage-service-factory-mock")();
-        util = require("../../lib/util")();
+        hashMock = require("../../mock/hash-mock")();
+        OtDateMock = require("../../mock/ot-date-mock")();
+        promiseMock = require("../../mock/promise-mock")();
+        randomMock = require("../../mock/random-mock")();
+        storageServiceFactoryMock = require("../../mock/storage-service-factory-mock")();
+        util = require("../../../lib/util")();
         storageService = storageServiceFactoryMock.instance;
 
         factory = () => {
@@ -34,7 +34,7 @@ describe("challengeManager", () => {
                 }
             };
 
-            return require("../../lib/challenge-manager")(config, hashMock, OtDateMock, promiseMock, randomMock, storageServiceFactoryMock, util);
+            return require("../../../lib/manager/challenge-manager")(config, hashMock, OtDateMock, promiseMock, randomMock, storageServiceFactoryMock, util);
         };
     });
     it("exposes known methods", () => {

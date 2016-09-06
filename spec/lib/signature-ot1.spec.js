@@ -27,7 +27,7 @@ describe("signatureOt1", () => {
     beforeEach(() => {
         var errorResponseMock, utilMock;
 
-        accessCodeManagerMock = require("../mock/access-code-manager-mock")();
+        accessCodeManagerMock = require("../mock/manager/access-code-manager-mock")();
         hashMock = require("../mock/hash-mock")();
         errorResponseMock = require("../mock/error-response-mock")();
         promiseMock = require("../mock/promise-mock")();

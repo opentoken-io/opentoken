@@ -36,6 +36,9 @@
         },
         "storage": {
             "$ref": "storage.json"
+        },
+        "token": {
+            "$ref": "token.json"
         }
     },
     "required": [

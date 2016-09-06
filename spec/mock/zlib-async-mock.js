@@ -1,10 +1,12 @@
 "use strict";
 
-var promiseMock, zlibAsyncMock;
+var promiseMock;
 
 promiseMock = require("./promise-mock")();
 
 module.exports = () => {
+    var zlibAsyncMock;
+
     zlibAsyncMock = jasmine.createSpyObj("zlibAsync", [
         "deflateRaw",
         "deflateRawAsync",

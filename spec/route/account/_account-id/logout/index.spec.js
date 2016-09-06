@@ -5,7 +5,7 @@ var loginCookieMock;
 jasmine.routeTester("/account/_account-id/logout/", (container) => {
     var accountManagerMock;
 
-    accountManagerMock = require("../../../../mock/account-manager-mock")();
+    accountManagerMock = require("../../../../mock/manager/account-manager-mock")();
     loginCookieMock = require("../../../../mock/login-cookie-mock")();
     container.register("accountManager", accountManagerMock);
     container.register("loginCookie", loginCookieMock);
