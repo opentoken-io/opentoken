@@ -62,7 +62,7 @@ In order to attack the algorithms used and without knowing any other weaknesses,
 
 First, we must break AES.  The key size that is used is 32 bytes.  That's 2^256 possibilities, which is about 1.16E77.  With the above supercomputer we can fully scan the keyspace in 4E58 years.  Really, we'd only have to scan about half of that in order to get a 50% chance of finding the key.  Assuming each atom of Earth was one of these supercomputers, it would still take 298,579,912 years to find it.
 
-Whirlpool uses a similarly sized key of 32 bytes.  Again, the number of possibilities for scanning the entire keyspace are the same.  Because it's implemented slower, the supercomputer now takes 1.35E59 years and finally will scan all possibilites after 1 billion years (with a 50% chance after 500 million years).
+Whirlpool uses a similarly sized key of 32 bytes.  Again, the number of possibilities for scanning the entire keyspace are the same.  Because it's implemented slower, the supercomputer now takes 1.35E59 years.  The "every atom of Earth is a supercomputer" would scan all possibilities after 1 billion years (with a 50% chance after 500 million years).
 
 Because the records are stored as double-encrypted payloads, even huge advances in bypassing some of the encryption will not help tremendously because multiple different encryption mechanisms are employed.
 
