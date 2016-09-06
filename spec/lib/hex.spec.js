@@ -4,7 +4,10 @@ describe("hex", () => {
     var hex;
 
     beforeEach(() => {
-        hex = require("../../lib/hex")();
+        var binaryBuffer;
+
+        binaryBuffer = require("../../lib/binary-buffer")();
+        hex = require("../../lib/hex")(binaryBuffer);
     });
     [
         {
