@@ -22,9 +22,8 @@ describe("formatter/binaryFormatter", () => {
         });
     });
     it("essentially breaks with objects", () => {
-        return formatterAsync({}).then((result) => {
-            expect(Buffer.isBuffer(result)).toBe(true);
-            expect(result.toString("binary")).toBe("[object Object]");
+        return formatterAsync({}).then(jasmine.fail, (err) => {
+            expect(err.toString()).toBe("TypeError: First argument must be a string, Buffer, ArrayBuffer, Array, or array-like object.");
         });
     });
 });

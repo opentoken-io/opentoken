@@ -4,12 +4,12 @@ describe("encoding", () => {
     var encoding;
 
     beforeEach(() => {
-        var base32, base64, binaryBuffer, hex;
+        var base32, base64, binaryBufferMock, hex;
 
-        binaryBuffer = require("../../lib/binary-buffer")();
-        base32 = require("../../lib/base32")(binaryBuffer, require("thirty-two"));
-        base64 = require("../../lib/base64")(binaryBuffer);
-        hex = require("../../lib/hex")(binaryBuffer);
+        binaryBufferMock = require("../mock/binary-buffer-mock")();
+        base32 = require("../../lib/base32")(binaryBufferMock, require("thirty-two"));
+        base64 = require("../../lib/base64")(binaryBufferMock);
+        hex = require("../../lib/hex")(binaryBufferMock);
         encoding = require("../../lib/encoding")(base32, base64, hex);
     });
     describe("decode()", () => {

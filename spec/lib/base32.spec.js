@@ -4,11 +4,11 @@ describe("base32", () => {
     var base32;
 
     beforeEach(() => {
-        var binaryBuffer, thirtyTwo;
+        var binaryBufferMock, thirtyTwo;
 
-        binaryBuffer = require("../../lib/binary-buffer")();
+        binaryBufferMock = require("../mock/binary-buffer-mock")();
         thirtyTwo = require("thirty-two");
-        base32 = require("../../lib/base32")(binaryBuffer, thirtyTwo);
+        base32 = require("../../lib/base32")(binaryBufferMock, thirtyTwo);
     });
     [
         {

@@ -1,11 +1,11 @@
 "use strict";
 
 describe("base64", () => {
-    var base64, binaryBuffer;
+    var base64, binaryBufferMock;
 
     beforeEach(() => {
-        binaryBuffer = require("../../lib/binary-buffer")();
-        base64 = require("../../lib/base64")(binaryBuffer);
+        binaryBufferMock = require("../mock/binary-buffer-mock")();
+        base64 = require("../../lib/base64")(binaryBufferMock);
     });
     [
         {

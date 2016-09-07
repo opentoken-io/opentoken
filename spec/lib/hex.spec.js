@@ -4,10 +4,10 @@ describe("hex", () => {
     var hex;
 
     beforeEach(() => {
-        var binaryBuffer;
+        var binaryBufferMock;
 
-        binaryBuffer = require("../../lib/binary-buffer")();
-        hex = require("../../lib/hex")(binaryBuffer);
+        binaryBufferMock = require("../mock/binary-buffer-mock")();
+        hex = require("../../lib/hex")(binaryBufferMock);
     });
     [
         {
