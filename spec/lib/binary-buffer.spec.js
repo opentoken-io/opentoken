@@ -12,18 +12,18 @@ describe("binaryBuffer", () => {
         new Buffer("some buffer")
     ].forEach((scenario) => {
         describe(".toBuffer()", () => {
-            it("converts a string to a buffer", () => {
+            it("makes a buffer", () => {
                 expect(binaryBuffer.toBuffer(scenario)).toEqual(jasmine.any(Buffer));
             });
-            it("preserves the input when it is already a buffer", () => {
+            it("has the right content", () => {
                 expect(binaryBuffer.toBuffer(new Buffer(scenario, "binary"))).toEqual(jasmine.any(Buffer));
             });
         });
         describe(".toString()", () => {
-            it("converts a buffer to a string", () => {
+            it("makes a buffer", () => {
                 expect(binaryBuffer.toString(scenario)).toEqual(jasmine.any(String));
             });
-            it("preserves the input if it is already a string", () => {
+            it("has the right content", () => {
                 expect(binaryBuffer.toString(scenario.toString("binary"))).toEqual(jasmine.any(String));
             });
         });
