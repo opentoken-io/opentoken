@@ -21,6 +21,10 @@ module.exports = (server, pathUrl, options) => {
                             title: "account-login"
                         },
                         {
+                            href: server.router.render("health-check"),
+                            title: "health-check"
+                        },
+                        {
                             href: server.router.render("registration-register"),
                             profile: "/schema/registration/register-request.json",
                             title: "registration-register"

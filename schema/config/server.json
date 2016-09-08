@@ -18,10 +18,6 @@
             "type": "string",
             "minLength": 1
         },
-        "name": {
-            "type": "string",
-            "minLength": 1
-        },
         "port": {
             "type": "integer",
             "minimum": 1,
@@ -44,6 +40,13 @@
             "type": "object"
         }
     },
+    "required": [
+        "baseUrl",
+        "exceptionIdLength",
+        "port",
+        "profileMiddleware",
+        "proxyProtocol"
+    ],
     "allOf": [
         {
             "description": "Define both certificateFile and keyFile or neither",

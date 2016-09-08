@@ -188,6 +188,10 @@ function config(args) {
 
         val = process.env[`OPENTOKEN_${name.toUpperCase()}`];
 
+        if (name === "api" && !val) {
+            val = "https://api.opentoken.io";
+        }
+
         if (args[`--${name}`]) {
             val = args[`--${name}`];
         }

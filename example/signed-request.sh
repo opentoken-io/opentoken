@@ -15,7 +15,7 @@
 #/ $1     - HTTP verb to use.
 #/ $2     - Path you're accessing.
 #/ $3     - Optional, the content-type for the data.
-#/ stdin  - Data is passed in via stdin.
+#/ $4     - If $3 is set, this defines the file source for the data.
 #/ stdout - Resulting response body is sent out this way.
 #/ stderr - Headers and debug information.
 #/
@@ -71,15 +71,10 @@ arrayContainsValue() {
 # Example
 #
 #   trap deleteTempFile EXIT
-#   tempFileBody=$(mktemp)
 #   tempFileSignature=$(mktemp)
 #
 # Returns nothing.
 deleteTempFile() {
-    if [[ -n "$tempFileBody" ]]; then
-        rm "$tempFileBody"
-    fi
-
     if [[ -n "$tempFileSignature" ]]; then
         rm "$tempFileSignature"
     fi
@@ -101,11 +96,7 @@ if [[ -n "${DEBUG-}" ]]; then
 fi
 
 errorExit=false
-
-if [[ -z "$OPENTOKEN_API" ]]; then
-    echo "Missing environment variable: OPENTOKEN_API"
-    errorExit=true
-fi
+: "${OPENTOKEN_API:=https://api.opentoken.io}"
 
 if [[ -z "$OPENTOKEN_CODE" ]]; then
     echo "Missing environment variable: OPENTOKEN_CODE"
@@ -132,10 +123,21 @@ if $errorExit; then
     exit 1
 fi
 
-dateStr=$(date --iso-8601=seconds)
+dateStr=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 verb=$1
 path=$2
-contentType=${3:-application/octet-stream}
+contentType=text/plain
+fileBody=
+
+if [[ -n "${3-}" ]]; then
+    contentType=$3
+    fileBody=$4
+
+    if [[ ! -f "$fileBody" ]]; then
+        echo "$fileBody is not a file" >&2
+        exit 1
+    fi
+fi
 
 # Determine the protocol and host
 protocol=${OPENTOKEN_API%//*}
@@ -158,10 +160,6 @@ path=${path:0:${#path}-(${#queryString}+${#querySep})}
 
 trap deleteTempFile EXIT
 tempFileSignature=$(mktemp)
-tempFileBody=$(mktemp)
-
-# Capture stdin for the body of the request
-cat > "$tempFileBody"
 
 # Make the content we wish to sign
 {
@@ -172,7 +170,10 @@ cat > "$tempFileBody"
     echo "content-type:$contentType"
     echo "x-opentoken-date:$dateStr"
     echo ""
-    cat "$tempFileBody"
+
+    if [[ -n "$fileBody" ]]; then
+        cat "$fileBody"
+    fi
 } >> "$tempFileSignature"
 
 # Sign the content and ensure it is a lowercase hex string
@@ -185,7 +186,7 @@ curlCmd+=(-H "host: $host")
 curlCmd+=(-H "x-opentoken-date: $dateStr")
 curlCmd+=(-H "content-type: $contentType")
 curlCmd+=(-H "Authorization: OT1-HMAC-SHA256-HEX; access-code=$OPENTOKEN_CODE; signed-headers=host content-type x-opentoken-date; signature=$signature")
-curlCmd+=(--data-binary "@$tempFileBody")
+curlCmd+=(--data-binary "@$fileBody")
 curlCmd+=("$protocol//$host$path$querySep$queryString")
 
 if [[ -n "${DEBUG-}" ]]; then

@@ -13,7 +13,7 @@ module.exports = () => {
     });
 
     mock.toString.andCallFake((params) => {
-        return params.toString();
+        return params.toString("binary");
     });
 
     return mock;
