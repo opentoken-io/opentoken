@@ -5,8 +5,8 @@
     "main": "lib/opentoken.js",
     "scripts": {
         "start": "node bin/server.js || true",
-        "test": "istanbul cover jasmine-node node_modules/jasmine-node-helpers/lib/* --captureExceptions spec/ && codecov && eslint .",
-        "watch": "jasmine-node node_modules/jasmine-node-helpers/lib/* lib spec --autotest --watch"
+        "test": "istanbul cover jasmine-node node_modules/jasmine-test-helpers/lib/* --captureExceptions spec/ && codecov && eslint .",
+        "watch": "jasmine-node node_modules/jasmine-test-helpers/lib/* lib spec --autotest --watch"
     },
     "repository": {
         "type": "git",
@@ -37,7 +37,7 @@
         "eslint": "^2.10.2",
         "istanbul": "^0.4.2",
         "jasmine-node": "^1.14.5",
-        "jasmine-node-helpers": "https://github.com/tests-always-included/jasmine-node-helpers",
+        "jasmine-test-helpers": "https://github.com/tests-always-included/jasmine-test-helpers",
         "mock-require": "^1.3.0"
     },
     "dependencies": {
