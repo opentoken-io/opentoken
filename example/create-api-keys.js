@@ -14,7 +14,7 @@ Example script to create a set of API keys for OpenToken.
 
 Usage:
 
-    create-api-keys [OPTIONS]
+    create-api-keys.js [OPTIONS]
 
 Options:
 
