@@ -30,7 +30,10 @@ nbproject/
 /coverage/
 /node_modules/
 npm-debug.log
+
+# Sensitive
 encryption.key
+override.json
 
 # Elastic Beanstalk Files
 .elasticbeanstalk/*

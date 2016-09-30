@@ -103,7 +103,7 @@ jasmine.routeTester = (routePath, containerOverrideFn, callback) => {
                 var config, container, serverMock;
 
                 container = require("../../lib/container");
-                config = container.resolve("config");
+                config = require("../../config.json");
                 config.baseDir = "/";
                 container.register("config", config);
 
