@@ -22,7 +22,7 @@ jasmine.formatterToPromise = (formatterName, reqMock, resMock) => {
         resMock = require("../mock/response-mock")();
     }
 
-    container = require("../../lib/dependencies");
+    container = require("../../lib/container");
     errorResponseMock = require("../mock/error-response-mock")();
     genericFormatterMock = require("../mock/formatter/generic-formatter-mock")();
     container.register("errorResponse", errorResponseMock);

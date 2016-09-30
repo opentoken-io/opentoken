@@ -64,6 +64,7 @@ describe("MiddlewareProfiler", () => {
                  * @param {Object} req Request
                  * @param {Object} res Response
                  * @param {Function} next
+                 * @return {number} irrelevant
                  */
                 function fakeMiddleware(req, res, next) {
                     var i, start;
@@ -77,6 +78,11 @@ describe("MiddlewareProfiler", () => {
                     }
 
                     next();
+
+                    /* Returning the value so ESLint is tricked into
+                     * thinking the variable is used.
+                     */
+                    return i;
                 }
 
                 /**

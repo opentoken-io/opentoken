@@ -1,10 +1,9 @@
 #!/usr/bin/env node
-
 "use strict";
 
 var config, container, logger;
 
-container = require("../lib/dependencies");
+container = require("../lib/container");
 
 // Initialize the server
 config = container.resolve("config");

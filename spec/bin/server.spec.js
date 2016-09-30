@@ -31,7 +31,7 @@ describe("bin/server.js", () => {
                 info() {}
             }
         };
-        mockRequire("../../lib/dependencies", {
+        mockRequire("../../lib/container", {
             resolve(thing) {
                 return containerResults[thing];
             }
