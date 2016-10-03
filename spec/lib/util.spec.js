@@ -69,4 +69,37 @@ describe("util", () => {
             expect(util.clone(new String("xx"))).toBe("xx");
         });
     });
+    describe(".deepMerge()", () => {
+        it("prefers the override", () => {
+            expect(util.deepMerge("a", "b")).toBe("b");
+        });
+        it("uses the default when the override is undefined", () => {
+            expect(util.deepMerge("a")).toBe("a");
+        });
+        it("does not merge when the default is not an object", () => {
+            expect(util.deepMerge("asdf", {
+                obj: true
+            })).toEqual({
+                obj: true
+            });
+        });
+        it("does not error when the override is not an object", () => {
+            expect(util.deepMerge({
+                obj: true
+            }, "asdf")).toEqual("asdf");
+        });
+        it("actually merges objects", () => {
+            expect(util.deepMerge({
+                both: "WRONG",
+                default: "correct"
+            }, {
+                both: "correct",
+                override: "correct"
+            })).toEqual({
+                both: "correct",
+                default: "correct",
+                override: "correct"
+            });
+        });
+    });
 });

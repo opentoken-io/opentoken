@@ -19,9 +19,10 @@ This guide is a bit terse and assumes that your hard drive is encrypted.  We don
         cd release
         npm install
 
-3. Decrypt the encryption key.
+3. Decrypt the encryption key and the override files.
 
         gpg --decrypt encryption.key.asc > encryption.key
+        gpg --decrypt override.json.asc > override.json
 
 4. Make sure tests pass.
 

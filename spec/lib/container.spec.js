@@ -10,7 +10,7 @@ describe("container", () => {
         expect(container).toEqual(jasmine.any(Object));
     });
     it("resolves a dependency", () => {
-        expect(container.resolve("config")).toEqual(jasmine.any(Object));
+        expect(container.resolve("container")).toBe(container);
     });
     it("resolve a dependency which has methods to run", () => {
         var base64;

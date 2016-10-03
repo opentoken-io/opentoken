@@ -134,10 +134,10 @@
         "storagePrefix": "session/"
     },
     "server": {
-        "baseUrl": "https://api.opentoken.io",
+        "baseUrl": "http://localhost",
         "exceptionIdLength": 12,
         "port": 8080,
-        "profileMiddleware": false,
+        "profileMiddleware": true,
         "proxyProtocol": false
     },
     "signature": {
@@ -147,9 +147,9 @@
         "dateWindowPast": {
             "minutes": 5
         },
-        "host": "api.opentoken.io",
+        "host": "localhost",
         "method": "OT1-HMAC-SHA256-HEX",
-        "relatedLink": "http://opentoken.io/request-signature/"
+        "relatedLink": "https://github.com/opentoken-io/opentoken/blob/master/example/signed-request.sh"
     },
     "storage": {
         "engine": "s3",
