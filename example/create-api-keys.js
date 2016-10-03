@@ -22,7 +22,7 @@ Options:
                         the use of the OPENTOKEN_ACCOUNT environment variable.
     --api=URL           Specify the API URL.  This would override the use of
                         OPENTOKEN_API environment variable.
-    --description=DESC  Set the email address for the account.
+    --description=DESC  Set a description for the set of keys.
     --help, -h          Show this help message.
     --mfa=KEY           Assigns the Base32 encoded MFA key.  Using this as
                         a command-line argument is insecure.  You should prefer
