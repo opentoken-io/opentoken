@@ -6,19 +6,21 @@ var against, bad, container, good, goodSmall, options, secureHash, size;
 options = process.argv.slice(2);
 
 if (options.length < 1) {
-    console.log("Test Hash Comparison \n");
-    console.log("Usage: ./test-hash-compare.js timeToRunFor [iterations]\n");
-    console.log("timeToRunFor: time the test will run in seconds");
-    console.log("iterations: how many times to run through the tests, default is 2");
+    console.log(`Test Hash Comparison
+
+Usage: ./test-hash-compare.js timeToRunFor [iterations]
+
+timeToRunFor: time the test will run in seconds.
+iterations: how many times to run through the tests, default is 2.`);
 
     return;
 }
 
 console.log("Setting Up...");
-
-container = require("../lib/dependencies");
+container = require("../lib/container");
 secureHash = container.resolve("secureHash");
 
+// Create some buffers
 size = 1024 * 16;
 against = new Buffer(size);
 against.fill(0x42);

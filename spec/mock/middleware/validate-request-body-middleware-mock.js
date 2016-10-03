@@ -2,7 +2,7 @@
 
 var container;
 
-container = require("../../../lib/dependencies");
+container = require("../../../lib/container");
 
 module.exports = () => {
     var middleware, middlewareFactory;

@@ -27,10 +27,9 @@ describe("registrationManager", () => {
             passwordHashConfig: "passwordHashConfig"
         }));
         totpMock = require("../../mock/mfa/totp-mock")();
-        factory = (override) => {
+        factory = () => {
             var config;
 
-            override = override || {};
             config = {
                 account: {},
                 registration: {

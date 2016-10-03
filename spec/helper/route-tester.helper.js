@@ -102,7 +102,7 @@ jasmine.routeTester = (routePath, containerOverrideFn, callback) => {
             beforeEach(() => {
                 var config, container, serverMock;
 
-                container = require("../../lib/dependencies");
+                container = require("../../lib/container");
                 config = container.resolve("config");
                 config.baseDir = "/";
                 container.register("config", config);
