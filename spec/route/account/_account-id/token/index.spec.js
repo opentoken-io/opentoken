@@ -111,8 +111,8 @@ jasmine.routeTester("/account/_account-id/token/", (container) => {
                     }
                 ], routeTester.res.linkObjects);
             });
-            it("resulted in a 204 (very important)", () => {
-                expect(routeTester.res.send).toHaveBeenCalledWith(204);
+            it("resulted in a 201 (very important)", () => {
+                expect(routeTester.res.send).toHaveBeenCalledWith(201);
             });
         });
     });
