@@ -1,7 +1,16 @@
 "use strict";
 
+var promiseMock;
+
+promiseMock = require("./promise-mock")();
+
 module.exports = () => {
-    return {
-        sendTemplate: jasmine.createSpy("emailMock.sendTemplate")
-    };
+    var mock;
+
+    mock = jasmine.createSpyObj("emailMock", [
+        "sendAsync"
+    ]);
+    mock.sendAsync.andReturn(promiseMock.resolve());
+
+    return mock;
 };

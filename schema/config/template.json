@@ -1,0 +1,12 @@
+{
+    "type": "object",
+    "properties": {
+        "emailPath": {
+            "type": "string",
+            "minLength": 1
+        }
+    },
+    "required": [
+        "emailPath"
+    ]
+}

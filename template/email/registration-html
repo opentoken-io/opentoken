@@ -1,0 +1,29 @@
+<p>
+    We're so glad that you're here!
+</p>
+
+<p>
+    There's only one last step to finish the registration: fetching one URL.
+</p>
+
+<p>
+    When you go get this, make sure you keep track of the HTTP headers.  Your account will be returned in the body of the response.  The links of the response will provide you a starting point for accessing your account.
+</p>
+
+<p>
+    Sorry, but this is still somewhat rough at the moment, so use <tt>curl</tt> <em>(or your alternate favorite tool)</em> carefully.  A web-based UI is planned but is slated for a much later release date.
+</p>
+
+<p>
+    Complete your registration by visiting this URL:
+</p>
+
+<blockquote>
+    <p>
+        {{{config.server.baseUrl}}}{{{data.confirmUrl}}}
+    </p>
+</blockquote>
+
+<p>
+    P.S. You rock.  It's true.
+</p>
