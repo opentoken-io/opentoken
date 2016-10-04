@@ -9,11 +9,13 @@
 function usageMessage() {
     return `Starts the OpenToken.io server.
 
-Accepts the following arguments:
+Usage: server.js [options]
 
-    --help -h -?               Shows this help message.
-    --override=FILE            Override settings in config.json with these.
-                               The properties are merged together.
+Options:
+
+    --help, -h, -?   Shows this help message.
+    --override FILE  Override settings in config.json with these.  The
+                     properties are merged together.
 
 Examples:
 
@@ -40,8 +42,8 @@ function loadConfig(container, args) {
     config = require("../config.json");
 
     // Allow overrides from an external config file.
-    if (args.override) {
-        override = require(path.resolve(process.cwd(), args.override));
+    if (args["--override"]) {
+        override = require(path.resolve(process.cwd(), args["--override"]));
         config = util.deepMerge(config, override);
     }
 
@@ -53,33 +55,27 @@ function loadConfig(container, args) {
  * The body of the program.
  */
 function main() {
-    var args, config, container, docopt, logger;
+    var args, config, container, logger, neodoc;
 
     // Load the dependency injection container.
     container = require("../lib/container");
 
     // Only load external libraries, no more of our lib/ files for now.
-    docopt = container.resolve("docopt");
+    neodoc = container.resolve("neodoc");
 
-    // Argument processing.
-    args = docopt(usageMessage());
+    // Argument processing and handle --help.
+    args = neodoc.run(usageMessage());
 
-    // When asked, show the help message and quit
-    if (args.help) {
-        console.log(usageMessage());
-
-        return;
-    }
-
-    // Get the configuration
+    // Get the configuration and save in container.
     config = loadConfig(container, args);
+    container.register("config", config);
 
     // Other modules may now be loaded.
     logger = container.resolve("logger");
 
-    if (args.override) {
-        // Can't log this earlier
-        logger.info(`Using overrides from file: ${args.override}`);
+    if (args["--override"]) {
+        // Was not able to log this earlier.
+        logger.info(`Using overrides from file: ${args["--override"]}`);
     }
 
     // Allow overriding of the port.
@@ -94,8 +90,7 @@ function main() {
         config.debug = true;
     }
 
-    // Save the configuration and bootstrap.
-    container.register("config", config);
+    // Bootstrap.
     container.resolve("bootstrap")().then(() => {
         // Kick off the server through dependency injection
         container.resolve("apiServer")();

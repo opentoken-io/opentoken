@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+# Turn on strict mode.
+set -eEo pipefail
+
+# Run the tests.
+istanbul cover jasmine-node node_modules/jasmine-test-helpers/lib/ --captureExceptions spec/
+
+# Check the code coverage.
+codecov
+
+# Verify the coding standards are enforced.
+eslint .
+
+echo "All tests pass."

@@ -4,9 +4,9 @@
     "description": "Public and free software API to tokenize or encrypt data.",
     "main": "lib/opentoken.js",
     "scripts": {
-        "start": "node bin/server.js || true",
-        "test": "istanbul cover jasmine-node node_modules/jasmine-test-helpers/lib/ --captureExceptions spec/ && codecov && eslint .",
-        "watch": "jasmine-node node_modules/jasmine-test-helpers/lib/ lib spec --autotest --watch"
+        "start": "scripts/start",
+        "test": "scripts/test",
+        "watch": "scripts/watch"
     },
     "repository": {
         "type": "git",
@@ -46,7 +46,6 @@
         "bluebird": "^3.4.6",
         "buffer-serializer": "^1.0.2",
         "dizzy": "^2.0.5",
-        "docopt": "^0.6.2",
         "findhit-proxywrap": "^0.3.11",
         "glob": "^7.1.0",
         "helmet": "^2.2.0",

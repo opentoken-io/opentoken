@@ -5,11 +5,11 @@ var mockRequire;
 mockRequire = require("mock-require");
 
 describe("bin/server.js", () => {
-    var apiServer, config, containerValues, docoptArgs;
+    var apiServer, config, containerValues, neodocArgs;
 
     beforeEach(() => {
         apiServer = jasmine.createSpy("apiServer");
-        docoptArgs = {};
+        neodocArgs = {};
         containerValues = {
             apiServer,
             bootstrap() {
@@ -21,8 +21,10 @@ describe("bin/server.js", () => {
                 };
             },
             config,
-            docopt: jasmine.createSpy("docopt").andReturn(docoptArgs),
             logger: require("../mock/logger-mock")(),
+            neodoc: {
+                run: jasmine.createSpy("neodoc").andReturn(neodocArgs)
+            },
             path: require("path"),
             util: require("../mock/util-mock")()
         };
@@ -46,16 +48,8 @@ describe("bin/server.js", () => {
     afterEach(() => {
         mockRequire.stopAll();
     });
-    it("shows help and does nothing else when --help is used", () => {
-        docoptArgs.help = true;
-        spyOn(console, "log");
-        mockRequire.reRequire("../../bin/server.js");
-        expect(console.log).toHaveBeenCalled();
-        expect(containerValues.config).not.toBeDefined();
-        expect(apiServer).not.toHaveBeenCalled();
-    });
     it("uses override files", () => {
-        docoptArgs.override = "/override.json";
+        neodocArgs["--override"] = "/override.json";
         mockRequire.reRequire("../../bin/server.js");
         expect(containerValues.config).toEqual({
             deep: "merge"
