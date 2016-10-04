@@ -1,7 +1,7 @@
 "use strict";
 
 describe("registrationManager", () => {
-    var accountManagerMock, emailMock, factory, promiseMock, randomMock, storageService, totpMock;
+    var accountManagerMock, factory, promiseMock, randomMock, storageService, templateMock, totpMock;
 
     beforeEach(() => {
         var encodingMock, storageServiceFactoryMock;
@@ -9,7 +9,6 @@ describe("registrationManager", () => {
         encodingMock = require("../../mock/encoding-mock")();
         promiseMock = require("../../mock/promise-mock")();
         accountManagerMock = require("../../mock/manager/account-manager-mock")();
-        emailMock = require("../../mock/email-mock")();
         randomMock = require("../../mock/random-mock")();
         storageServiceFactoryMock = require("../../mock/storage-service-factory-mock")();
         storageService = storageServiceFactoryMock.instance;
@@ -26,6 +25,7 @@ describe("registrationManager", () => {
             passwordHash: "hashed password",
             passwordHashConfig: "passwordHashConfig"
         }));
+        templateMock = require("../../mock/template-mock")();
         totpMock = require("../../mock/mfa/totp-mock")();
         factory = () => {
             var config;
@@ -41,7 +41,7 @@ describe("registrationManager", () => {
                 }
             };
 
-            return require("../../../lib/manager/registration-manager")(accountManagerMock, config, emailMock, encodingMock, promiseMock, randomMock, storageServiceFactoryMock, totpMock);
+            return require("../../../lib/manager/registration-manager")(accountManagerMock, config, encodingMock, promiseMock, randomMock, storageServiceFactoryMock, templateMock, totpMock);
         };
     });
     it("exposes known functions", () => {
@@ -285,7 +285,7 @@ describe("registrationManager", () => {
                     passwordHash: "hashhash",
                     passwordHashConfig: "passwordHashConfig"
                 });
-                expect(emailMock.sendTemplate).toHaveBeenCalledWith("user@example.com", "registration", {
+                expect(templateMock.sendEmailAsync).toHaveBeenCalledWith("user@example.com", "registration", {
                     confirmUrl: "rendered route: registration-confirm, code:\"code\", id:\"id\""
                 });
             });

@@ -1,0 +1,46 @@
+{
+    "type": "object",
+    "properties": {
+        "engine": {
+            "type": "string",
+            "minLength": 1
+        },
+        "from": {
+            "type": "string",
+            "format": "email",
+            "minLength": 1
+        }
+    },
+    "required": [
+        "engine",
+        "from"
+    ],
+    "oneOf": [
+        {
+            "properties": {
+                "engine": {
+                    "enum": [
+                        "ses"
+                    ]
+                },
+                "ses": {
+                    "type": "object",
+                    "properties": {
+                        "accessKeyId": {
+                            "type": "string",
+                            "minLength": 1
+                        },
+                        "region": {
+                            "type": "string",
+                            "minLength": 1
+                        },
+                        "secretAccessKey": {
+                            "type": "string",
+                            "minLength": 1
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

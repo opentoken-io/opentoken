@@ -13,6 +13,9 @@
         "debug": {
             "type": "boolean"
         },
+        "email": {
+            "$ref": "email.json"
+        },
         "encryption": {
             "$ref": "encryption.json"
         },
@@ -36,6 +39,9 @@
         },
         "storage": {
             "$ref": "storage.json"
+        },
+        "template": {
+            "$ref": "template.json"
         },
         "token": {
             "$ref": "token.json"

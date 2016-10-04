@@ -51,6 +51,7 @@
         "glob": "^7.1.0",
         "helmet": "^2.2.0",
         "moment": "^2.15.1",
+        "mustache": "^2.2.1",
         "neodoc": "^0.10.1",
         "parse-link-header": "opentoken-io/parse-link-header#multiple-links",
         "request": "^2.75.0",

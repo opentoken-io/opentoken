@@ -6,6 +6,10 @@
             "type": "integer",
             "minimum": 8
         },
+        "emailTemplate": {
+            "type": "string",
+            "minLength": 1
+        },
         "idHash": {
             "$ref": "../meta/hash-derivation.json"
         },
@@ -23,6 +27,7 @@
     },
     "required": [
         "confirmationCodeLength",
+        "emailTemplate",
         "idHash",
         "idLength",
         "lifetime",

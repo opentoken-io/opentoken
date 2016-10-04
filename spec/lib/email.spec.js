@@ -1,18 +1,45 @@
 "use strict";
 
 describe("email", () => {
-    var email;
+    var containerMock, create;
 
     beforeEach(() => {
-        var loggerMock;
-
-        loggerMock = require("../mock/logger-mock")();
-        email = require("../../lib/email")(loggerMock);
+        containerMock = jasmine.createSpyObj("containerMock", [
+            "call"
+        ]);
+        create = (config) => {
+            return require("../../lib/email")(config, containerMock);
+        };
     });
-    it("exposes sendTemplate", () => {
-        expect(email.sendTemplate).toEqual(jasmine.any(Function));
-
-        // This is only for coverage.  The function itself does nothing.
-        email.sendTemplate("test@example.com", "test-email", {});
+    it("finds an email engine", () => {
+        expect(() => {
+            create({
+                email: {
+                    engine: "ses"
+                }
+            });
+        }).not.toThrow();
+        expect(containerMock.call).toHaveBeenCalled();
+    });
+    it("throws an error without configuration options set", () => {
+        expect(() => {
+            create({});
+        }).toThrow();
+    });
+    it("throws an error without email engine configured", () => {
+        expect(() => {
+            create({
+                email: {}
+            });
+        }).toThrow();
+    });
+    it("throws an error for an engine which does not exist", () => {
+        expect(() => {
+            create({
+                email: {
+                    engine: "notThere"
+                }
+            });
+        }).toThrow("Could not find email engine: notThere");
     });
 });
