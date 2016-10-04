@@ -38,7 +38,7 @@ module.exports = (server, path, options) => {
                                 title: "account"
                             }
                         });
-                        res.send(204);
+                        res.send(201);
                     }).then(next, next);
                 }
             ]
