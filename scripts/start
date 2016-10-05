@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+# Build the command
+startCommand=(node bin/server.js)
+
+# Check for the presence of an override file
+if [[ -e "override.json" ]]; then
+    startCommand+=("--override=override.json")
+fi
+
+# Start the server
+"${startCommand[@]}"
+
+# Even if the server died because of an exception or because of SIGINT,
+# return a 0 status code so npm doesn't throw up a page of error messages.
+:
