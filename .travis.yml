@@ -5,10 +5,6 @@ node_js:
     - "5.0"
     - "5"
     - "6.0"
-    - "6.5"
-# Version 6.6 failed due to a bug in its source code. A link to the issue can
-# be found here:
-# https://github.com/nodejs/node/issues/8571
-#    - "6"
+    - "6"
 before_install:
     - "npm install -g npm@latest"
