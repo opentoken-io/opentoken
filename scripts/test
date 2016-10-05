@@ -7,7 +7,14 @@ set -eEo pipefail
 istanbul cover jasmine-node node_modules/jasmine-test-helpers/lib/ --captureExceptions spec/
 
 # Check the code coverage.
-codecov
+if [[ "$CI" == "true" ]]; then
+    codecov
+else
+    # Easiest way to generate coverage files and not upload the report
+    # is to use --dump.
+    echo "Executing codecov and generating coverage report."
+    codecov --dump > /dev/null
+fi
 
 # Verify the coding standards are enforced.
 eslint .
