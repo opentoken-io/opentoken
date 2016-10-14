@@ -8,15 +8,15 @@ Tools required:
 * node and npm
 * zip
 
-This guide is a bit terse and assumes that your hard drive is encrypted.  We don't want encryption keys leaking out to the world because a laptop was stolen.
+This guide is a bit terse and assumes that your hard drive is encrypted.  We don't want encryption keys leaking out to the world because of a stolen laptop.
 
-1. Clone the repository somewhere new.
+1. Download and extract.  This automatically creates an `opentoken-master` folder.
 
-        git clone https://github.com/opentoken-io/opentoken.git release
+        curl -s https://codeload.github.com/opentoken-io/opentoken/tar.gz/master | tar xvzf -
 
 2. Install modules.
 
-        cd release
+        cd opentoken-master
         npm install
 
 3. Decrypt the encryption key and the override files.
@@ -29,13 +29,18 @@ This guide is a bit terse and assumes that your hard drive is encrypted.  We don
         npm test
 
 5. If that fails, **stop here**.
-6. Create an archive.
+6. Prune the development dependencies and clean out unnecessary files.
 
-        zip -r9 ../opentoken-$(date --utc +"%Y-%m-%d-%H-%M-%S").zip * .[^.]* --exclude .git/\* --exclude coverage/\*
+        npm prune --production
+        rm -rf coverage
 
-7. Login to the [AWS Console](https://opentoken-io.signin.aws.amazon.com/console).
-8. Upload the archive to Elastic Beanstalk.
-9. Wipe the release folder or at least delete `encryption.key`.
+7. Create an archive.
+
+        zip -r9 ../opentoken-$(date --utc +"%Y-%m-%d-%H-%M-%S").zip ./
+
+8. Login to the [AWS Console](https://opentoken-io.signin.aws.amazon.com/console).
+9. Upload the archive to Elastic Beanstalk.
+10. Wipe the release folder or at least delete `encryption.key`.
 
 Isn't it sweet using AWS for deployment?
 

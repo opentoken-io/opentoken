@@ -1,10 +1,10 @@
 "use strict";
 
 describe("email/ses", () => {
-    var ses, sesInstance;
+    var configMock, create, sesInstance;
 
     beforeEach(() => {
-        var awsSdkMock, configMock, path, promiseMock, utilMock;
+        var awsSdkMock, path, promiseMock, utilMock;
 
         /**
          * Fake S3 class
@@ -36,48 +36,70 @@ describe("email/ses", () => {
             email: {
                 from: "testUser@example.com",
                 ses: {
-                    some: "settings"
+                    accessKeyId: "abcd",
+                    some: "settings",
+                    secretAccessKey: "efgh"
                 }
             }
         };
         path = require("path");
         promiseMock = require("../../mock/promise-mock")();
         utilMock = require("../../mock/util-mock")();
-
-        ses = require("../../../lib/email/ses")(awsSdkMock, configMock, path, promiseMock, utilMock);
+        create = () => {
+            return require("../../../lib/email/ses")(awsSdkMock, configMock, path, promiseMock, utilMock);
+        };
     });
     it("initializes awsSdk", () => {
+        create();
+        expect(sesInstance).not.toBe(null);
+        expect(sesInstance.params).toEqual({
+            accessKeyId: "abcd",
+            some: "settings",
+            secretAccessKey: "efgh"
+        });
+    });
+    it("eliminates empty keys", () => {
+        configMock.email.ses.accessKeyId = "";
+        configMock.email.ses.secretAccessKey = "";
+        create();
         expect(sesInstance).not.toBe(null);
         expect(sesInstance.params).toEqual({
             some: "settings"
         });
     });
-    it("sends an email", () => {
-        return ses.sendAsync("dest@example.com", "subj trimmed\n", "text untrimmed\n", "html untrimmed\n").then(() => {
-            expect(sesInstance.sendEmail).toHaveBeenCalledWith({
-                Destination: {
-                    ToAddresses: [
-                        "dest@example.com"
-                    ]
-                },
-                Message: {
-                    Body: {
-                        Html: {
-                            Charset: "utf-8",
-                            Data: "html untrimmed\n"
+    describe("with an instance", () => {
+        var ses;
+
+        beforeEach(() => {
+            ses = create();
+        });
+        it("sends an email", () => {
+            return ses.sendAsync("dest@example.com", "subj trimmed\n", "text untrimmed\n", "html untrimmed\n").then(() => {
+                expect(sesInstance.sendEmail).toHaveBeenCalledWith({
+                    Destination: {
+                        ToAddresses: [
+                            "dest@example.com"
+                        ]
+                    },
+                    Message: {
+                        Body: {
+                            Html: {
+                                Charset: "utf-8",
+                                Data: "html untrimmed\n"
+                            },
+                            Text: {
+                                Charset: "utf-8",
+                                Data: "text untrimmed\n"
+                            }
                         },
-                        Text: {
+                        Subject: {
                             Charset: "utf-8",
-                            Data: "text untrimmed\n"
+                            Data: "subj trimmed"
                         }
                     },
-                    Subject: {
-                        Charset: "utf-8",
-                        Data: "subj trimmed"
-                    }
-                },
-                Source: "testUser@example.com"
-            }, jasmine.any(Function));
+                    Source: "testUser@example.com"
+                }, jasmine.any(Function));
+            });
         });
     });
 });

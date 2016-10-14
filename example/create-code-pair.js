@@ -10,11 +10,11 @@ var container, exampleLib, hash, neodoc;
  */
 function usageHelp() {
     return `
-Example script to create a set of API keys for OpenToken.
+Example script to create a set of API access codes for OpenToken.
 
 Usage:
 
-    create-api-keys.js [OPTIONS]
+    create-code-pair.js [OPTIONS]
 
 Options:
 
@@ -22,7 +22,7 @@ Options:
                         the use of the OPENTOKEN_ACCOUNT environment variable.
     --api=URL           Specify the API URL.  This would override the use of
                         OPENTOKEN_API environment variable.
-    --description=DESC  Set a description for the set of keys.
+    --description=DESC  Set a description for the set of codes.
     --help, -h          Show this help message.
     --mfa=KEY           Assigns the Base32 encoded MFA key.  Using this as
                         a command-line argument is insecure.  You should prefer
@@ -102,7 +102,7 @@ function main() {
         accessCodeRequest = {
             description
         };
-        console.log("Requesting set of API keys");
+        console.log("Requesting set of API access codes");
 
         return exampleLib.postLinkAsync(res.link.service.account_accessCode, accessCodeRequest);
     }).then((res) => {
@@ -116,7 +116,7 @@ function main() {
     });
 }
 
-container = require("../lib/dependencies.js");
+container = require("../lib/container");
 exampleLib = require("./example-lib");
 hash = container.resolve("hash");
 neodoc = require("neodoc");

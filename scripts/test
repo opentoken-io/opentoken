@@ -9,11 +9,16 @@ istanbul cover jasmine-node node_modules/jasmine-test-helpers/lib/ --captureExce
 # Check the code coverage.
 if [[ "$CI" == "true" ]]; then
     codecov
-else
+elif [[ -d ".git" ]]; then
     # Easiest way to generate coverage files and not upload the report
     # is to use --dump.
     echo "Executing codecov and generating coverage report."
     codecov --dump > /dev/null
+else
+    # codecov runs git and hg.  If the folder is not under source control,
+    # codecov breaks with some nasty error.  This situation happens during
+    # deployment, so we just don't worry about coverage during deployment.
+    echo "Not running code coverage report."
 fi
 
 # Verify the coding standards are enforced.
