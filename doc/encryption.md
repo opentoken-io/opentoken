@@ -1,6 +1,8 @@
 Encryption
 ==========
 
+This document describes the configuration options controlling the methods of encrypting records.  The [record encryption](record-encryption.md) is discussed separately.  The rest of the configuration options are also [explained in detail](config.md).
+
 The `encryption` options in the `config.json` allow you to select the cipher, hash, key digests and iterations for your security needs.  There's a "primary" and a "secondary" configuration, where "primary" is always used and "secondary" may be used in addition to the primary.
 
     "encryption": {
