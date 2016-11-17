@@ -1,7 +1,7 @@
 "use strict";
 
 describe("storage/s3", () => {
-    var awsSdkMock, promiseMock, s3;
+    var awsSdkMock, config, create, promiseMock;
 
     beforeEach(() => {
         /**
@@ -14,6 +14,7 @@ describe("storage/s3", () => {
              * @param {*} params No influence on this class
              */
             constructor(params) {
+                awsSdkMock.lastInstance = this;
                 this.params = params;
                 this.getObjectAsync = jasmine.createSpy("getObjectAsync");
                 this.getObjectAsync.andCallFake(() => {
@@ -35,130 +36,147 @@ describe("storage/s3", () => {
         }
         promiseMock = require("../../mock/promise-mock")();
         awsSdkMock = {
-            S3: S3Fake,
-            config: {
-                region: null
-            }
+            S3: S3Fake
         };
-        s3 = require("../../../lib/storage/s3")(awsSdkMock, {
+        config = {
             storage: {
                 s3: {
+                    accessKeyId: "akey",
                     bucket: "test-bucket",
-                    region: "us-east-1"
+                    region: "us-east-1",
+                    secretAccessKey: "skey"
                 }
             }
-        }, promiseMock);
+        };
+        create = () => {
+            return require("../../../lib/storage/s3")(awsSdkMock, config, promiseMock);
+        };
     });
-    describe(".configure()", () => {
-        it("sets up the S3 object", () => {
-            awsSdkMock.S3 = jasmine.createSpy("awsSdkMock.S3");
-            expect(awsSdkMock.config.region).toBe("us-east-1");
-            s3.transit();
-            expect(awsSdkMock.S3).toHaveBeenCalledWith({
+    describe("initial configuration", () => {
+        it("deletes empty AWS credentials", () => {
+            config.storage.s3.accessKeyId = "";
+            config.storage.s3.secretAccessKey = "";
+            create().transit();
+            expect(awsSdkMock.lastInstance.params).toEqual({
                 params: {
-                    Bucket: "test-bucket"
-                }
-            });
-        });
-    });
-    describe(".transit()", () => {
-        it("should only make (call) the S3 object once", () => {
-            awsSdkMock.S3 = jasmine.createSpy("awsSdkMock.S3");
-            s3.transit();
-            s3.transit();
-            expect(awsSdkMock.S3.calls.length).toBe(1);
-        });
-    });
-    describe(".deleteAsync()", () => {
-        it("deletes a file", () => {
-            return s3.deleteAsync("afile").then((val) => {
-                expect(val).toEqual({
-                    Key: "afile"
-                });
-            });
-        });
-    });
-    describe(".getAsync()", () => {
-        it("gets an object back", () => {
-            return s3.getAsync("afile").then((val) => {
-                expect(val).toEqual(jasmine.any(Buffer));
-            });
-        });
-    });
-    describe(".listAsync()", () => {
-        it("gets top level list", () => {
-            return s3.listAsync().then((val) => {
-                expect(val).toEqual({
-                    Prefix: null
-                });
-            });
-        });
-        it("gets a list by passing in a prefix", () => {
-            return s3.listAsync("accounts").then((val) => {
-                expect(val).toEqual({
-                    Prefix: "accounts"
-                });
-            });
-        });
-    });
-    describe(".putAsync()", () => {
-        it("puts to s3 with content as a string", () => {
-            return s3.putAsync("string", "this is a string").then((val) => {
-                expect(val).toEqual({
-                    Body: jasmine.any(Buffer),
+                    Bucket: "test-bucket",
                     ContentType: "application/octet-stream",
-                    Key: "string",
                     ServerSideEncryption: "AES256"
-                });
+                },
+                region: "us-east-1"
             });
         });
-        it("puts to s3 with contents as a buffer", () => {
-            return s3.putAsync("buffer", new Buffer("this is a buffer", "binary")).then((val) => {
-                expect(val).toEqual({
-                    Body: jasmine.any(Buffer),
+        it("sets up the S3 object", () => {
+            create().transit();
+            expect(awsSdkMock.lastInstance.params).toEqual({
+                accessKeyId: "akey",
+                params: {
+                    Bucket: "test-bucket",
                     ContentType: "application/octet-stream",
-                    Key: "buffer",
                     ServerSideEncryption: "AES256"
+                },
+                region: "us-east-1",
+                secretAccessKey: "skey"
+            });
+        });
+    });
+    describe("on an instance", () => {
+        var s3;
+
+        beforeEach(() => {
+            s3 = create();
+        });
+        describe(".transit()", () => {
+            it("should only make (call) the S3 object once", () => {
+                awsSdkMock.S3 = jasmine.createSpy("awsSdkMock.S3");
+                s3.transit();
+                s3.transit();
+                expect(awsSdkMock.S3.calls.length).toBe(1);
+            });
+        });
+        describe(".deleteAsync()", () => {
+            it("deletes a file", () => {
+                return s3.deleteAsync("afile").then((val) => {
+                    expect(val).toEqual({
+                        Key: "afile"
+                    });
                 });
             });
         });
-        it("puts to s3 with options", () => {
-            return s3.putAsync("options", "file contents", {
-                contentType: "text/plain",
-                expires: "a date"
-            }).then((val) => {
-                expect(val).toEqual({
-                    Body: jasmine.any(Buffer),
-                    ContentType: "text/plain",
-                    Expires: "a date",
-                    Key: "options",
-                    ServerSideEncryption: "AES256"
+        describe(".getAsync()", () => {
+            it("gets an object back", () => {
+                return s3.getAsync("afile").then((val) => {
+                    expect(val).toEqual(jasmine.any(Buffer));
                 });
             });
         });
-        it("puts to s3 with content type option", () => {
-            return s3.putAsync("options", "file contents", {
-                contentType: "text/plain"
-            }).then((val) => {
-                expect(val).toEqual({
-                    Body: jasmine.any(Buffer),
-                    ContentType: "text/plain",
-                    Expires: null,
-                    Key: "options",
-                    ServerSideEncryption: "AES256"
+        describe(".listAsync()", () => {
+            it("gets top level list", () => {
+                return s3.listAsync().then((val) => {
+                    expect(val).toEqual({
+                        Prefix: null
+                    });
+                });
+            });
+            it("gets a list by passing in a prefix", () => {
+                return s3.listAsync("accounts").then((val) => {
+                    expect(val).toEqual({
+                        Prefix: "accounts"
+                    });
                 });
             });
         });
-        it("puts to s3 with expires option", () => {
-            return s3.putAsync("options", "file contents", {
-                expires: "a date"
-            }).then((val) => {
-                expect(val).toEqual({
-                    Body: jasmine.any(Buffer),
-                    ContentType: "application/octet-stream",
-                    Expires: "a date",
-                    Key: "options",
-                    ServerSideEncryption: "AES256"
+        describe(".putAsync()", () => {
+            it("puts to s3 with content as a string", () => {
+                return s3.putAsync("string", "this is a string").then((val) => {
+                    expect(val).toEqual({
+                        Body: jasmine.any(Buffer),
+                        Key: "string"
+                    });
+                });
+            });
+            it("puts to s3 with contents as a buffer", () => {
+                return s3.putAsync("buffer", new Buffer("this is a buffer", "binary")).then((val) => {
+                    expect(val).toEqual({
+                        Body: jasmine.any(Buffer),
+                        Key: "buffer"
+                    });
+                });
+            });
+            it("puts to s3 with options", () => {
+                return s3.putAsync("options", "file contents", {
+                    contentType: "text/plain",
+                    expires: "a date"
+                }).then((val) => {
+                    expect(val).toEqual({
+                        Body: jasmine.any(Buffer),
+                        ContentType: "text/plain",
+                        Expires: "a date",
+                        Key: "options"
+                    });
+                });
+            });
+            it("puts to s3 with content type option", () => {
+                return s3.putAsync("options", "file contents", {
+                    contentType: "text/plain"
+                }).then((val) => {
+                    expect(val).toEqual({
+                        Body: jasmine.any(Buffer),
+                        ContentType: "text/plain",
+                        Expires: null,
+                        Key: "options"
+                    });
+                });
+            });
+            it("puts to s3 with expires option", () => {
+                return s3.putAsync("options", "file contents", {
+                    expires: "a date"
+                }).then((val) => {
+                    expect(val).toEqual({
+                        Body: jasmine.any(Buffer),
+                        Expires: "a date",
+                        Key: "options"
+                    });
                 });
             });
         });

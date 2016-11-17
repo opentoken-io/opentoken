@@ -21,6 +21,10 @@
                 "s3": {
                     "type": "object",
                     "properties": {
+                        "accessKeyId": {
+                            "type": "string",
+                            "minLength": 1
+                        },
                         "bucket": {
                             "type": "string",
                             "minLength": 1
@@ -39,6 +43,10 @@
                                 "ap-southeast-2",
                                 "sa-east-1"
                             ]
+                        },
+                        "secretAccessKey": {
+                            "type": "string",
+                            "minLength": 1
                         }
                     },
                     "required": [

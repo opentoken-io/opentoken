@@ -107,10 +107,10 @@
         }
     },
     "record": {
+        "encryptionKeyFile": "encryption.key",
         "lifetimeMaximum": {
             "months": 6
-        },
-        "encryptionKeyFile": "encryption.key"
+        }
     },
     "registration": {
         "confirmationCodeLength": 32,
@@ -164,8 +164,10 @@
     "storage": {
         "engine": "s3",
         "s3": {
+            "accessKeyId": "",
             "bucket": "opentoken-io-api",
-            "region": "us-east-1"
+            "region": "us-east-1",
+            "secretAccessKey": ""
         }
     },
     "template": {

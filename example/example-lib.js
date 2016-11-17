@@ -266,7 +266,7 @@ function totpCode(keyBase32, offset) {
 
 
 Bluebird = require("bluebird");
-container = require("../lib/dependencies.js");
+container = require("../lib/container");
 encoding = container.resolve("encoding");
 parseLinkHeader = require("parse-link-header");
 requestLibAsync = Bluebird.promisify(require("request"));

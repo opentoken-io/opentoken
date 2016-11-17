@@ -105,7 +105,7 @@ function main() {
     });
 }
 
-container = require("../lib/dependencies.js");
+container = require("../lib/container");
 exampleLib = require("./example-lib");
 hash = container.resolve("hash");
 neodoc = require("neodoc");
