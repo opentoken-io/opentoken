@@ -21,6 +21,14 @@ module.exports = (server, pathUrl, options) => {
                             title: "account-login"
                         },
                         {
+                            href: `${server.router.render("account-token-create", {
+                                accountId: "TEMPLATED"
+                            }).replace("TEMPLATED", "{accountId}")}{?public}`,
+                            profile: "/schema/account/token-create-request.json",
+                            templated: true,
+                            title: "account-token-create"
+                        },
+                        {
                             href: server.router.render("health-check"),
                             title: "health-check"
                         },

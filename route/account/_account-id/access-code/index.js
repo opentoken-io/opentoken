@@ -33,6 +33,18 @@ module.exports = (server, path, options) => {
                     accessCodeManager.createAsync(req.params.accountId, req.body).then((codeInfo) => {
                         // Convert the OtDate to a string
                         codeInfo.expires = codeInfo.expires.toString();
+
+                        // This does not have a "self" link because no
+                        // resource is actually created.  That's not following
+                        // Hypermedia very well.
+                        res.links({
+                            up: {
+                                href: server.router.render("account", {
+                                    accountId: req.params.accountId
+                                }),
+                                title: "account"
+                            }
+                        });
                         res.send(201, codeInfo);
                     }).then(next, next);
                 }

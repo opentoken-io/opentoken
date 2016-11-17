@@ -25,10 +25,11 @@ module.exports = (server, path, options) => {
                                     title: "account-logout"
                                 },
                                 {
-                                    href: server.router.render("account-token-create", {
+                                    href: `${server.router.render("account-token-create", {
                                         accountId: req.params.accountId
-                                    }),
+                                    })}{?public}`,
                                     profile: "/schema/account/token-create-request.json",
+                                    templated: true,
                                     title: "account-token-create"
                                 }
                             ]
