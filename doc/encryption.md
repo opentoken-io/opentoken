@@ -37,7 +37,7 @@ Properties
 
 The structure for the primary and secondary encryption layers are identical, so they will not be discussed individually.
 
-All of the algorithms and hashes must be defined in the `ciphers-and-hashes.js` file.  Look there if you want to know what values are supported.
+All the algorithms and hashes must be defined in the `ciphers-and-hashes.js` file.  Look there if you want to know what values are supported.
 
 * `cipher.algorithm` - [cipher] Encryption algorithm.
 * `cipher.digest` - [hash] The hashing digest used for secure key generation.

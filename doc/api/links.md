@@ -17,7 +17,7 @@ A `self` link is always returned with the resource.  It will reflect the URI req
 
     Link: </>; rel="up"; title="self-discovery"
 
-This link relation will allow the API consumer to always return to the root of the service and find all of the other services that we offer.
+This link relation will allow the API consumer to always return to the root of the service and find all the other services that we offer.
 
 
 Additional Link Relations
@@ -30,14 +30,14 @@ Additional Link Relations
 
 The starting point for services are advertised with a `service` link.  Service titles are consistent throughout the service and will not change unless the service changes drastically.
 
-When there is a `profile` attribute, that defines the data that should be sent in the request.  Typically a POST request should be used, with a 201 response code for successful creation.  At times, such as when looking up an account, there is a `profile` attribute and all of the data fields are in the URI.  Situations like that would indicate that the requester should use a GET instead of POST.
+When there is a `profile` attribute, that defines the data that should be sent in the request.  Typically, a POST request should be used, with a 201 response code for successful creation.  At times, such as when looking up an account, there is a `profile` attribute and all the data fields are in the URI.  Situations like that would indicate that the requester should use a GET instead of POST.
 
     Link: </registration/NrV3togfnHmutqNVIhUm0Mg7/qr/>; rel="item";
         title="registration-secure-qr"
 
 When there is a list or collection of related documents, there will be `item` links on the parent document to each of the child documents.
 
-    Link: </registration/NrV3togfnHmutqNVIhUm0Mg7/"; rel="edit";
+    Link: </registration/NrV3togfnHmutqNVIhUm0Mg7/>; rel="edit";
         profile="/schema/registration/secure-request.json";
         title="registration-secure"
 
@@ -57,9 +57,9 @@ Templated Links
 
 The link above is a templated URI.  The `{accountId}` parameter is defined in the JSON Schema that is referenced in the `profile` attribute.  It is necessary that the client is able to parse and use templated URIs.  For instance, to login to the account ID `VD1kTObHqH36Px3KXMv0JoEi`, the URI would look like this:
 
-    https://api.opentoken.io//account/VD1kTObHqH36Px3KXMv0JoEi/login
+    https://api.opentoken.io/account/VD1kTObHqH36Px3KXMv0JoEi/login
 
-This endpoint has additional properties in the schema, so the login request will need to be a POST.
+This endpoint has additional properties in the schema, so login requests will need to be sent via a POST.
 
 
 Further Reading

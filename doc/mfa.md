@@ -1,7 +1,7 @@
 Multi-Factor Authentication (MFA)
 =================================
 
-OpenToken.io requires the use of MFA to ensure that the right person is logging in as opposed to someone guessing a password, a keylogger stealing a password, or other unintended accesses of the secrets stored in the service.
+OpenToken.io requires the use of MFA to ensure that the right person is logging in as opposed to someone who guesses a password, a keylogger stealing a password, or other unintended accesses of the secrets stored in the service.
 
 The configuration in `config.json` uses the following properties.
 

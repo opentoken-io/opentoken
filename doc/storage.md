@@ -4,7 +4,7 @@ Storage
 Configuration
 -------------
 
-The `storage` options in `config.json` help to handle many facets of how storage is accomplished in OpenToken.io. Setting `engine` to your desired code in the storage directory will let set up the application to be able to inject your desired engine into code where it will be needed.  It is advisable to set up specific engine configuration options in it's own property.
+The `storage` options in `config.json` help to handle many facets of how storage is accomplished in OpenToken.io. Setting `engine` to your desired code in the storage directory will let set up the application to be able to inject your desired engine into code where it will be needed.  It is advisable to set up specific engine configuration options in its own property.
 
     "storage": {
         "engine": "s3",

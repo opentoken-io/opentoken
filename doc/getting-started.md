@@ -1,7 +1,9 @@
 Getting Started
 ===============
 
-To use the API you must first sign up for it.  There's scripts in the [`../example/`](../example/) folder that will help you out.
+To use the API you must first sign up for it.  There are scripts in the [`../example/`](../example/) folder that will help you out.
+
+This is not documenting the API.  There's [way better documentation](api/self-discovery.md) available for that.  This only runs through the example commands.
 
 
 Creating an Account
@@ -44,7 +46,7 @@ Signing a request to OpenToken.io is easier than AWS but based on the same princ
     unset HISTFILE  # Turn off shell history so your password isn't stored
     export OPENTOKEN_CODE=YOUR_API_CODE
     export OPENTOKEN_SECRET=YOUR_API_SECRET
-    ./signed-request POST /account/ACCOUNT_ID/token/ text/plain tokenize-me.txt
+    ./signed-request.sh POST /account/ACCOUNT_ID/token/ text/plain tokenize-me.txt
 
 This will write out the response.  Inside there will be a `Location` header, with the appropriate portions changed into real IDs.
 
@@ -52,6 +54,6 @@ This will write out the response.  Inside there will be a `Location` header, wit
 
 To retrieve a token you issue a similar signed request
 
-    ./signed-request GET /account/ACCOUNT_ID/token/zzzzzzzzzz > content.txt
+    ./signed-request.sh GET /account/ACCOUNT_ID/token/zzzzzzzzzz > content.txt
 
 

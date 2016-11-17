@@ -17,9 +17,9 @@ I'm using "E" instead of "×10^" notation.  The number after the E is the number
 
 * 1E9: One billion.  A fountain pen cap (55 mm) enlarged to be one billion times larger would be able to hold the Earth inside (55,000 kilometers for the pen cap, a mere 12,742 km for Earth).
 
-* 4.3E17:  400 quadrillion.  This is our current guess as to the age of the universe in seconds.
+* 4.3E17:  430 quadrillion.  This is our current guess as to the age of the universe in seconds.
 
-* 4E19: 40 quintillion.  The grand canyon can hold about this many grains of sand.
+* 4E19: 40 quintillion.  The grand canyon can hold about this many grains of sand.  A Rubik's cube has 4.3E19 possible configurations.
 
 * 7E27: 7 octillion.  This is close to the number of atoms in an average human body.
 
@@ -39,14 +39,14 @@ Random Tokens
 
 Account IDs, tokens and other randomly generated things on the system generate a secure hash of a particular length.  Secure hashes are made by getting random bytes and encoding them with base64, so each character in the ID can be one of 64 different values.
 
-By default we use identifiers of 32 bytes, though the configuration file may be altered to pick nearly any size you like.  Our validation forces identifiers to be at least 8 bytes.  Trying to guess one of these generated identifiers is very hard.
+By default, we use identifiers of 32 bytes, though the configuration file may be altered to pick nearly any size you like.  Our validation forces identifiers to be at least 8 bytes.  Trying to guess one of these generated identifiers is very hard.
 
 * 8 bytes (the minimum) = 2.8E14 (about 281,474,976,700,000)
 * 32 bytes (our default) = 6.2E57
 
 This means each atom on Earth can have a million accounts on our system and that would consume 20% of the total accounts available, give or take.
 
-The reason these figures are important is because we encrypt data with the real account ID and the token ID.  Even we can not read your data until the moment you are requesting it!  Keeping it safe from everyone, including us, is very important.
+The reason these figures are important is that we encrypt data with the real account ID and the token ID.  Even we can not read your data until the moment you are requesting it!  Keeping it safe from everyone, including us, is very important.
 
 
 Encryption Strength
@@ -64,7 +64,7 @@ First, we must break AES.  The key size that is used is 32 bytes.  That's 2^256 
 
 Whirlpool uses a similarly sized key of 32 bytes.  Again, the number of possibilities for scanning the entire keyspace are the same.  Because it's implemented slower, the supercomputer now takes 1.35E59 years.  The "every atom of Earth is a supercomputer" would scan all possibilities after 1 billion years (with a 50% chance after 500 million years).
 
-Because the records are stored as double-encrypted payloads, even huge advances in bypassing some of the encryption will not help tremendously because multiple different encryption mechanisms are employed.
+Because the records are stored as double-encrypted payloads, even huge advances in bypassing some encryption will not help tremendously because multiple different encryption mechanisms are employed.
 
 On a final note, assume that you have an extremely valuable secret, you've found weaknesses in the different encryption mechanisms in place, you have infinite funds to build computers and everyone wants you to succeed.  The world is attempting to crack one of the secrets stored by OpenToken.io.  Given the absurdity of the examples above, it would still take nearly two billion years to get your secret.  To put that in perspective, the sun is estimated to last another 5 billion years but Earth is not.
 
