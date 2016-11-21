@@ -193,7 +193,7 @@ First, look at the `type`. It is "pbkdf2", and that's explained by [RFC 2898](ht
 
 If you prefer some pseudocode, this is how it would work.
 
-    // Set up PBKDF2 with SHA512 and 100000 iterations
+    // Set up PBKDF2 with SHA512 and 100,000 iterations
     pbkdf2 = new Pbkdf2("sha512", 100000);
     pbkdf2.setSalt("S9KlR3C8cI.....maOsgG4AaW");
 

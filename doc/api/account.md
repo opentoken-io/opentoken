@@ -84,7 +84,7 @@ This response helps us out tremendously by providing necessary bits for calculat
         }
     }
 
-The idea is that the user will enter their password. A routine will use the configuration from the `passwordHashConfig` property to configure PBKDF2 to use a salted SHA512 for 100000 iterations and then derive 48 bytes and encode it as Base64. That result is fed into a secondary hash function, specified by the `challengeHashConfig` settings. In this case the result would have the secondary salt applied, hashed with SHA512 and the result will be encoded in hexadecimal.
+The idea is that the user will enter their password. A routine will use the configuration from the `passwordHashConfig` property to configure PBKDF2 to use a salted SHA512 for 100,000 iterations and then derive 48 bytes and encode it as Base64. That result is fed into a secondary hash function, specified by the `challengeHashConfig` settings. In this case the result would have the secondary salt applied, hashed with SHA512 and the result will be encoded in hexadecimal.
 
 Here is the same information written out in pseudocode.
 
