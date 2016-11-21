@@ -12,7 +12,7 @@ You can follow the link from [registration] where you are provided a normal link
     GET /schema/account/login-request.json HTTP/1.1
     Host: api.opentoken.io
 
-And the response is pretty straightforward.
+And the response provides the schema.
 
     HTTP/1.1 200 OK
     Content-Type: application/json; charset=utf-8
@@ -88,7 +88,7 @@ The idea is that the user will enter their password.  A routine will use the con
 
 Here is the same information written out in pseudocode.
 
-    // Set up PBKDF2 with SHA512 and 100000 iterations
+    // Set up PBKDF2 with SHA512 and 100,000 iterations
     pbkdf2 = new Pbkdf2("sha512", 100000);
     pbkdf2.setSalt("S9KlR3C8cI.....maOsgG4AaW");
 
@@ -149,7 +149,7 @@ Now that you are logged in, you can create [access code pairs](access-codes.md).
 Account Actions
 ---------------
 
-When you were done logging into your account, there was an `up` link relation that was titled `account`.  Fetch that resource to see what you can do.  Make sure your cookie is sent with the request.  Here's a [formatted example](example-formatting.md) of the GET request, with extra long bits shortened to aid readability.
+When you logged into your account, there was an `up` link relation that was titled `account`.  Fetch that resource to see what you can do.  Make sure your cookie is sent with the request.  Here's a [formatted example](example-formatting.md) of the GET request, with extra long bits shortened to aid readability.
 
     GET /account/W2l6H0vEhdurrhSDN4VjV2BlgSICpvEH
     Host: api.opentoken.io

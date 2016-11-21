@@ -1,9 +1,9 @@
 Signed Requests
 ===============
 
-Whenever you use these access codes, you are required to make signed requests.  This process ensures that the request is coming from an authenticated user and prevents replay attacks.  You will transmit the public `code` and use the private `secret` to generate the signature.
+Whenever you use these access codes, you are required to make signed requests.  This process ensures the request is coming from an authenticated user and prevents replay attacks.  You will transmit the public `code` and use the private `secret` to generate the signature.
 
-The signature process is broken down into small steps for this explanation.  First, you create a date stamp.  Next, some signed headers are formatted.  Next, some content that will be signed.  The [HMAC] of the content is calculated.  Lastly, the request has the right headers set.
+The signature process is broken down into small steps for this explanation.  First, you create a date stamp.  After that, the content will need to be signed and an [HMAC] of the content calculated.  Lastly, the request has the right headers set.
 
 
 Date Stamp
@@ -52,7 +52,7 @@ The HTTP verb must be in all uppercase.
 
 The URI path is everything after the hostname, including the first slash.  This must preserve the case.
 
-The query string includes any optional parameters.  In URIs they appear after a `?`.  If you had a URI such as `https://api.opentoken.io/test?something=true`, then this line would be `something=true`.  It would not contain the `?`.
+The query string includes any optional parameters.  In URIs they appear after a `?`.  If you had a URI such as `https://api.opentoken.io/test?something=true&count=2`, then this line would be `something=true&count=2`.  It would not contain the `?`.
 
 The formatted headers were generated in the previous section.
 
@@ -107,7 +107,7 @@ We now have everything required to make the request.  The following HTTP headers
 
     Host: api.opentoken.io
 
-This header is often automatically added by the library or tools that are used to make HTTP requests.
+This header is often automatically added by the library or tools used to make HTTP requests.
 
     Content-Type: text/plain
 

@@ -39,7 +39,7 @@ This is saying that you need to POST a JSON object that may have a `description`
         "description": "Example for Documentation"
     }
 
-When the codes are created successfully, the response will indicate that with a 201 response.
+When the codes are created successfully, the response will have a 201 status code.
 
     HTTP/1.1 201 Created
     Content-Type: application/json

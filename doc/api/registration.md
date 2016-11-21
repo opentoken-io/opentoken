@@ -1,7 +1,7 @@
 Registration
 ============
 
-Creating a new account with OpenToken.io is a non-trivial task.  The amount of data requested is minimal; the biggest hurdle is experienced because of the extra security that is required, such as setting up a MFA device.
+Creating a new account with OpenToken.io is a non-trivial task.  The amount of data requested is minimal; the biggest hurdle is experienced because of the extra security required, such as setting up a MFA device.
 
 Let's get started!  You must first find the registration [link] from the [self discovery] endpoint.  From there, you should notice that the link has a profile URI.  That's our first step.
 
@@ -238,7 +238,7 @@ This response is a bit more cryptic.
     Link: </>; rel="up"; title="self-discovery"
     Link: </registration/TN3ztPb1Lk2VaOMG_1p9wPw9Oeev7sR9>; rel="self"
 
-Not to worry; the 204 status indicates that what you have done was successful.  At this point the API is sending you an email confirmation.  Inside that email will be the random confirmation link.
+Not to worry; the 204 status indicates that what you have done was successful.  At this point, the API is sending you an email confirmation.  Inside that email will be the random confirmation link.
 
 
 Email Confirmation

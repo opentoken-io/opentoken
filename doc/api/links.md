@@ -41,7 +41,7 @@ When there is a list or collection of related documents, there will be `item` li
         profile="/schema/registration/secure-request.json";
         title="registration-secure"
 
-An `edit` link relation indicates that the current document is able to be changed.  This will include a `profile` attribute that cites a JSON schema file.  The payload that is expected will be described and validated against the JSON schema.  Successful updates will return a status code of 200.
+An `edit` link relation indicates the current document is able to be changed.  This will include a `profile` attribute citing a JSON schema file.  The payload that is expected will be described and validated against the JSON schema.  Successful updates will return a status code of 200.
 
     Link: <...>; rel="related"; title="signature-information"
 
@@ -55,7 +55,7 @@ Templated Links
         profile="/schema/account/login-request.json";
         templated="true"; title="account-login"
 
-The link above is a templated URI.  The `{accountId}` parameter is defined in the JSON Schema that is referenced in the `profile` attribute.  It is necessary that the client is able to parse and use templated URIs.  For instance, to login to the account ID `VD1kTObHqH36Px3KXMv0JoEi`, the URI would look like this:
+The link above is a templated URI.  The `{accountId}` parameter is defined in the JSON Schema referenced in the `profile` attribute.  The client must be able to parse and use templated URIs.  For instance, to login to the account ID `VD1kTObHqH36Px3KXMv0JoEi`, the URI would look like this:
 
     https://api.opentoken.io/account/VD1kTObHqH36Px3KXMv0JoEi/login
 

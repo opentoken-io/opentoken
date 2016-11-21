@@ -4,7 +4,7 @@ Account
 Configuration
 -------------
 
-The `account` options in `config.json` allow you to set how long an account is viable at times during it's lifespan. There are current only settings for `initiate` and `complete`. We want the lifetime for an initial account creation to be short so we can clean up accounts which haven't been completed and won't have numerous files sitting in [storage]. Also, we set a `complete` account to 6 months; to comply with PCI standards.
+The `account` options in `config.json` allow you to set how long an account is viable at times during its lifespan. There are currently only settings for `initiate` and `complete`. We want the lifetime for an initial account creation to be short so we can clean up accounts which haven't been completed and we won't have numerous files sitting in [storage]. Also, we set a `complete` account to expoire in 6 months; to comply with PCI standards.
 
 The object assigned to each account section is passed into the OtDate object to set the expires for each lifetime.
 
