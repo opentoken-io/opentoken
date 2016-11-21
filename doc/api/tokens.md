@@ -1,15 +1,15 @@
 Tokens
 ======
 
-Tokens can only be created by using [access code pairs](access-codes.md).  They are associated with a single [account][account].
+Tokens can only be created by using [access code pairs](access-codes.md). They are associated with a single [account][account].
 
 
 Tokenization of Data
 --------------------
 
-Any type of information can be tokenized.  Content does not matter to the API and your `Content-Type` header is preserved with the tokenized data.  The account-specific tokenization link can be found through [self-discovery](self-discovery.md) and it is also available with the [account resource][account].
+Any type of information can be tokenized. Content does not matter to the API and your `Content-Type` header is preserved with the tokenized data. The account-specific tokenization link can be found through [self-discovery](self-discovery.md) and it is also available with the [account resource][account].
 
-It has an associated profile, so let's get it now.  It will help us immensely for the templated URI.
+It has an associated profile, so let's get it now. It will help us immensely for the templated URI.
 
     GET /schema/account/token-create-request.json HTTP/1.1
     Host: api.opentoken.io
@@ -26,7 +26,7 @@ The response gives us a JSON schema.
         "properties": {
             "public": {
                 "type": "string",
-                "description": "If set to true, the token will be made public.  Default is 'false'.",
+                "description": "If set to true, the token will be made public. Default is 'false'.",
                 "enum": [
                     "false",
                     "true"
@@ -36,7 +36,7 @@ The response gives us a JSON schema.
         "required": []
     }
 
-This explains the end of the URL and indicates that we can optionally send a `?public=true` or `?public=false` at the end of the URI when creating a token.  Let's send a bit of a test right now.  This must use a [signed request] using [access code pairs](access-codes.md).
+This explains the end of the URL and indicates that we can optionally send a `?public=true` or `?public=false` at the end of the URI when creating a token. Let's send a bit of a test right now. This must use a [signed request] using [access code pairs](access-codes.md).
 
     POST /account/W2l6H0vEhdurrhSDN4VjV2BlgSICpvEH/token
     Host: api.opentoken.io
@@ -56,7 +56,7 @@ The result will indicate the new token's location.
     Link: </account/W2l6H0vEhdurrhSDN4VjV2BlgSICpvEH>; rel="up"; title="account"
     Location: /account/W2l6H0vEhdurrhSDN4VjV2BlgSICpvEH/token/_w5Szy6iBY2O6ECVZGSso6-qP6CECRDs
 
-The token's location is specified by both a link header and the `Location` header.  Fetching the token returns the original data and the original content type.  The request must be [signed][signed request] and sent to the right location.
+The token's location is specified by both a link header and the `Location` header. Fetching the token returns the original data and the original content type. The request must be [signed][signed request] and sent to the right location.
 
     GET /account/W2l6H0vEhdurrhSDN4VjV2BlgSICpvEH/token/_w5Szy6iBY2O6ECVZGSso6-qP6CECRDs
     Host: api.opentoken.io
@@ -80,7 +80,7 @@ Because everything works, we are provided the original information.
 Tokenization of Public Data
 ---------------------------
 
-It may be desirable to have unauthenticated clients retrieve the tokenized information.  The process is nearly identical to tokenizing private information.  The important part is adding the `?private=true` at the end of the URI when tokenizing information.  Creating a public token still requires a [signed request].
+It may be desirable to have unauthenticated clients retrieve the tokenized information. The process is nearly identical to tokenizing private information. The important part is adding the `?private=true` at the end of the URI when tokenizing information. Creating a public token still requires a [signed request].
 
     POST /account/W2l6H0vEhdurrhSDN4VjV2BlgSICpvEH/token?public=true
     Host: api.opentoken.io

@@ -1,9 +1,9 @@
 Encryption
 ==========
 
-This document describes the configuration options controlling the methods of encrypting records.  The [record encryption](record-encryption.md) is discussed separately.  The rest of the configuration options are also [explained in detail](config.md).
+This document describes the configuration options controlling the methods of encrypting records. The [record encryption](record-encryption.md) is discussed separately. The rest of the configuration options are also [explained in detail](config.md).
 
-The `encryption` options in the `config.json` allow you to select the cipher, hash, key digests and iterations for your security needs.  There's a "primary" and a "secondary" configuration, where "primary" is always used and "secondary" may be used in addition to the primary.
+The `encryption` options in the `config.json` allow you to select the cipher, hash, key digests and iterations for your security needs. There's a "primary" and a "secondary" configuration, where "primary" is always used and "secondary" may be used in addition to the primary.
 
     "encryption": {
         "primary": {
@@ -32,14 +32,14 @@ The `encryption` options in the `config.json` allow you to select the cipher, ha
         }
     }
 
-The above are the recommended settings for today.  As machines get more powerful, you can increase the number of iterations.  When new algorithms are designed and proved to be more secure, you can select different digests and algorithms.
+The above are the recommended settings for today. As machines get more powerful, you can increase the number of iterations. When new algorithms are designed and proved to be more secure, you can select different digests and algorithms.
 
 Properties
 ----------
 
 The structure for the primary and secondary encryption layers are identical, so they will not be discussed individually.
 
-All the algorithms and hashes must be defined in the `ciphers-and-hashes.js` file.  Look there if you want to know what values are supported.
+All the algorithms and hashes must be defined in the `ciphers-and-hashes.js` file. Look there if you want to know what values are supported.
 
 * `cipher.algorithm` - [cipher] Encryption algorithm.
 * `cipher.digest` - [hash] The hashing digest used for secure key generation.

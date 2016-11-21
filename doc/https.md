@@ -50,7 +50,7 @@ The same questions will be prompted from above except for the "extra" ones.
 Updating `config.json`
 ----------------------
 
-Once the keys are generated, they can be added under the "server" property.  Only the private key and the certificate are required.
+Once the keys are generated, they can be added under the "server" property. Only the private key and the certificate are required.
 
     {
         "server": {
@@ -63,7 +63,7 @@ Once the keys are generated, they can be added under the "server" property.  Onl
 
 When set, the server will attempt to load these files and start the server up using HTTPS.
 
-An easy way to see if this works is to go to `https://hostname:8443/`.  Replace `hostname` with your server's name or use `localhost` if developing on your own machine.  You will get a warning about not being able to verify the certificate, but you will have an encrypted connection.
+An easy way to see if this works is to go to `https://hostname:8443/`. Replace `hostname` with your server's name or use `localhost` if developing on your own machine. You will get a warning about not being able to verify the certificate, but you will have an encrypted connection.
 
 Optionally you can run the command:
 

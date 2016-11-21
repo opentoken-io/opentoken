@@ -27,7 +27,7 @@ In documented examples, only these headers are listed.
 Sample Response
 ---------------
 
-This response is mostly not formatted.  The only modification was to wrap it to have shorter lines so it displays better.  The wrapped lines are indented so this is still a valid response.
+This response is mostly not formatted. The only modification was to wrap it to have shorter lines so it displays better. The wrapped lines are indented so this is still a valid response.
 
     HTTP/1.1 204 No Content
     Cache-Control: no-store, no-cache, must-revalidate, proxy-revalidate
@@ -48,7 +48,7 @@ This response is mostly not formatted.  The only modification was to wrap it to 
     X-XSS-Protection: 1; mode=block
     Connection: keep-alive
 
-This is the same response formatted as it would appear in the documentation.  Note that the `Link` header was split into separate lines for clarity and the links may have been shortened.  It is easier to see where each link starts this way.
+This is the same response formatted as it would appear in the documentation. Note that the `Link` header was split into separate lines for clarity and the links may have been shortened. It is easier to see where each link starts this way.
 
     HTTP/1.1 204 No Content
     Link: </>; rel="up"; title="self-discovery"
@@ -61,7 +61,7 @@ This is the same response formatted as it would appear in the documentation.  No
         profile="/schema/registration/register-request.json";
         title="registration-register"
 
-Likewise, if the response contains JSON, the JSON will be formatted to be more appealing to read.  Here's an unformatted example.
+Likewise, if the response contains JSON, the JSON will be formatted to be more appealing to read. Here's an unformatted example.
 
     HTTP/1.1 200 OK
     Cache-Control: no-store, no-cache, must-revalidate, proxy-revalidate

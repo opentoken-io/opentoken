@@ -1,9 +1,9 @@
 Self Discovery
 ==============
 
-The entire API for OpenToken is self-describing because it is a Hypermedia (REST level 3) service.  The starting point for all requests is the self-discovery endpoint.  As is typical, our self-discovery endpoint is at the root.  It returns link relations to other services available to the client.
+The entire API for OpenToken is self-describing because it is a Hypermedia (REST level 3) service. The starting point for all requests is the self-discovery endpoint. As is typical, our self-discovery endpoint is at the root. It returns link relations to other services available to the client.
 
-Examples below are [simplified and formatted](example-formatting.md) for clarity.  Link headers are discussed in depth [separately][Links].
+Examples below are [simplified and formatted](example-formatting.md) for clarity. Link headers are discussed in depth [separately][Links].
 
 Sample request:
 
@@ -26,7 +26,7 @@ Sample response:
         profile="/schema/registration/register-request.json";
         title="registration-register"
 
-There is no content at the root of the API, but there are links to all the services.  As [mentioned elsewhere][Links], do not rely on the URIs in the API.  Instead, always look up the URIs by following `Link` headers.
+There is no content at the root of the API, but there are links to all the services. As [mentioned elsewhere][Links], do not rely on the URIs in the API. Instead, always look up the URIs by following `Link` headers.
 
 There are link headers to each of the following services:
 

@@ -1,13 +1,13 @@
 Using An Account
 ================
 
-During the [registration process][Registration], an account was created.  In our examples, we are using the account ID `W2l6H0vEhdurrhSDN4VjV2BlgSICpvEH`.  You should also know about [link headers](links.md).
+During the [registration process][Registration], an account was created. In our examples, we are using the account ID `W2l6H0vEhdurrhSDN4VjV2BlgSICpvEH`. You should also know about [link headers](links.md).
 
 
 Preparing to Log In
 -------------------
 
-You can follow the link from [registration] where you are provided a normal link.  Alternately, one can begin with [self-discovery](self-discovery.md) and fill in a templated link.  The link's title is `account-login` and it also has a profile.  The first thing we must do is fetch the profile.  Here's the [example] that fetches the profile:
+You can follow the link from [registration] where you are provided a normal link. Alternately, one can begin with [self-discovery](self-discovery.md) and fill in a templated link. The link's title is `account-login` and it also has a profile. The first thing we must do is fetch the profile. Here's the [example] that fetches the profile:
 
     GET /schema/account/login-request.json HTTP/1.1
     Host: api.opentoken.io
@@ -43,7 +43,7 @@ And the response provides the schema.
         ]
     }
 
-Because the `account-login` link is a "service" link relation, we know we need to start with the right information as specified in the profile.  (If you don't know this, check out the [link header explanations](links.md).)  This schema is asking for a JSON object that follows a structure like this:
+Because the `account-login` link is a "service" link relation, we know we need to start with the right information as specified in the profile. (If you don't know this, check out the [link header explanations](links.md).)  This schema is asking for a JSON object that follows a structure like this:
 
     {
         "challengeHash": "Some hashed password-related information here",
@@ -52,12 +52,12 @@ Because the `account-login` link is a "service" link relation, we know we need t
         }
     }
 
-The MFA seed was given to us during [registration], so we can calculate the current TOTP value.  The `challengeHash` property is a bit harder.  We don't have enough information yet for logging in, so we must issue a GET on the service URI.
+The MFA seed was given to us during [registration], so we can calculate the current TOTP value. The `challengeHash` property is a bit harder. We don't have enough information yet for logging in, so we must issue a GET on the service URI.
 
     GET /account/W2l6H0vEhdurrhSDN4VjV2BlgSICpvEH/login HTTP/1.1
     Host: api.opentoken.io
 
-This response helps us out tremendously by providing necessary bits for calculating this password hash.  As was the case with registration, the more lengthy values are shortened to keep the example as readable as possible.
+This response helps us out tremendously by providing necessary bits for calculating this password hash. As was the case with registration, the more lengthy values are shortened to keep the example as readable as possible.
 
     HTTP/1.1 200 OK
     Content-Type: application/json
@@ -84,7 +84,7 @@ This response helps us out tremendously by providing necessary bits for calculat
         }
     }
 
-The idea is that the user will enter their password.  A routine will use the configuration from the `passwordHashConfig` property to configure PBKDF2 to use a salted SHA512 for 100000 iterations and then derive 48 bytes and encode it as Base64.  That result is fed into a secondary hash function, specified by the `challengeHashConfig` settings.  In this case the result would have the secondary salt applied, hashed with SHA512 and the result will be encoded in hexadecimal.
+The idea is that the user will enter their password. A routine will use the configuration from the `passwordHashConfig` property to configure PBKDF2 to use a salted SHA512 for 100000 iterations and then derive 48 bytes and encode it as Base64. That result is fed into a secondary hash function, specified by the `challengeHashConfig` settings. In this case the result would have the secondary salt applied, hashed with SHA512 and the result will be encoded in hexadecimal.
 
 Here is the same information written out in pseudocode.
 
@@ -110,7 +110,7 @@ If you prefer a more mathematical representation, you could envision it like thi
 
     SHA512(PBKDF2(userPassword, passwordHashConfig.salt) + challengeHashConfig.salt)
 
-The `passwordHashConfig` will be identical to what was provided during [registration] and the result of hashing the password will be the exact same.  This is fed into a secondary hash that uses a challenge (the `challengeHash.salt` value).  The challenge is used to prevent replay attacks.  Challenges expire after a small period (a few minutes).
+The `passwordHashConfig` will be identical to what was provided during [registration] and the result of hashing the password will be the exact same. This is fed into a secondary hash that uses a challenge (the `challengeHash.salt` value). The challenge is used to prevent replay attacks. Challenges expire after a small period (a few minutes).
 
 
 Logging In
@@ -143,13 +143,13 @@ Assuming everything goes according to plan, the result will look a lot like this
 
 The cookie is created with the intent to make it easier for a web-based interface that deals directly with the API and can perform administrative actions.
 
-Now that you are logged in, you can create [access code pairs](access-codes.md).  Being logged in does not allow you access to tokenize nor detokenize data.
+Now that you are logged in, you can create [access code pairs](access-codes.md). Being logged in does not allow you access to tokenize nor detokenize data.
 
 
 Account Actions
 ---------------
 
-When you logged into your account, there was an `up` link relation that was titled `account`.  Fetch that resource to see what you can do.  Make sure your cookie is sent with the request.  Here's a [formatted example](example-formatting.md) of the GET request, with extra long bits shortened to aid readability.
+When you logged into your account, there was an `up` link relation that was titled `account`. Fetch that resource to see what you can do. Make sure your cookie is sent with the request. Here's a [formatted example](example-formatting.md) of the GET request, with extra long bits shortened to aid readability.
 
     GET /account/W2l6H0vEhdurrhSDN4VjV2BlgSICpvEH
     Host: api.opentoken.io

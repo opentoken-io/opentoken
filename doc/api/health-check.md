@@ -1,7 +1,7 @@
 Health Check
 ============
 
-The `health-check` service that is found through [self discovery](self-discovery.md) is a very simple endpoint.  It returns a successful response when the API appears to be working.  It does not perform a thorough check because it is designed to be called very often.
+The `health-check` service that is found through [self discovery](self-discovery.md) is a very simple endpoint. It returns a successful response when the API appears to be working. It does not perform a thorough check because it is designed to be called very often.
 
 Sample request:
 

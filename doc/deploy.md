@@ -8,9 +8,9 @@ Tools required:
 * node and npm
 * zip
 
-This guide is a bit terse and assumes that your hard drive is encrypted.  We don't want encryption keys leaking out to the world because of a stolen laptop.
+This guide is a bit terse and assumes that your hard drive is encrypted. We don't want encryption keys leaking out to the world because of a stolen laptop.
 
-1. Download and extract.  This automatically creates an `opentoken-master` folder.
+1. Download and extract. This automatically creates an `opentoken-master` folder.
 
         curl -s https://codeload.github.com/opentoken-io/opentoken/tar.gz/master | tar xvzf -
 
