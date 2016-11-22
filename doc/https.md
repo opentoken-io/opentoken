@@ -1,7 +1,7 @@
 HTTPS
 =====
 
-HTTPS for Open Token can be enabled by adding/updating a configuration option in config.json.
+HTTPS for OpenToken.io can be enabled by adding/updating a configuration option in config.json.
 
 The default settings do not enable HTTPS.
 
@@ -38,7 +38,7 @@ There will be several prompts for information: Below is an example for getting i
     A challenge password []:
     An optional company name []: If there is an optional company name enter it here.
 
-Do not enter a password because the config file does not support entering a passwrod at this time.
+Do not enter a password because the config file does not support entering a password at this time.
 
 This will create a Private Key file and a Certificate Signing Request file. We aren't done yet though, we still need to generate a Self-Signed Certificate file.
 
@@ -50,7 +50,7 @@ The same questions will be prompted from above except for the "extra" ones.
 Updating `config.json`
 ----------------------
 
-Once the keys are generated they can be added under the "server" property.  Only the private key and the certificate are required.
+Once the keys are generated, they can be added under the "server" property. Only the private key and the certificate are required.
 
     {
         "server": {
@@ -63,7 +63,7 @@ Once the keys are generated they can be added under the "server" property.  Only
 
 When set, the server will attempt to load these files and start the server up using HTTPS.
 
-An easy way to see if this works is to go to `https://hostname:8443/`.  Replace `hostname` with your server's name or use `localhost` if developing on your own machine.  You will get a warning about not being able to verify the certificate, but you will have an encrypted connection.
+An easy way to see if this works is to go to `https://hostname:8443/`. Replace `hostname` with your server's name or use `localhost` if developing on your own machine. You will get a warning about not being able to verify the certificate, but you will have an encrypted connection.
 
 Optionally you can run the command:
 

@@ -12,7 +12,7 @@ Inside the [main config][config], there is an `email` object whose properties co
 
 ### `email.engine`
 
-Engine to use for emails.  Engines each require their own properties to be set in the config.  Currently only `ses` is allowed.
+Engine to use for emails. Engines each require their own properties to be set in the config. Currently only `ses` is allowed.
 
 
 ### `email.from`
@@ -23,7 +23,7 @@ Email address that originates the messages.
 SES Backend
 -----------
 
-Amazon's hosting platform includes an email delivery service called Simple Email Service (SES).  Sending messages using SES requires additional configuration settings.
+Amazon's hosting platform includes an email delivery service called Simple Email Service (SES). Sending messages using SES requires additional configuration settings.
 
 You may use the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` environment variables instead of specifying the keys directly in the config file.
 
