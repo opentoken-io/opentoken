@@ -1,6 +1,20 @@
 "use strict";
 
+/**
+ * @param {Restify} server
+ * @param {string} path
+ * @param {*} options
+ * @return {Function} middleware
+ */
 module.exports = (server, path, options) => {
+    /**
+     * @param {opentoken~config} config
+     * @param {opentoken~readBodyBufferMiddleware} readBodyBufferMiddleware
+     * @param {opentoken~tokenManager} tokenManager
+     * @param {opentoken~validateRequestQueryMiddleware} validateRequestQueryMiddleware
+     * @param {opentoken~validateSignatureMiddleware} validateSignatureMiddleware
+     * @return {restifyRouterMagic~routeDef}
+     */
     return options.container.call((config, readBodyBufferMiddleware, tokenManager, validateRequestQueryMiddleware, validateSignatureMiddleware) => {
         return {
             name: "account-tokenCreate",
@@ -8,6 +22,12 @@ module.exports = (server, path, options) => {
                 readBodyBufferMiddleware(config.server.bodyBytesMaximum),
                 validateSignatureMiddleware(),
                 validateRequestQueryMiddleware("/account/token-create-request.json"),
+
+                /**
+                 * @param {restify~Request} req
+                 * @param {restify~Response} res
+                 * @param {Function} next
+                 */
                 (req, res, next) => {
                     var publicFlag;
 

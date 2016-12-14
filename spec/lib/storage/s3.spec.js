@@ -159,5 +159,22 @@ describe("storage/s3", () => {
                 });
             });
         });
+        describe(".transit()", () => {
+            it("can be safely called multiple times", () => {
+                var instance;
+
+                // The point of this test is to call .transit() multiple
+                // times and ensure it doesn't reinitialize the awsS3 object.
+                return s3.putAsync("x", "x").then(() => {
+                    // Ignore the value
+                    instance = awsSdkMock.lastInstance;
+
+                    return s3.putAsync("y", "y");
+                }).then(() => {
+                    // Ignore this value as well
+                    expect(awsSdkMock.lastInstance).toBe(instance);
+                });
+            });
+        });
     });
 });
