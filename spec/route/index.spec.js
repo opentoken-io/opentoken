@@ -24,11 +24,11 @@ jasmine.routeTester("/", null, (routeTester) => {
                         title: "account-login"
                     },
                     {
-                        href: "rendered route: account-token-create, accountId:\"{accountId}\"{?public}",
+                        href: "rendered route: account-tokenCreate, accountId:\"{accountId}\"{?public}",
                         profile: "/schema/account/token-create-request.json",
                         rel: "service",
                         templated: true,
-                        title: "account-token-create"
+                        title: "account-tokenCreate"
                     },
                     {
                         href: "rendered route: health-check",

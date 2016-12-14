@@ -50,7 +50,7 @@ jasmine.routeTester("/account/_account-id/", (container) => {
                         title: "account-logout"
                     },
                     {
-                        href: "rendered route: account-token-create, accountId:\"account-id\"{?public}",
+                        href: "rendered route: account-tokenCreate, accountId:\"account-id\"{?public}",
                         profile: "/schema/account/token-create-request.json",
                         rel: "service",
                         templated: true,
