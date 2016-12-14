@@ -3,10 +3,10 @@
 "use strict";
 
 describe("WebServer", () => {
-    var containerMock, fs, loggerMock, middlewareProfiler, promiseMock, restify, restifyRouterMagicMock, restifyServer, restMiddleware, webServer;
+    var containerMock, ErrorResponse, fsAsyncMock, loggerMock, middlewareProfiler, promiseMock, restify, restifyRouterMagicMock, restifyServer, restMiddleware, webServer;
 
     beforeEach(() => {
-        var errorResponseMock, formattersMock, randomMock, WebServer;
+        var formattersMock, randomMock, WebServer;
 
         /**
          * Set up a fake MiddlewareProfiler object
@@ -27,12 +27,12 @@ describe("WebServer", () => {
         }
 
         middlewareProfiler = null;
-        errorResponseMock = require("../mock/error-response-mock")();
         formattersMock = require("../mock/formatters-mock")();
         loggerMock = require("../mock/logger-mock")();
         promiseMock = require("../mock/promise-mock")();
+        ErrorResponse = require("../../lib/error-response")(promiseMock);
         randomMock = require("../mock/random-mock")();
-        fs = jasmine.createSpyObj("fs", [
+        fsAsyncMock = jasmine.createSpyObj("fsAsyncMock", [
             "readFileAsync"
         ]);
         restifyServer = jasmine.createSpyObj("restifyServer", [
@@ -54,7 +54,7 @@ describe("WebServer", () => {
         });
         restMiddleware = jasmine.createSpy("restMiddleware");
         containerMock = {};
-        WebServer = require("../../lib/web-server")(containerMock, errorResponseMock, formattersMock, fs, loggerMock, MiddlewareProfilerMock, promiseMock, randomMock, restify, restifyRouterMagicMock, restMiddleware);
+        WebServer = require("../../lib/web-server")(containerMock, ErrorResponse, formattersMock, fsAsyncMock, loggerMock, MiddlewareProfilerMock, promiseMock, randomMock, restify, restifyRouterMagicMock, restMiddleware);
         webServer = new WebServer({
             exceptionIdLength: 8
         });
@@ -192,7 +192,7 @@ describe("WebServer", () => {
             }, {});
         });
         it("reads certificate and key files", () => {
-            fs.readFileAsync.andCallFake((fn) => {
+            fsAsyncMock.readFileAsync.andCallFake((fn) => {
                 if (fn === "keyfile") {
                     return promiseMock.resolve("keyfile ok");
                 }
@@ -260,10 +260,10 @@ describe("WebServer", () => {
                 expect(args[0]).toBe(restifyServer);
                 args = middlewareProfiler.displayAtInterval.mostRecentCall.args;
                 expect(args.length).toBe(2);
-                expect(args[0]).toEqual(jasmine.any(Number));
-                expect(args[1]).toEqual(jasmine.any(Function));
+                expect(args[0]).toEqual(jasmine.any(Function));
+                expect(args[1]).toEqual(jasmine.any(Number));
                 expect(() => {
-                    args[1]("test");
+                    args[0]("test");
                 }).not.toThrow();
             });
         });
@@ -312,12 +312,8 @@ describe("WebServer", () => {
                     error: true
                 });
             }).then(() => {
-                expect(loggerMock.error).toHaveBeenCalled();
-                expect(res.send).toHaveBeenCalledWith(500, {
-                    logRef: "fakeLogRef",
-                    message: "Uncaught Exception: [object Object]",
-                    code: "tD2G3B7o"
-                });
+                expect(req.log).toHaveBeenCalled();
+                expect(res.send).toHaveBeenCalledWith(500, jasmine.any(ErrorResponse));
                 expect(res.write).not.toHaveBeenCalled();
             });
         });
@@ -344,7 +340,7 @@ describe("WebServer", () => {
 
                 return promiseMock.promisify(uncaughtCallback)(req, res, error);
             }).then(() => {
-                expect(loggerMock.error).toHaveBeenCalled();
+                expect(req.log).toHaveBeenCalled();
                 expect(res.send).not.toHaveBeenCalled();
                 expect(res.write).not.toHaveBeenCalled();
             });

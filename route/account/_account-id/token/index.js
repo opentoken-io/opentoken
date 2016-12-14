@@ -1,11 +1,11 @@
 "use strict";
 
 module.exports = (server, path, options) => {
-    return options.container.call((readBodyBufferMiddleware, tokenManager, validateRequestQueryMiddleware, validateSignatureMiddleware) => {
+    return options.container.call((config, readBodyBufferMiddleware, tokenManager, validateRequestQueryMiddleware, validateSignatureMiddleware) => {
         return {
-            name: "account-token-create",
+            name: "account-tokenCreate",
             post: [
-                readBodyBufferMiddleware(),
+                readBodyBufferMiddleware(config.server.bodyBytesMaximum),
                 validateSignatureMiddleware(),
                 validateRequestQueryMiddleware("/account/token-create-request.json"),
                 (req, res, next) => {

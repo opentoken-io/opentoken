@@ -1,9 +1,13 @@
 "use strict";
 
 describe("validateRequestBodyMiddleware", () => {
-    var chainMiddlewareMock, restifyPluginsMock, schemaMock, validateRequestBodyMiddleware;
+    var chainMiddlewareMock, ErrorResponse, restifyPluginsMock, schemaMock, validateRequestBodyMiddleware;
 
     beforeEach(() => {
+        var promiseMock;
+
+        promiseMock = require("../../mock/promise-mock")();
+        ErrorResponse = require("../../../lib/error-response")(promiseMock);
         chainMiddlewareMock = jasmine.createSpy("chainMiddlewareMock");
         restifyPluginsMock = jasmine.createSpyObj("restifyPlugins", [
             "bodyParser"
@@ -12,7 +16,7 @@ describe("validateRequestBodyMiddleware", () => {
             "validate"
         ]);
         schemaMock.validate.andReturn(null);
-        validateRequestBodyMiddleware = require("../../../lib/middleware/validate-request-body-middleware")(chainMiddlewareMock, restifyPluginsMock, schemaMock);
+        validateRequestBodyMiddleware = require("../../../lib/middleware/validate-request-body-middleware")(chainMiddlewareMock, ErrorResponse, restifyPluginsMock, schemaMock);
     });
     it("parses the body", () => {
         validateRequestBodyMiddleware("schema");
@@ -54,7 +58,7 @@ describe("validateRequestBodyMiddleware", () => {
                 expect(schemaMock.validate).toHaveBeenCalledWith({
                     body: true
                 }, "schema");
-                expect(res.send).toHaveBeenCalledWith(400, jasmine.any(Error));
+                expect(res.send).toHaveBeenCalledWith(400, jasmine.any(ErrorResponse));
             });
         });
     });

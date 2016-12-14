@@ -12,7 +12,7 @@
  * @return {Promise.<Function>} A Promised middleware accepting (req,res)
  */
 jasmine.formatterToPromise = (formatterName, reqMock, resMock) => {
-    var container, errorResponseMock, formatter, genericFormatterMock;
+    var container, formatter, genericFormatterMock;
 
     if (!reqMock) {
         reqMock = require("../mock/request-mock")();
@@ -23,9 +23,7 @@ jasmine.formatterToPromise = (formatterName, reqMock, resMock) => {
     }
 
     container = require("../../lib/container");
-    errorResponseMock = require("../mock/error-response-mock")();
     genericFormatterMock = require("../mock/formatter/generic-formatter-mock")();
-    container.register("errorResponse", errorResponseMock);
     container.register("genericFormatter", genericFormatterMock);
 
     // This normally would return the thing we want.  In our case we don't

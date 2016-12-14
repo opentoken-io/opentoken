@@ -1,7 +1,15 @@
 "use strict";
 
 module.exports = (server, path, options) => {
-    return options.container.call((accountManager, config, loginCookie, validateRequestBodyMiddleware) => {
+    /**
+     * @param {opentoken~accountManager} accountManager
+     * @param {opentoken~config} config
+     * @param {opentoken~ErrorResponse} ErrorResponse
+     * @param {opentoken~loginCookie} loginCookie
+     * @param {opentoken~validateRequestBodyMiddleware} validateRequestBodyMiddleware
+     * @return {restifyRouterMagic~route}
+     */
+    return options.container.call((accountManager, config, ErrorResponse, loginCookie, validateRequestBodyMiddleware) => {
         return {
             get(req, res, next) {
                 // Clear any existing cookies
@@ -46,11 +54,14 @@ module.exports = (server, path, options) => {
                         res.send(200, {
                             sessionId: login.sessionId
                         });
+
+                        next();
                     }, (err) => {
                         loginCookie.clear(req, res);
-
-                        throw err;
-                    }).then(next, next);
+                        req.log(`Login failure: ${err.toString()}`);
+                        res.send(403, new ErrorResponse("Unable to login", "gxt9zbR0AK"));
+                        next(err);
+                    });
                 }
             ]
         };

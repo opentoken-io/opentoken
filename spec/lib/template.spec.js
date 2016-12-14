@@ -37,7 +37,9 @@ describe("template", () => {
             });
         });
         it("processes a template", () => {
-            fsAsyncMock.readFileAsync.andReturn(promiseMock.resolve(new Buffer("testing {{x}} value")));
+            fsAsyncMock.readFileAsync.andCallFake(() => {
+                return promiseMock.resolve(new Buffer("testing {{x}} value"));
+            });
 
             return template.processTemplateAsync({
                 x: "XXX"

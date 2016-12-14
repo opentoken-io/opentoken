@@ -1,10 +1,10 @@
 "use strict";
 
 describe("middleware/validateSignatureMiddleware", () => {
-    var authorizedHeader, middlewareFactory, OtDateMock, signatureOt1Mock;
+    var authorizedHeader, ErrorResponse, middlewareFactory, OtDateMock, signatureOt1Mock;
 
     beforeEach(() => {
-        var configMock, errorResponseMock, promiseMock;
+        var configMock, promiseMock;
 
         // Minimal authorized header.  This would normally be
         // rejected by the version-specific signature verification.
@@ -23,16 +23,16 @@ describe("middleware/validateSignatureMiddleware", () => {
                 relatedLink: "https://example.com/signature-description"
             }
         };
-        errorResponseMock = require("../../mock/error-response-mock")();
         OtDateMock = require("../../mock/ot-date-mock")();
         promiseMock = require("../../mock/promise-mock")();
+        ErrorResponse = require("../../../lib/error-response")(promiseMock);
         signatureOt1Mock = require("../../mock/signature-ot1-mock")();
 
         // Always return the same date for the date checks.
         // We can simulate errors in other ways, shown in tests below.
         OtDateMock.now.andReturn(OtDateMock.now());
 
-        middlewareFactory = require("../../../lib/middleware/validate-signature-middleware")(configMock, errorResponseMock, OtDateMock, promiseMock, signatureOt1Mock);
+        middlewareFactory = require("../../../lib/middleware/validate-signature-middleware")(configMock, ErrorResponse, OtDateMock, promiseMock, signatureOt1Mock);
     });
     it("resulted in a middleware factory", () => {
         expect(middlewareFactory).toEqual(jasmine.any(Function));
@@ -61,11 +61,9 @@ describe("middleware/validateSignatureMiddleware", () => {
                         title: "signature-information"
                     }
                 ], resMock.linkObjects);
-                expect(resMock.send).toHaveBeenCalledWith(401, {
-                    code,
-                    logRef: "fakeLogRef",
-                    message
-                });
+                expect(resMock.send).toHaveBeenCalledWith(401, jasmine.any(ErrorResponse));
+                expect(resMock.send.mostRecentCall.args[1].code).toBe(code);
+                expect(resMock.send.mostRecentCall.args[1].message).toBe(message);
             };
         }
 

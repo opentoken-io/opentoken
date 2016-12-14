@@ -44,9 +44,11 @@ describe("accessCodeManager", () => {
     describe(".createAsync()", () => {
         describe("successful saving", () => {
             beforeEach(() => {
-                storageService.putAsync.andReturn(promiseMock.resolve({
-                    expires: "some expiration date"
-                }));
+                storageService.putAsync.andCallFake(() => {
+                    return promiseMock.resolve({
+                        expires: "some expiration date"
+                    });
+                });
             });
             it("saves the record", () => {
                 return manager.createAsync("accountId", {}).then(() => {
@@ -85,7 +87,9 @@ describe("accessCodeManager", () => {
         });
         describe("failed saving", () => {
             it("rejects the promise", () => {
-                storageService.putAsync.andReturn(promiseMock.reject("x"));
+                storageService.putAsync.andCallFake(() => {
+                    return promiseMock.reject("x");
+                });
 
                 return manager.createAsync().then(jasmine.fail, () => {
                     return;
@@ -105,7 +109,9 @@ describe("accessCodeManager", () => {
     });
     describe(".getAsync()", () => {
         it("gets from the storage service", () => {
-            storageService.getAsync.andReturn(promiseMock.resolve("record data"));
+            storageService.getAsync.andCallFake(() => {
+                return promiseMock.resolve("record data");
+            });
 
             return manager.getAsync("accountId", "code").then((result) => {
                 expect(storageService.getAsync).toHaveBeenCalledWith([

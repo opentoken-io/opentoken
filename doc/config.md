@@ -239,9 +239,9 @@ These govern the server itself, such as what hostname it advertises.
 When giving fully qualified links, the `baseUrl` is prepended to links. Make sure this does not end in a `/`, otherwise you'll generate links that may not work.
 
 
-### `server.exceptionIdLength`
+### `server.bodyBytesMaximum`
 
-When an exception generates a 500 error, the exception is assigned a randomly generated ID for the purposes of logging. The ID's length is controlled by this setting.
+When reading requests, only this many bytes will be read in the body.  This limits the maximum amount of data that can be tokenized.
 
 
 ### `server.port`
@@ -257,6 +257,12 @@ If truthy, the middleware will be profiled and log messages will be periodically
 ### `server.proxyProtocol`
 
 Enables [Proxy Protocol](http://www.haproxy.org/download/1.5/doc/proxy-protocol.txt) support in the listening server. Proxy protocol is supported in a strict sense; when this setting is enabled, requests without proxy protocol are rejected and will cause errors.
+
+
+### `server.requestIdLength`
+
+Every incoming request is assigned a random identifier for associating multiple log entries together.  The generated ID's length is controlled by this setting.
+
 
 
 Signatures

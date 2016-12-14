@@ -27,7 +27,9 @@ module.exports = () => {
             ].forEach((methodName) => {
                 this[methodName] = jasmine.createSpy(methodName);
             });
-            this.startServerAsync.andReturn(promiseMock.resolve());
+            this.startServerAsync.andCallFake(() => {
+                return promiseMock.resolve();
+            });
             WebServerMock.mostRecentInstance = this;
         }
     }

@@ -21,6 +21,10 @@ jasmine.routeTester("/registration/_id/confirm/_code", (container) => {
                 expect(registrationManagerMock.confirmEmailAsync).toHaveBeenCalledWith("id", "code");
                 jasmine.checkLinks([
                     {
+                        href: "rendered route: self-discovery",
+                        rel: "up"
+                    },
+                    {
                         href: "rendered route: account, accountId:\"account id\"",
                         rel: "self"
                     },

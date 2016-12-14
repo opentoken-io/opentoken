@@ -54,7 +54,7 @@ jasmine.routeTester("/account/_account-id/", (container) => {
                         profile: "/schema/account/token-create-request.json",
                         rel: "service",
                         templated: true,
-                        title: "account-token-create"
+                        title: "account-tokenCreate"
                     }
                 ], routeTester.res.linkObjects);
             });
@@ -64,7 +64,9 @@ jasmine.routeTester("/account/_account-id/", (container) => {
             // Really, this shouldn't happen.  If the session exists,
             // the account should exist as well.
             beforeEach(() => {
-                accountManagerMock.recordAsync.andReturn(promiseMock.reject(new Error("something is wrong")));
+                accountManagerMock.recordAsync.andCallFake(() => {
+                    return promiseMock.reject(new Error("something is wrong"));
+                });
             });
             it("returns an error", () => {
                 return routeTester.get().then(jasmine.fail, () => {

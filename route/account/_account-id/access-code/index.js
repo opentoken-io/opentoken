@@ -36,8 +36,16 @@ module.exports = (server, path, options) => {
 
                         // This does not have a "self" link because no
                         // resource is actually created.  That's not following
-                        // Hypermedia very well.
+                        // Hypermedia very well, but since no resource is
+                        // created we are unable to emit a self link.
                         res.links({
+                            service: {
+                                href: server.router.render("account-accessCode", {
+                                    accountId: req.params.accountId
+                                }),
+                                profile: "/schema/account/access-code-request.json",
+                                title: "account-accessCode"
+                            },
                             up: {
                                 href: server.router.render("account", {
                                     accountId: req.params.accountId

@@ -1,9 +1,13 @@
 "use strict";
 
 describe("validateRequestQueryMiddleware", () => {
-    var chainMiddlewareMock, middlewareFactory, restifyPluginsMock, schemaMock;
+    var chainMiddlewareMock, ErrorResponse, middlewareFactory, restifyPluginsMock, schemaMock;
 
     beforeEach(() => {
+        var promiseMock;
+
+        promiseMock = require("../../mock/promise-mock")();
+        ErrorResponse = require("../../../lib/error-response")(promiseMock);
         chainMiddlewareMock = jasmine.createSpy("chainMiddlewareMock");
         restifyPluginsMock = jasmine.createSpyObj("restifyPlugins", [
             "queryParser"
@@ -12,7 +16,7 @@ describe("validateRequestQueryMiddleware", () => {
             "validate"
         ]);
         schemaMock.validate.andReturn(null);
-        middlewareFactory = require("../../../lib/middleware/validate-request-query-middleware")(chainMiddlewareMock, restifyPluginsMock, schemaMock);
+        middlewareFactory = require("../../../lib/middleware/validate-request-query-middleware")(chainMiddlewareMock, ErrorResponse, restifyPluginsMock, schemaMock);
     });
     it("parses the query", () => {
         middlewareFactory("schema");
@@ -54,7 +58,7 @@ describe("validateRequestQueryMiddleware", () => {
                 expect(schemaMock.validate).toHaveBeenCalledWith({
                     query: true
                 }, "schema");
-                expect(res.send).toHaveBeenCalledWith(400, jasmine.any(Error));
+                expect(res.send).toHaveBeenCalledWith(400, jasmine.any(ErrorResponse));
             });
         });
     });

@@ -39,11 +39,13 @@ jasmine.routeTester("/account/_account-id/token/_token-id/", (container) => {
         ].forEach((scenario) => {
             describe(`successful request ${scenario.name}`, () => {
                 beforeEach(() => {
-                    tokenManagerMock.getRecordAsync.andReturn(promiseMock.resolve({
-                        contentType: "text/plain",
-                        data: new Buffer("this is the data", "binary"),
-                        public: scenario.public
-                    }));
+                    tokenManagerMock.getRecordAsync.andCallFake(() => {
+                        return promiseMock.resolve({
+                            contentType: "text/plain",
+                            data: new Buffer("this is the data", "binary"),
+                            public: scenario.public
+                        });
+                    });
                     routeTester.req.signed = scenario.signed;
 
                     return routeTester.get();
@@ -104,7 +106,7 @@ jasmine.routeTester("/account/_account-id/token/_token-id/", (container) => {
             describe(`failed request ${scenario.name}`, () => {
                 beforeEach(() => {
                     routeTester.req.signed = scenario.signed;
-                    tokenManagerMock.getRecordAsync.andReturn(scenario.record());
+                    tokenManagerMock.getRecordAsync.andCallFake(scenario.record);
 
                     return routeTester.get();
                 });

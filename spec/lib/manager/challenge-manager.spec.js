@@ -53,7 +53,9 @@ describe("challengeManager", () => {
     });
     describe(".createAsync()", () => {
         it("creates a new challenge when none existed", () => {
-            storageService.getAsync.andReturn(promiseMock.resolve([]));
+            storageService.getAsync.andCallFake(() => {
+                return promiseMock.resolve([]);
+            });
             OtDateMock.stubNow().plus.andReturn(OtDateMock.stubNow());
 
             return factory().createAsync("accountId").then((result) => {
@@ -65,7 +67,9 @@ describe("challengeManager", () => {
             });
         });
         it("creates a new challenge", () => {
-            storageService.getAsync.andReturn(promiseMock.resolve([]));
+            storageService.getAsync.andCallFake(() => {
+                return promiseMock.resolve([]);
+            });
             OtDateMock.stubNow().plus.andReturn(OtDateMock.stubNow());
 
             return factory().createAsync("accountId").then((result) => {
@@ -83,12 +87,14 @@ describe("challengeManager", () => {
 
             date = OtDateMock.now();
             date.date.setTime(date.date.getTime() + 5000);
-            storageService.getAsync.andReturn(promiseMock.resolve([
-                {
-                    expires: date,
-                    id: "---hash---"
-                }
-            ]));
+            storageService.getAsync.andCallFake(() => {
+                return promiseMock.resolve([
+                    {
+                        expires: date,
+                        id: "---hash---"
+                    }
+                ]);
+            });
         });
         it("fails when no challenge IDs match", () => {
             return factory().validateAsync("accountId", "does-not-matter", "wrong").then(jasmine.fail, (err) => {
@@ -113,7 +119,9 @@ describe("challengeManager", () => {
     });
     describe("loading lists", () => {
         it("returns an empty array when there was no data", () => {
-            storageService.getAsync.andReturn(promiseMock.reject());
+            storageService.getAsync.andCallFake(() => {
+                return promiseMock.reject();
+            });
             OtDateMock.stubNow().plus.andReturn(OtDateMock.stubNow());
 
             return factory().createAsync("accountId").then(() => {
@@ -133,22 +141,24 @@ describe("challengeManager", () => {
 
             nowPlus5Seconds = OtDateMock.now();
             nowPlus5Seconds.date.setTime(nowPlus5Seconds.date.getTime() + 5000);
-            storageService.getAsync.andReturn(promiseMock.resolve([
-                // These get filtered out
-                "not an object",
-                null,
-                {},
-                {
-                    expires: new Date() - 1,
-                    id: "expired"
-                },
+            storageService.getAsync.andCallFake(() => {
+                return promiseMock.resolve([
+                    // These get filtered out
+                    "not an object",
+                    null,
+                    {},
+                    {
+                        expires: new Date() - 1,
+                        id: "expired"
+                    },
 
-                // This one is kept
-                {
-                    expires: nowPlus5Seconds,
-                    id: "valid for 5 seconds"
-                }
-            ]));
+                    // This one is kept
+                    {
+                        expires: nowPlus5Seconds,
+                        id: "valid for 5 seconds"
+                    }
+                ]);
+            });
             OtDateMock.stubNow().plus.andReturn(OtDateMock.stubNow());
 
             return factory().createAsync("accountId").then(() => {

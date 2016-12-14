@@ -15,7 +15,7 @@ describe("formatter/errorJsonFormatter", () => {
             parsed = JSON.parse(result.toString("binary"));
             expect(parsed).toEqual({
                 code: "4qsTYJa3",
-                logRef: "fakeLogRef",
+                logref: "random log id",
                 message: "Unknown error"
             });
         });

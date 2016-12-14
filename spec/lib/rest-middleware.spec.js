@@ -1,7 +1,7 @@
 "use strict";
 
 describe("restMiddleware", () => {
-    var helmetMock, linksMiddlewareMock, restifyCookiesMock, restifyLinks, restifyMock, restifyPlugins, restMiddleware, serverMock;
+    var helmetMock, linksMiddlewareMock, requestLoggerMiddlewareMock, restifyCookiesMock, restifyLinks, restifyPlugins, restMiddleware, serverMock;
 
     /**
      * Tests the common middleware set up when calling restMiddleware.
@@ -16,8 +16,8 @@ describe("restMiddleware", () => {
             helmetMock.noCache,
             helmetMock.noSniff,
             helmetMock.xssFilter,
+            requestLoggerMiddlewareMock,
             restifyLinks,
-            restifyMock.CORS,
             restifyPlugins.acceptParser,
             restifyPlugins.gzipResponse,
             restifyPlugins.queryParser
@@ -66,9 +66,8 @@ describe("restMiddleware", () => {
             "xssFilter"
         ]);
         serverMock = require("../mock/server-mock")();
-        restifyMock = mockMiddleware("restifyMock", [
-            "CORS"
-        ]);
+        requestLoggerMiddlewareMock = jasmine.createSpy("requestLoggerMiddlewareMock");
+        requestLoggerMiddlewareMock.andReturn(requestLoggerMiddlewareMock);
         restifyLinks = jasmine.createSpy("restifyLinks");
         restifyLinks.andReturn(restifyLinks);
         restifyPlugins = mockMiddleware("restifyPlugins", [
@@ -79,7 +78,7 @@ describe("restMiddleware", () => {
         restifyCookiesMock = jasmine.createSpyObj("restifyCookies", [
             "parse"
         ]);
-        restMiddleware = restMiddlewareFactory(helmetMock, linksMiddlewareMock, loggerMock, restifyMock, restifyCookiesMock, restifyLinks, restifyPlugins);
+        restMiddleware = restMiddlewareFactory(helmetMock, linksMiddlewareMock, loggerMock, requestLoggerMiddlewareMock, restifyCookiesMock, restifyLinks, restifyPlugins);
     });
     it("calls restMiddleware without https", () => {
         restMiddleware({

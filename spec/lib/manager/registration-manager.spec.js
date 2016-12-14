@@ -55,28 +55,32 @@ describe("registrationManager", () => {
     });
     describe(".confirmEmailAsync", () => {
         beforeEach(() => {
-            storageService.getAsync.andReturn(promiseMock.resolve({
-                confirmationCode: "code",
-                email: "user@example.com",
-                mfa: {
-                    totp: {
-                        confirmed: true,
-                        key: "totp key"
-                    }
-                },
-                passwordHash: "hashed password",
-                passwordHashConfig: "passwordHashConfig"
-            }));
+            storageService.getAsync.andCallFake(() => {
+                return promiseMock.resolve({
+                    confirmationCode: "code",
+                    email: "user@example.com",
+                    mfa: {
+                        totp: {
+                            confirmed: true,
+                            key: "totp key"
+                        }
+                    },
+                    passwordHash: "hashed password",
+                    passwordHashConfig: "passwordHashConfig"
+                });
+            });
         });
         it("fails if the record was not secured (passwordHash)", () => {
-            storageService.getAsync.andReturn(promiseMock.resolve({
-                confirmationCode: "code",
-                mfa: {
-                    totp: {
-                        confirmed: true
+            storageService.getAsync.andCallFake(() => {
+                return promiseMock.resolve({
+                    confirmationCode: "code",
+                    mfa: {
+                        totp: {
+                            confirmed: true
+                        }
                     }
-                }
-            }));
+                });
+            });
 
             return factory().confirmEmailAsync("id", "code").then(jasmine.fail, (result) => {
                 expect(result).toEqual(jasmine.any(Error));
@@ -85,10 +89,12 @@ describe("registrationManager", () => {
             });
         });
         it("fails if the record was not secured (totpConfirmed)", () => {
-            storageService.getAsync.andReturn(promiseMock.resolve({
-                confirmationCode: "code",
-                passwordHash: "hash"
-            }));
+            storageService.getAsync.andCallFake(() => {
+                return promiseMock.resolve({
+                    confirmationCode: "code",
+                    passwordHash: "hash"
+                });
+            });
 
             return factory().confirmEmailAsync("id", "code").then(jasmine.fail, (result) => {
                 expect(result).toEqual(jasmine.any(Error));
@@ -104,7 +110,9 @@ describe("registrationManager", () => {
             });
         });
         it("will not delete if creation goes awry", () => {
-            accountManagerMock.createAsync.andReturn(promiseMock.reject("err"));
+            accountManagerMock.createAsync.andCallFake(() => {
+                return promiseMock.reject("err");
+            });
 
             return factory().confirmEmailAsync("id", "code").then(jasmine.fail, (result) => {
                 expect(result).toBe("err");
@@ -145,7 +153,9 @@ describe("registrationManager", () => {
     });
     describe(".qrCodeImageAsync", () => {
         it("does not generate a code if the get fails", () => {
-            storageService.getAsync.andReturn(promiseMock.reject("err"));
+            storageService.getAsync.andCallFake(() => {
+                return promiseMock.reject("err");
+            });
 
             return factory().qrCodeImageAsync("id").then(jasmine.fail, (err) => {
                 expect(totpMock.generateQrCodeAsync).not.toHaveBeenCalled();
@@ -155,7 +165,9 @@ describe("registrationManager", () => {
         it("does not generate a QR code when already confirmed", () => {
             return storageService.getAsync().then((record) => {
                 record.mfa.totp.confirmed = true;
-                storageService.getAsync.andReturn(promiseMock.resolve(record));
+                storageService.getAsync.andCallFake(() => {
+                    return promiseMock.resolve(record);
+                });
 
                 return factory().qrCodeImageAsync("id");
             }).then(() => {
@@ -311,19 +323,21 @@ describe("registrationManager", () => {
             });
         });
         it("does not return the totp if the record is confirmed", () => {
-            storageService.getAsync.andReturn(promiseMock.resolve({
-                confirmationCode: "code",
-                email: "user@example.com",
-                extraProperty: "discarded when saved as an account",
-                mfa: {
-                    totp: {
-                        confirmed: true,
-                        key: "totp key"
-                    }
-                },
-                passwordHash: "hashed password",
-                passwordHashConfig: "passwordHashConfig"
-            }));
+            storageService.getAsync.andCallFake(() => {
+                return promiseMock.resolve({
+                    confirmationCode: "code",
+                    email: "user@example.com",
+                    extraProperty: "discarded when saved as an account",
+                    mfa: {
+                        totp: {
+                            confirmed: true,
+                            key: "totp key"
+                        }
+                    },
+                    passwordHash: "hashed password",
+                    passwordHashConfig: "passwordHashConfig"
+                });
+            });
 
             return factory().getRecordAsync("id").then((result) => {
                 expect(result).toEqual({

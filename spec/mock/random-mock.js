@@ -1,5 +1,9 @@
 "use strict";
 
+var promiseMock;
+
+promiseMock = require("./promise-mock")();
+
 module.exports = () => {
     var random;
 
@@ -14,9 +18,7 @@ module.exports = () => {
         buff = new Buffer(size);
         buff.fill(0x42);
 
-        return new Promise((resolve) => {
-            resolve(buff);
-        });
+        return promiseMock.resolve(buff);
     });
 
     random.idAsync.andCallFake((size) => {
@@ -27,9 +29,7 @@ module.exports = () => {
         // Fill with the letter B, BBBBBBBBBBBBB... etc
         buff.fill(0x42);
 
-        return new Promise((resolve) => {
-            resolve(buff.toString());
-        });
+        return promiseMock.resolve(buff.toString());
     });
 
     return random;

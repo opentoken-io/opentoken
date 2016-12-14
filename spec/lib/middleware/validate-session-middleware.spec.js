@@ -1,16 +1,14 @@
 "use strict";
 
 describe("validateSessionMiddleware", () => {
-    var loginCookieMock, middlewareFactory, promiseMock, sessionManagerMock;
+    var ErrorResponse, loginCookieMock, middlewareFactory, promiseMock, sessionManagerMock;
 
     beforeEach(() => {
-        var errorResponseMock;
-
-        errorResponseMock = require("../../mock/error-response-mock")();
         loginCookieMock = require("../../mock/login-cookie-mock")();
         sessionManagerMock = require("../../mock/manager/session-manager-mock")();
         promiseMock = require("../../mock/promise-mock")();
-        middlewareFactory = require("../../../lib/middleware/validate-session-middleware")(errorResponseMock, loginCookieMock, sessionManagerMock);
+        ErrorResponse = require("../../../lib/error-response")(promiseMock);
+        middlewareFactory = require("../../../lib/middleware/validate-session-middleware")(ErrorResponse, loginCookieMock, sessionManagerMock);
     });
     describe("middleware", () => {
         var middlewareAsync, req, res, serverMock;
@@ -32,15 +30,15 @@ describe("validateSessionMiddleware", () => {
         });
         describe("when sessionManager rejects the session", () => {
             beforeEach(() => {
-                sessionManagerMock.validateAsync.andReturn(promiseMock.reject("x"));
+                sessionManagerMock.validateAsync.andCallFake(() => {
+                    return promiseMock.reject("x");
+                });
             });
             it("sends an error response", () => {
                 return middlewareAsync(req, res).then(jasmine.fail, () => {
-                    expect(res.send).toHaveBeenCalledWith(403, {
-                        code: "8gzh4j1A",
-                        logRef: "fakeLogRef",
-                        message: "Session is invalid."
-                    });
+                    expect(res.send).toHaveBeenCalledWith(403, jasmine.any(ErrorResponse));
+                    expect(res.send.mostRecentCall.args[1].code).toEqual("8gzh4j1A");
+                    expect(res.send.mostRecentCall.args[1].message).toEqual("Session is invalid.");
                 });
             });
             it("passes a value to \"next\"", () => {

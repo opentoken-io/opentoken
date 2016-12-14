@@ -13,7 +13,8 @@ module.exports = () => {
         "getPath",
         "getQuery",
         "href",
-        "isChunked"
+        "isChunked",
+        "log"
     ]);
     request.body = null;
     request.contentType.andReturn(null);
@@ -33,6 +34,7 @@ module.exports = () => {
     request.isChunked.andCallFake(() => {
         return false;
     });
+    request.logId = "random log id";
     request.method = "GET";
     request.params = {};
 

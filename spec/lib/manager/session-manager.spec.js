@@ -84,9 +84,11 @@ describe("sessionManager", () => {
     });
     describe(".validateAsync()", () => {
         beforeEach(() => {
-            storageService.getAsync.andReturn(promiseMock.resolve({
-                accountId: "accountId"
-            }));
+            storageService.getAsync.andCallFake(() => {
+                return promiseMock.resolve({
+                    accountId: "accountId"
+                });
+            });
         });
         it("validates a good session", () => {
             return factory().validateAsync("accountId", "sessionId").then(() => {
@@ -96,9 +98,11 @@ describe("sessionManager", () => {
             });
         });
         it("confirms the account ID is as expected", () => {
-            storageService.getAsync.andReturn(promiseMock.resolve({
-                accountId: "wrong"
-            }));
+            storageService.getAsync.andCallFake(() => {
+                return promiseMock.resolve({
+                    accountId: "wrong"
+                });
+            });
 
             return factory().validateAsync("accountId", "sessionId").then(() => {
                 jasmine.fail();
@@ -107,12 +111,11 @@ describe("sessionManager", () => {
             });
         });
         it("does not wait for the sessions to be refreshed", () => {
-            var promise;
-
-            // Purposely do not resolve this promise.  If we depend on this
-            // unresolved promise, then the test will time out and fail.
-            promise = new Promise(() => {});
-            storageService.putAsync.andReturn(promise);
+            storageService.putAsync.andCallFake(() => {
+                // Purposely do not resolve this promise.  If we depend on this
+                // unresolved promise, then the test will time out and fail.
+                return new Promise(() => {});
+            });
 
             return factory().validateAsync("accountId", "sessionId");
         });

@@ -14,9 +14,15 @@ module.exports = () => {
         "getAsync",
         "putAsync"
     ]);
-    instance.deleteAsync.andReturn(promise.resolve());
-    instance.getAsync.andReturn(promise.reject(new Error("Not configured to be successful")));
-    instance.putAsync.andReturn(promise.resolve());
+    instance.deleteAsync.andCallFake(() => {
+        return promise.resolve();
+    });
+    instance.getAsync.andCallFake(() => {
+        return promise.reject(new Error("Not configured to be successful"));
+    });
+    instance.putAsync.andCallFake(() => {
+        return promise.resolve();
+    });
     factory = jasmine.createSpy("storageServiceFactoryMock").andCallFake((idHash, lifetime, storagePrefix) => {
         expect(idHash).toEqual(jasmine.any(Object));
         expect(lifetime).toEqual(jasmine.any(Object));

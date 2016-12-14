@@ -145,10 +145,11 @@
     },
     "server": {
         "baseUrl": "http://localhost",
-        "exceptionIdLength": 12,
+        "bodyBytesMaximum": 1048576,
         "port": 8080,
         "profileMiddleware": true,
-        "proxyProtocol": false
+        "proxyProtocol": false,
+        "requestIdLength": 12
     },
     "signature": {
         "dateWindowFuture": {

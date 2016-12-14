@@ -170,7 +170,7 @@ describe("MiddlewareProfiler", () => {
     });
     describe("toString()", () => {
         it("returns an empty string with no profiling information", () => {
-            expect(mp.toString()).toEqual("");
+            expect(mp.toString()).toEqual("--- Middleware Profiling ---");
         });
         it("returns a couple fake values", () => {
             var profiles;
@@ -184,7 +184,7 @@ describe("MiddlewareProfiler", () => {
                 elapsed: .3333,
                 hits: 3
             };
-            expect(mp.toString()).toEqual("fake, 0 hits, 0 ms, NaN avg\nfake2, 3 hits, 333 ms, 111 avg");
+            expect(mp.toString()).toEqual("--- Middleware Profiling ---\nfake, 0 hits, 0 ms, NaN avg\nfake2, 3 hits, 333 ms, 111 avg");
         });
     });
 });

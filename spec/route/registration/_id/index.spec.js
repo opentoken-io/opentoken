@@ -75,5 +75,26 @@ jasmine.routeTester("/registration/_id", (container) => {
                 ], routeTester.res.linkObjects);
             });
         });
+        it("reports failure", () => {
+            var body;
+
+            registrationManagerMock.secureAsync.andCallFake(() => {
+                return Promise.reject(new Error());
+            });
+            body = {
+                mfa: {
+                    totp: {
+                        current: "000000",
+                        previous: "111111"
+                    }
+                },
+                passwordHash: "abcdefghijklmnopqrstuvwxyz"
+            };
+
+            return routeTester.post(body).then(() => {
+                expect(routeTester.res.send).toHaveBeenCalledWith(400, jasmine.any(Object));
+                expect(routeTester.res.linkObjects).toEqual([]);
+            });
+        });
     });
 });

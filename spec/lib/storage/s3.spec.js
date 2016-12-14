@@ -56,7 +56,9 @@ describe("storage/s3", () => {
         it("deletes empty AWS credentials", () => {
             config.storage.s3.accessKeyId = "";
             config.storage.s3.secretAccessKey = "";
-            create().transit();
+
+            // Must make a call to have the transit() function called
+            create().deleteAsync("anything");
             expect(awsSdkMock.lastInstance.params).toEqual({
                 params: {
                     Bucket: "test-bucket",
@@ -67,7 +69,8 @@ describe("storage/s3", () => {
             });
         });
         it("sets up the S3 object", () => {
-            create().transit();
+            // Must make a call to have the transit() function called
+            create().deleteAsync("anything");
             expect(awsSdkMock.lastInstance.params).toEqual({
                 accessKeyId: "akey",
                 params: {
@@ -86,14 +89,6 @@ describe("storage/s3", () => {
         beforeEach(() => {
             s3 = create();
         });
-        describe(".transit()", () => {
-            it("should only make (call) the S3 object once", () => {
-                awsSdkMock.S3 = jasmine.createSpy("awsSdkMock.S3");
-                s3.transit();
-                s3.transit();
-                expect(awsSdkMock.S3.calls.length).toBe(1);
-            });
-        });
         describe(".deleteAsync()", () => {
             it("deletes a file", () => {
                 return s3.deleteAsync("afile").then((val) => {
@@ -107,22 +102,6 @@ describe("storage/s3", () => {
             it("gets an object back", () => {
                 return s3.getAsync("afile").then((val) => {
                     expect(val).toEqual(jasmine.any(Buffer));
-                });
-            });
-        });
-        describe(".listAsync()", () => {
-            it("gets top level list", () => {
-                return s3.listAsync().then((val) => {
-                    expect(val).toEqual({
-                        Prefix: null
-                    });
-                });
-            });
-            it("gets a list by passing in a prefix", () => {
-                return s3.listAsync("accounts").then((val) => {
-                    expect(val).toEqual({
-                        Prefix: "accounts"
-                    });
                 });
             });
         });

@@ -14,7 +14,9 @@ module.exports = () => {
     ]);
 
     mock.compare.andReturn(true);
-    mock.deriveAsync.andReturn(promiseMock.resolve("---derived---"));
+    mock.deriveAsync.andCallFake(() => {
+        return promiseMock.resolve("---derived---");
+    });
     mock.hash.andReturn("---hash---");
     mock.hmac.andReturn("---hmac---");
 

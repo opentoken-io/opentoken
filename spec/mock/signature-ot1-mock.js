@@ -10,7 +10,9 @@ module.exports = () => {
     mock = jasmine.createSpyObj("signatureOt1Mock", [
         "authenticateAsync"
     ]);
-    mock.authenticateAsync.andReturn(promiseMock.resolve());
+    mock.authenticateAsync.andCallFake(() => {
+        return promiseMock.resolve();
+    });
 
     return mock;
 };

@@ -1,7 +1,13 @@
 "use strict";
 
 module.exports = (server, path, options) => {
-    return options.container.call((registrationManager, validateRequestBodyMiddleware) => {
+    /**
+     * @param {opentoken~ErrorResponse} ErrorResponse
+     * @param {opentoken~registrationManager} registrationManager
+     * @param {opentoken~validateRequestBodyMiddleware} validateRequestBodyMiddleware
+     * @return {restifyRouterMagic~route}
+     */
+    return options.container.call((ErrorResponse, registrationManager, validateRequestBodyMiddleware) => {
         var getResponse;
 
         getResponse = require("./_get-response")(server);
@@ -23,7 +29,11 @@ module.exports = (server, path, options) => {
                             })
                         });
                         res.send(204);
-                    }).then(next, next);
+                    }).then(next, (err) => {
+                        req.log(err.toString);
+                        res.send(400, new ErrorResponse("Invalid information", "6a6BwJexiW"));
+                        next();
+                    });
                 }
             ]
         };

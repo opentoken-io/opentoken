@@ -3,11 +3,25 @@
 describe("middleware/readBodyBufferMiddleware", () => {
     var middlewareFactory;
 
+
+    /**
+     * Fake error class
+     *
+     * @param {string} message
+     */
+    function PayloadTooLargeError(message) {
+        this.message = message;
+    }
+
+
     beforeEach(() => {
-        var zlib;
+        var restifyErrorsMock, zlib;
 
         zlib = require("zlib");
-        middlewareFactory = require("../../../lib/middleware/read-body-buffer-middleware")(zlib);
+        restifyErrorsMock = {
+            PayloadTooLargeError
+        };
+        middlewareFactory = require("../../../lib/middleware/read-body-buffer-middleware")(restifyErrorsMock, zlib);
     });
     it("makes middleware", () => {
         expect(middlewareFactory()).toEqual(jasmine.any(Function));
@@ -18,7 +32,7 @@ describe("middleware/readBodyBufferMiddleware", () => {
         beforeEach(() => {
             req = require("../../mock/request-mock")();
             res = require("../../mock/response-mock")();
-            middlewareAsync = jasmine.middlewareToPromise(middlewareFactory());
+            middlewareAsync = jasmine.middlewareToPromise(middlewareFactory(20));
         });
         it("appends multiple chunks together", () => {
             var promise;
@@ -87,6 +101,38 @@ describe("middleware/readBodyBufferMiddleware", () => {
             return middlewareAsync(req, res).then(() => {
                 expect(Buffer.isBuffer(req.body)).toBe(true);
                 expect(req.body.toString()).toEqual("");
+            });
+        });
+        it("dies when receiving too much data all at once", () => {
+            var promise;
+
+            req.internalContentLength = 30;
+            promise = middlewareAsync(req, res).then(() => {
+                expect(Buffer.isBuffer(req.body)).toBe(true);
+                expect(req.body.toString()).toEqual("chunk1chunk2");
+            });
+            req.emit("data", new Buffer("012345678901234567890123456789", "binary"));
+            req.emit("end");
+
+            return promise.then(jasmine.fail, (err) => {
+                expect(err).toEqual(jasmine.any(PayloadTooLargeError));
+            });
+        });
+        it("dies when receiving too much data in chunks", () => {
+            var promise;
+
+            req.internalContentLength = 30;
+            promise = middlewareAsync(req, res).then(() => {
+                expect(Buffer.isBuffer(req.body)).toBe(true);
+                expect(req.body.toString()).toEqual("chunk1chunk2");
+            });
+            req.emit("data", new Buffer("0123456789", "binary"));
+            req.emit("data", new Buffer("0123456789", "binary"));
+            req.emit("data", new Buffer("0123456789", "binary"));
+            req.emit("end");
+
+            return promise.then(jasmine.fail, (err) => {
+                expect(err).toEqual(jasmine.any(PayloadTooLargeError));
             });
         });
     });

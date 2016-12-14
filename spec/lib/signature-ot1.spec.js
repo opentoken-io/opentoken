@@ -1,7 +1,7 @@
 "use strict";
 
 describe("signatureOt1", () => {
-    var accessCodeManagerMock, hashMock, kvPairs, promiseMock, requestMock, signatureDescription, signatureLib, verifySignature;
+    var accessCodeManagerMock, ErrorResponse, hashMock, kvPairs, promiseMock, requestMock, signatureDescription, signatureLib, verifySignature;
 
     /**
      * Checks an error to make sure it is the right error.  The error
@@ -13,33 +13,28 @@ describe("signatureOt1", () => {
      */
     function assertError(message, code) {
         return (err) => {
-            // ErrorResponse objects do not have a useful .toString() and
-            // that works to our advantage here.  If the promise is rejected
-            // with any Error object, the first expectation here will be
-            // very valuable in diagnosing why the code is misbehaving.
-            expect(err.toString()).toBe("[object Object]");
-            expect(err.logRef).toBe("fakeLogRef");
+            expect(err).toEqual(jasmine.any(ErrorResponse));
             expect(err.message).toBe(message);
             expect(err.code).toBe(code);
         };
     }
 
     beforeEach(() => {
-        var binaryBufferMock, errorResponseMock, utilMock;
+        var binaryBufferMock, utilMock;
 
         accessCodeManagerMock = require("../mock/manager/access-code-manager-mock")();
         binaryBufferMock = require("../mock/binary-buffer-mock")();
-        errorResponseMock = require("../mock/error-response-mock")();
         hashMock = require("../mock/hash-mock")();
         promiseMock = require("../mock/promise-mock")();
         requestMock = require("../mock/request-mock")();
         utilMock = require("../mock/util-mock")();
+        ErrorResponse = require("../../lib/error-response")(promiseMock);
 
         hashMock.hmac.andReturn("FakeSignature");
         requestMock.headers.host = "example.com";
         requestMock.headers["x-opentoken-date"] = "2010-01-01T01:23:45Z";
         requestMock.headers["content-type"] = "text/plain";
-        signatureLib = require("../../lib/signature-ot1")(accessCodeManagerMock, binaryBufferMock, errorResponseMock, hashMock, promiseMock, utilMock);
+        signatureLib = require("../../lib/signature-ot1")(accessCodeManagerMock, binaryBufferMock, ErrorResponse, hashMock, promiseMock, utilMock);
         kvPairs = {
             "access-code": "FakeAccessCode",
             signature: "FakeSignature",
@@ -108,7 +103,9 @@ describe("signatureOt1", () => {
     });
     describe("private key", () => {
         it("fails when the access code + account is invalid", () => {
-            accessCodeManagerMock.getAsync.andReturn(promiseMock.reject());
+            accessCodeManagerMock.getAsync.andCallFake(() => {
+                return promiseMock.reject();
+            });
 
             return verifySignature().then(jasmine.fail, assertError("Invalid account ID or access code.", "76rEUePY"));
         });

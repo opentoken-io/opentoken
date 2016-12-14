@@ -5,6 +5,15 @@ module.exports = (server, path, options) => {
         return {
             get(req, res, next) {
                 registrationManager.confirmEmailAsync(req.params.id, req.params.code).then((accountId) => {
+                    // First, wipe all links
+                    res.setHeader("Link", "");
+
+                    // Add the "up" link that's always added by default.
+                    res.links({
+                        up: server.router.render("self-discovery")
+                    });
+
+                    // Add more links
                     res.links({
                         self: server.router.render("account", {
                             accountId

@@ -13,8 +13,12 @@ module.exports = () => {
         "verifyCurrent",
         "verifyCurrentAndPrevious"
     ]);
-    mock.generateQrCodeAsync.andReturn(promiseMock.resolve(new Buffer("QR CODE PNG", "binary")));
-    mock.generateSecretAsync.andReturn(promiseMock.resolve(new Buffer("SECRET", "binary")));
+    mock.generateQrCodeAsync.andCallFake(() => {
+        return promiseMock.resolve(new Buffer("QR CODE PNG", "binary"));
+    });
+    mock.generateSecretAsync.andCallFake(() => {
+        return promiseMock.resolve(new Buffer("SECRET", "binary"));
+    });
     mock.generateUrl.andReturn("url");
     mock.verifyCurrent.andReturn(true);
     mock.verifyCurrentAndPrevious.andReturn(true);

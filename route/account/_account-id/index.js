@@ -30,7 +30,7 @@ module.exports = (server, path, options) => {
                                     })}{?public}`,
                                     profile: "/schema/account/token-create-request.json",
                                     templated: true,
-                                    title: "account-token-create"
+                                    title: "account-tokenCreate"
                                 }
                             ]
                         });

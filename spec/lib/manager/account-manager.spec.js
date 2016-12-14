@@ -81,15 +81,19 @@ describe("accountManager", () => {
     });
     describe(".loginAsync()", () => {
         beforeEach(() => {
-            storageService.getAsync.andReturn(promiseMock.resolve({
-                mfa: {
-                    totp: {
-                        key: "abcdefg"
-                    }
-                },
-                passwordHash: "passwordHash"
-            }));
-            challengeManagerMock.validateAsync.andReturn(promiseMock.resolve());
+            storageService.getAsync.andCallFake(() => {
+                return promiseMock.resolve({
+                    mfa: {
+                        totp: {
+                            key: "abcdefg"
+                        }
+                    },
+                    passwordHash: "passwordHash"
+                });
+            });
+            challengeManagerMock.validateAsync.andCallFake(() => {
+                return promiseMock.resolve();
+            });
         });
         it("fails if TOTP does not validate", () => {
             totpMock.verifyCurrent.andReturn(false);
@@ -141,9 +145,11 @@ describe("accountManager", () => {
     });
     describe(".loginHashConfigAsync()", () => {
         it("returns a configuration with a new challenge", () => {
-            storageService.getAsync.andReturn(promiseMock.resolve({
-                passwordHashConfig: "passwordHashConfig"
-            }));
+            storageService.getAsync.andCallFake(() => {
+                return promiseMock.resolve({
+                    passwordHashConfig: "passwordHashConfig"
+                });
+            });
 
             return factory().loginHashConfigAsync("id").then((result) => {
                 expect(challengeManagerMock.createAsync).toHaveBeenCalledWith("id");
@@ -179,16 +185,18 @@ describe("accountManager", () => {
     });
     describe(".recordAsync()", () => {
         it("filters the record to only return select values", () => {
-            storageService.getAsync.andReturn(promiseMock.resolve({
-                email: "emailAddress",
-                mfa: {
-                    totp: {
-                        confirmed: true,
-                        key: "totp key"
-                    }
-                },
-                secret: "stuff"
-            }));
+            storageService.getAsync.andCallFake(() => {
+                return promiseMock.resolve({
+                    email: "emailAddress",
+                    mfa: {
+                        totp: {
+                            confirmed: true,
+                            key: "totp key"
+                        }
+                    },
+                    secret: "stuff"
+                });
+            });
 
             return factory().recordAsync("accountId").then((record) => {
                 expect(record).toEqual({

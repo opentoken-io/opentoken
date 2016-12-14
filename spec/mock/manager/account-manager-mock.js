@@ -15,22 +15,34 @@ module.exports = () => {
         "passwordHashConfigAsync",
         "recordAsync"
     ]);
-    mock.createAsync.andReturn(promiseMock.resolve("createdId"));
-    mock.loginAsync.andReturn(promiseMock.resolve({
-        sessionId: "login-session-id"
-    }));
-    mock.loginHashConfigAsync.andReturn(promiseMock.resolve("loginHashConfig"));
-    mock.logoutAsync.andReturn(promiseMock.resolve());
-    mock.passwordHashConfigAsync.andReturn(promiseMock.resolve("accountManager.passwordHashConfig"));
-    mock.recordAsync.andReturn(promiseMock.resolve({
-        id: "record-id",
-        login: "new-login-cookie",
-        record: {
-            challengeHashConfig: "record-challenge-hash-config",
-            email: "record-email",
-            passwordHashConfig: "record-password-hash-config"
-        }
-    }));
+    mock.createAsync.andCallFake(() => {
+        return promiseMock.resolve("createdId");
+    });
+    mock.loginAsync.andCallFake(() => {
+        return promiseMock.resolve({
+            sessionId: "login-session-id"
+        });
+    });
+    mock.loginHashConfigAsync.andCallFake(() => {
+        return promiseMock.resolve("loginHashConfig");
+    });
+    mock.logoutAsync.andCallFake(() => {
+        return promiseMock.resolve();
+    });
+    mock.passwordHashConfigAsync.andCallFake(() => {
+        return promiseMock.resolve("accountManager.passwordHashConfig");
+    });
+    mock.recordAsync.andCallFake(() => {
+        return promiseMock.resolve({
+            id: "record-id",
+            login: "new-login-cookie",
+            record: {
+                challengeHashConfig: "record-challenge-hash-config",
+                email: "record-email",
+                passwordHashConfig: "record-password-hash-config"
+            }
+        });
+    });
 
     return mock;
 };

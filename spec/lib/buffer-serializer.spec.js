@@ -4,11 +4,12 @@ describe("bufferSerializer", () => {
     var bufferSerializer, OtDate;
 
     beforeEach(() => {
-        var container;
+        var bufferSerializerModule, moment;
 
-        container = require("../../lib/container");
-        OtDate = container.resolve("OtDate");
-        bufferSerializer = container.resolve("bufferSerializer");
+        moment = require("moment");
+        OtDate = require("../../lib/ot-date")(moment);
+        bufferSerializerModule = require("buffer-serializer");
+        bufferSerializer = require("../../lib/buffer-serializer")(bufferSerializerModule, OtDate);
     });
     it("serializes something", () => {
         var result;
