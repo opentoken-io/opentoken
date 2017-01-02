@@ -4,7 +4,7 @@ describe("email/ses", () => {
     var configMock, create, sesInstance;
 
     beforeEach(() => {
-        var awsSdkMock, promiseMock, utilMock;
+        var awsSdkMock, promiseMock, util;
 
         /**
          * Fake S3 class
@@ -43,9 +43,9 @@ describe("email/ses", () => {
             }
         };
         promiseMock = require("../../mock/promise-mock")();
-        utilMock = require("../../mock/util-mock")();
+        util = require("../../../lib/util")();
         create = () => {
-            return require("../../../lib/email/ses")(awsSdkMock, configMock, promiseMock, utilMock);
+            return require("../../../lib/email/ses")(awsSdkMock, configMock, promiseMock, util);
         };
     });
     it("initializes awsSdk", () => {

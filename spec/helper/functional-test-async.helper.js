@@ -128,7 +128,14 @@ function mockHttpAndEvents(test) {
     http = require("http");
 
     // Preload modules so they get the real EventEmitter
-    require("bunyan");
+    try {
+        // bunyan is required by restify.  npm <= 3.x installs bunyan under
+        // restify and the next line can error.  That's ok.
+        // We should only require it here and if it fails we ignore the error.
+        require("bunyan");
+    } catch (e) {
+        // Ignore
+    }
 
     // Mock the necessary bits to avoid making a server
     // and still have access to the router.
@@ -155,6 +162,9 @@ function mockHttpAndEvents(test) {
     // nodeMocksHttp uses this directly when creating a response.  This
     // must be the same object or a descendant of what Restify uses.
     jasmine.swapProperty(events, "EventEmitter", EventEmitterSafetyLayer);
+
+    // Now rerequire nodeMocksHttp and provide it to the FunctionalTest object.
+    test.setNodeMocksHttp(mockRequire.reRequire("node-mocks-http"));
 }
 
 
@@ -177,7 +187,8 @@ EventEmitterSafetyLayer.prototype.constructor = originalEventEmitter;
 jasmine.functionalTestAsync = () => {
     var config, container, test;
 
-    // This is the returned value
+    // Create the FunctionalTest object, which is what the promise will
+    // provide.
     test = new jasmine.FunctionalTest();
 
     // Get a completely new and reset container, including mocks.

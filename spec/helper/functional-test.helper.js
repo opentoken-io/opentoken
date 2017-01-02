@@ -1,12 +1,11 @@
 "use strict";
 
-var chalk, crypto, events, nodeMocksHttp, parseLinkHeader;
+var chalk, crypto, events, parseLinkHeader;
 
 // Required for the class
 chalk = require("chalk");
 crypto = require("crypto");
 events = require("events");
-nodeMocksHttp = require("node-mocks-http");
 parseLinkHeader = require("parse-link-header");
 
 
@@ -30,6 +29,7 @@ class FunctionalTest {
      * Initialization.
      */
     constructor() {
+        this.nodeMocksHttp = null;
         this.state = {};
 
         // The request handler needs to be assigned or nothing works.
@@ -426,14 +426,27 @@ class FunctionalTest {
      * @return {Promise.<opentoken~functionalTestAsyncResponse>}
      */
     requestAsync(options) {
-        var req, res;
+        var originalHeader, req, res;
 
         this.reformatRequestOptions(options);
-        req = nodeMocksHttp.createRequest(options);
-        res = nodeMocksHttp.createResponse({
+        req = this.nodeMocksHttp.createRequest(options);
+        res = this.nodeMocksHttp.createResponse({
             eventEmitter: events.EventEmitter,
             req
         });
+
+        // The res.header() function does not operate in a similar fashion to
+        // how Restify's version works.  Restify allows for a single string
+        // input and this returns the value.  We monkey patch the response
+        // object to behave similarly.
+        originalHeader = res.header;
+        res.header = (key, val) => {
+            if (!val && typeof key === "string") {
+                return res.getHeader(key);
+            }
+
+            return originalHeader.call(res, key, val);
+        };
 
         return new Promise((resolve, reject) => {
             var theTimeout;
@@ -480,6 +493,17 @@ class FunctionalTest {
             // Issue the request to the router
             this.requestHandler(req, res);
         });
+    }
+
+
+    /**
+     * After the event emitters are mocked, the functional-test-async bit will
+     * set the mock HTTP object on here.
+     *
+     * @param {nodeMocksHttp} nodeMocksHttp
+     */
+    setNodeMocksHttp(nodeMocksHttp) {
+        this.nodeMocksHttp = nodeMocksHttp;
     }
 
 

@@ -8,6 +8,14 @@ describe("bin/server.js", () => {
     var apiServer, config, containerValues, neodocArgs;
 
     beforeEach(() => {
+        if (process.env.PORT) {
+            delete process.env.PORT;
+        }
+
+        if (process.env.DEBUG) {
+            delete process.env.DEBUG;
+        }
+
         apiServer = jasmine.createSpy("apiServer");
         neodocArgs = {};
         containerValues = {
@@ -26,7 +34,7 @@ describe("bin/server.js", () => {
                 run: jasmine.createSpy("neodoc").andReturn(neodocArgs)
             },
             path: require("path"),
-            util: require("../mock/util-mock")()
+            util: require("../../lib/util")()
         };
         mockRequire("../../lib/container", {
             register(key, value) {
@@ -47,12 +55,23 @@ describe("bin/server.js", () => {
     });
     afterEach(() => {
         mockRequire.stopAll();
+
+        if (process.env.PORT) {
+            delete process.env.PORT;
+        }
+
+        if (process.env.DEBUG) {
+            delete process.env.DEBUG;
+        }
     });
     it("uses override files", () => {
         neodocArgs["--override"] = "/override.json";
         mockRequire.reRequire("../../bin/server.js");
         expect(containerValues.config).toEqual({
-            deep: "merge"
+            override: true,
+            server: {
+                port: 443
+            }
         });
         expect(apiServer).toHaveBeenCalled();
     });
@@ -81,7 +100,7 @@ describe("bin/server.js", () => {
         expect(containerValues.config).toEqual({
             debug: true,
             server: {
-                port: 1234
+                port: 443
             }
         });
         expect(apiServer).toHaveBeenCalled();
