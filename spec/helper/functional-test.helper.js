@@ -535,8 +535,12 @@ class FunctionalTest {
             if (!options.method) {
                 options.method = "POST";
             }
+        } else if (Buffer.alloc) {
+            // node.js v5.10.0 and newer
+            options.body = Buffer.alloc(0, 0, "binary");
         } else {
-            options.body = Buffer.from("", "binary");
+            // Deprecated as of node.js 6.0.0
+            options.body = new Buffer(0);
         }
 
         queryString = options.url.split("?");
