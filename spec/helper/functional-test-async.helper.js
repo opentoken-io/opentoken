@@ -2,7 +2,7 @@
 
 /**
  * @typedef {Object} opentoken~functionalTestAsyncResponse
- * @propety {*} body Can be anything, including objects.
+ * @property {*} body Can be anything, including objects.
  * @property {Object} links The Link header reformatted for ease of use
  * @property {Object} headers
  * @property {number} statusCode
