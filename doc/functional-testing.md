@@ -34,7 +34,7 @@ As was done in the `beforeEach()`, this is asynchronous and so it returns a prom
 Request Options
 ---------------
 
-Functions that make requests allow options to be passed in with the request, controlling additional data that would be sent or simulated through the API.  The options objects may have the following properties and it is passed (with modifications) to the request mock library.
+Functions that make requests allow options to be passed in with the request, controlling additional data that would be sent or simulated through the API.  The options object may have the following properties and it is passed (with modifications) to the request mock library.
 
 * `.body` - Extra information to send in the body of a request.  If this is set, the `.method` property will default to `"POST"`.  Also, the `Content-Type` header defaults to `"application/json"`.
 
@@ -60,7 +60,7 @@ The response object is a simple Object and has the following properties:
 
 * `.body` - Can be anything, including objects.  Its value is what was passed to `res.send()`.  It does not pass through Restify's formatters and will not automatically be changed into a Buffer.
 
-* `.headers` - Object hash containing key/value header pairs.  Because headers are case insensitive but are stored in a case sensitive object, `functionalTest.getHeader()` may help you find if a specific header exists.
+* `.headers` - Object hash containing key/value header pairs.  Because headers are case-insensitive but are stored in a case-sensitive object, `functionalTest.getHeader()` may help you find if a specific header exists.
 
 * `.links` - The "Link" header reformatted as an object.  Follows the format of the `parse-link-header` module.
 
@@ -90,7 +90,7 @@ Converts `value` into a buffer object.  Used internally to convert information b
 
 Creates a new set of access codes by starting a session (if needed) and making the necessary API calls.  Assigns them to `this.state.accessCode` and `this.state.accessSecret`.
 
-Every response is checked and the promise will be rejected if there's any snags along the way.
+Every response is checked and the promise will be rejected if there's any snag along the way.
 
     it("creates access codes", () => {
         return test.createAccessCodesAsync().then((response) => {
@@ -114,7 +114,7 @@ All responses are checked to ensure they are valid.  Any failed request will rej
 
 ### `test.debug(response)`
 
-Logs a bunch of information about a response.  Only useful when you are figuring out what's going on with the requests and responses.  All of the output is directed to the console via `console.log` with a tinge of color to make it stand out.
+Logs a bunch of information about a response.  Only useful when you are figuring out what's going on with the requests and responses.  All output is directed to the console via `console.log` with a tinge of color to make it stand out.
 
     test.loginAsync().then((response) => {
         test.debug(response);
@@ -137,7 +137,7 @@ Searches the links and returns a single link definition given the link relation 
 
 ### `Promise<response> = then.followAsync(response, rel, [title], [options])`
 
-When given the response from a previous request, follow one of the links and make another request.  This function is very handy, especially since all of the requests in the API should follow links.  The `rel` and `title` are passed directly to `.findLink()`.  The `options`, when specified, are sent to `.requestAsync()`.
+When given the response from a previous request, follow one of the links and make another request.  This function is very handy, especially since all requests in the API should follow links.  The `rel` and `title` are passed directly to `.findLink()`.  The `options`, when specified, are sent to `.requestAsync()`.
 
 Any error from `.findLink()` will reject the returned promise.  Otherwise, the promise is resolved or rejected by `.requestAsync()`.
 
@@ -150,7 +150,7 @@ Any error from `.findLink()` will reject the returned promise.  Otherwise, the p
 
 ### `* = test.getHeader(headers, headerName)`
 
-Searches the `headers` object for a case-insensitive match to `headerName`.  This is necessary because the headers are technically case insensitive but JavaScript has case sensitive object property names and case sensitive string comparisons.
+Searches the `headers` object for a case-insensitive match to `headerName`.  This is necessary because the headers are technically case-insensitive but JavaScript has case-sensitive object property names and case-sensitive string comparisons.
 
 When there is no match, `null` is returned instead.
 
@@ -167,7 +167,7 @@ When there is no match, `null` is returned instead.
 
 ### `Promise<response> = test.loginAsync()`
 
-Initiates a login.  If there is no account created yet, this first creates an account.  Assigns `this.state.sessionId`, which can be used manually to simulate requests that occur during a logged in session.
+Initiates a login request.  If there is no account created yet, this first creates an account.  Assigns `this.state.sessionId`, which can be used manually to simulate requests that occur during a logged in session.
 
 Checks for errors along the way and rejects the promise when anything goes wrong.
 
@@ -193,7 +193,7 @@ Probably not something that should be called externally.
 
 Initiates the fake request.  It does this by first setting up a couple mocks and changing the options that were supplied into a set the mocks require.
 
-From here, it makes a promise, fixes a few problems created by a conflict between Restify and the mocks, then starts the request.  Events are simulated to send any body on the request and the response events are captured to resolve the promise.  A timer is also started, helping to ensure tests do not run for too long.  The promise is resolved if there is any response and is rejected only if the timer expires.
+From here, it makes a promise, fixes a few problems created by a conflict between Restify and the mocks, then starts the request.  Events are simulated to send a request body and the response events are captured to resolve the promise.  A timer is also started, helping to ensure tests do not run for too long.  The promise is resolved if there is any response and is rejected only if the timer expires.
 
 If you wanted to peek behind the curtain, this is where the Wizard hides.
 
