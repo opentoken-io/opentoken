@@ -394,7 +394,6 @@ class FunctionalTest {
             });
         }
 
-
         // Set some default properties for posting data
         if (options.body) {
             options.body = this.coerseToBuffer(options.body);

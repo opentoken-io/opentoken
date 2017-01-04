@@ -17,7 +17,7 @@ You must instantiate a functional test object in your `beforeEach()` of your tes
         });
     });
 
-Tests simulating API requests can be initiated by several of the `FunctionalTest` object's methods.  Here is a simple request to the API to the health check endpoint.
+Tests simulating API requests can be initiated by several of the `FunctionalTest` object's methods.  Here is a simple request to the API's health check endpoint.
 
     it("says the server is running", () => {
         return test.startAsync("service, "health-check").then((response) => {
@@ -28,7 +28,7 @@ Tests simulating API requests can be initiated by several of the `FunctionalTest
         });
     });
 
-As was also done in the `beforeEach()`, this is asynchronous and so it returns a promise, which resolves in a special response object.
+As was done in the `beforeEach()`, this is asynchronous and so it returns a promise, which resolves in a special response object.
 
 
 Request Options
@@ -64,7 +64,7 @@ The response object is a simple Object and has the following properties:
 
 * `.links` - The "Link" header reformatted as an object.  Follows the format of the `parse-link-header` module.
 
-* `.statusCode` - A number indicating if the response was a success or failure.
+* `.statusCode` - A number indicating if the response was a success or failure.  This is the HTTP status code, so 2xx level responses (200, 201, etc) are success.  3xx levels are client errors, 4xx mean it is missing, 5xx level are server errors.
 
 * `.uri` - The request URI.
 
@@ -123,7 +123,7 @@ Logs a bunch of information about a response.  Only useful when you are figuring
 
 ### `linkDefinition = test.findLink(links, rel, [title])`
 
-Searches the links and returns a single link definition given the link relation and optionally the link title.  Returns an `Error` object when there's no matching links or too many matching links.
+Searches the links and returns a single link definition given the link relation and optionally the link title.  Returns an `Error` object where there are no matching links or too many matching links.
 
     it("finds the \"self\" link", () => {
         return test.loginAsync().then((response) => {
@@ -191,9 +191,9 @@ Probably not something that should be called externally.
 
 ### `Promise<response> = test.requestAsync(options)`
 
-Initiates the fake request.  It does this by first setting up a couple mocks and changing the options that were supplied into a set that the mocks require.
+Initiates the fake request.  It does this by first setting up a couple mocks and changing the options that were supplied into a set the mocks require.
 
-From here, it makes a promise, fixes a few problems that are created by a conflict between Restify and the mocks, then starts the request.  Events are simulated to send any body on the request and the response events are captured to resolve the promise.  A timer is also started and that timer will help ensure that tests do not run for too long.  The promise is resolved if there is any response and is rejected only if the timer expires.
+From here, it makes a promise, fixes a few problems created by a conflict between Restify and the mocks, then starts the request.  Events are simulated to send any body on the request and the response events are captured to resolve the promise.  A timer is also started, helping to ensure tests do not run for too long.  The promise is resolved if there is any response and is rejected only if the timer expires.
 
 If you wanted to peek behind the curtain, this is where the Wizard hides.
 

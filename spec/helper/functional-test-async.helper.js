@@ -2,7 +2,7 @@
 
 /**
  * @typedef {Object} opentoken~functionalTestAsyncResponse
- * @property {*} body Can be anything, including objects.
+ * @property {*} body Can be anything, including objects
  * @property {Object} links The Link header reformatted for ease of use
  * @property {Object} headers
  * @property {number} statusCode
@@ -36,7 +36,6 @@ function EventEmitterSafetyLayer() {
 
     args = [].slice.call(arguments);
 
-    // eslint-disable-next-line new-cap
     return originalEventEmitter.call(this, args);
 }
 
