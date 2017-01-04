@@ -1,0 +1,19 @@
+{
+    "debug": true,
+    "email": {
+        "engine": "log"
+    },
+    "record": {
+        "encryptionKeyFile": "encryption.key.dev"
+    },
+    "server": {
+        "baseUrl": "http://localhost:8080",
+        "port": 8080
+    },
+    "signature": {
+        "host": "localhost"
+    },
+    "storage": {
+        "engine": "in-memory"
+    }
+}

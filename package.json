@@ -58,6 +58,7 @@
         "request": "^2.75.0",
         "restify": "opentoken-io/node-restify#proxywrap",
         "restify-cookies": "^0.2.2",
+        "restify-errors": "^4.3.0",
         "restify-links": "^1.1.0",
         "restify-plugins": "^1.1.0",
         "restify-router-magic": "^1.1.0",

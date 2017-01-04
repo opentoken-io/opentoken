@@ -17,6 +17,17 @@
     ],
     "oneOf": [
         {
+            "description": "These engines do not require additional configuration.",
+            "properties": {
+                "engine": {
+                    "enum": [
+                        "log",
+                        "mock"
+                    ]
+                }
+            }
+        },
+        {
             "properties": {
                 "engine": {
                     "enum": [

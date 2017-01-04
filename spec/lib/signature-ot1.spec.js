@@ -20,21 +20,21 @@ describe("signatureOt1", () => {
     }
 
     beforeEach(() => {
-        var binaryBufferMock, utilMock;
+        var binaryBufferMock, util;
 
         accessCodeManagerMock = require("../mock/manager/access-code-manager-mock")();
         binaryBufferMock = require("../mock/binary-buffer-mock")();
         hashMock = require("../mock/hash-mock")();
         promiseMock = require("../mock/promise-mock")();
         requestMock = require("../mock/request-mock")();
-        utilMock = require("../mock/util-mock")();
+        util = require("../../lib/util")();
         ErrorResponse = require("../../lib/error-response")(promiseMock);
 
         hashMock.hmac.andReturn("FakeSignature");
         requestMock.headers.host = "example.com";
         requestMock.headers["x-opentoken-date"] = "2010-01-01T01:23:45Z";
         requestMock.headers["content-type"] = "text/plain";
-        signatureLib = require("../../lib/signature-ot1")(accessCodeManagerMock, binaryBufferMock, ErrorResponse, hashMock, promiseMock, utilMock);
+        signatureLib = require("../../lib/signature-ot1")(accessCodeManagerMock, binaryBufferMock, ErrorResponse, hashMock, promiseMock, util);
         kvPairs = {
             "access-code": "FakeAccessCode",
             signature: "FakeSignature",

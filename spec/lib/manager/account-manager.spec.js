@@ -4,7 +4,7 @@ describe("accountManager", () => {
     var challengeManagerMock, factory, promiseMock, randomMock, sessionManagerMock, storageService, storageServiceFactoryMock, totpMock;
 
     beforeEach(() => {
-        var utilMock;
+        var util;
 
         challengeManagerMock = require("../../mock/manager/challenge-manager-mock")();
         promiseMock = require("../../mock/promise-mock")();
@@ -13,7 +13,7 @@ describe("accountManager", () => {
         storageService = storageServiceFactoryMock.instance;
         sessionManagerMock = require("../../mock/manager/session-manager-mock")();
         totpMock = require("../../mock/mfa/totp-mock")();
-        utilMock = require("../../mock/util-mock")();
+        util = require("../../../lib/util")();
         factory = () => {
             var config;
 
@@ -38,7 +38,7 @@ describe("accountManager", () => {
                 }
             };
 
-            return require("../../../lib/manager/account-manager")(challengeManagerMock, config, promiseMock, randomMock, sessionManagerMock, storageServiceFactoryMock, totpMock, utilMock);
+            return require("../../../lib/manager/account-manager")(challengeManagerMock, config, promiseMock, randomMock, sessionManagerMock, storageServiceFactoryMock, totpMock, util);
         };
     });
     it("exposes known methods", () => {

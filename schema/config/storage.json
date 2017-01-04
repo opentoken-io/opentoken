@@ -11,6 +11,16 @@
     ],
     "oneOf": [
         {
+            "description": "in-memory",
+            "properties": {
+                "engine": {
+                    "enum": [
+                        "in-memory"
+                    ]
+                }
+            }
+        },
+        {
             "description": "s3 storage engine",
             "properties": {
                 "engine": {
