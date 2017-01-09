@@ -4,9 +4,9 @@
     "description": "Public and free software API to tokenize or encrypt data.",
     "main": "lib/opentoken.js",
     "scripts": {
-        "start": "scripts/start",
-        "test": "scripts/test",
-        "watch": "scripts/watch"
+        "start": "script/start",
+        "test": "script/test",
+        "watch": "script/watch"
     },
     "repository": {
         "type": "git",
