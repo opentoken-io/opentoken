@@ -1,5 +1,9 @@
 "use strict";
 
+var mockRequire;
+
+mockRequire = require("mock-require");
+
 /**
  * Load an OpenToken-style formatter and wrap it in a Promise to make
  * testing easier.  This promise is *REJECTED* if the middleware calls
@@ -22,7 +26,8 @@ jasmine.formatterToPromise = (formatterName, reqMock, resMock) => {
         resMock = require("../mock/response-mock")();
     }
 
-    container = require("../../lib/container");
+    // Get a fresh copy of the container
+    container = mockRequire.reRequire("../../lib/container");
     genericFormatterMock = require("../mock/formatter/generic-formatter-mock")();
     container.register("genericFormatter", genericFormatterMock);
 
@@ -34,6 +39,10 @@ jasmine.formatterToPromise = (formatterName, reqMock, resMock) => {
     // get the unwrapped formatter.
     container.resolve(formatterName);
     formatter = genericFormatterMock.formatWithFallback.mostRecentCall.args[0];
+
+    // Because the container was corrupt, we now erase the corrupted
+    // container from the require cache.
+    mockRequire.reRequire("../../lib/container");
 
     return (body) => {
         return new Promise((resolve, reject) => {
