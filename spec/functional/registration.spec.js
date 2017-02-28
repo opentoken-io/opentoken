@@ -12,7 +12,7 @@ describe("registration", () => {
         return test.createAccountAsync().then((response) => {
             expect(response.statusCode).toBe(201);
             expect(response.body).toEqual(jasmine.any(Object));
-            expect(response.links.self.url).toBe(`/account/${response.body.accountId}`);
+            expect(response.links.rel("self")[0].uri).toBe(`/account/${response.body.accountId}`);
         });
     });
 });
