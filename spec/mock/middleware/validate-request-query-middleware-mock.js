@@ -11,9 +11,9 @@ module.exports = () => {
         var result;
 
         req.query = req.query || {};
-        result = container.resolve("schema").validate(req.query, middleware.schemaPath);
+        result = container.resolve("tv4").validateResult(req.query, middleware.schemaPath);
 
-        if (result) {
+        if (!result.valid) {
             res.send(400, new Error(`Did not validate against schema: ${middleware.schemaPath}`));
 
             return next(false);

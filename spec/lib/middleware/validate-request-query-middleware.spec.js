@@ -1,7 +1,7 @@
 "use strict";
 
 describe("validateRequestQueryMiddleware", () => {
-    var chainMiddlewareMock, ErrorResponse, middlewareFactory, restifyPluginsMock, schemaMock;
+    var chainMiddlewareMock, ErrorResponse, middlewareFactory, restifyPluginsMock, tv4Mock;
 
     beforeEach(() => {
         var promiseMock;
@@ -12,11 +12,15 @@ describe("validateRequestQueryMiddleware", () => {
         restifyPluginsMock = jasmine.createSpyObj("restifyPlugins", [
             "queryParser"
         ]);
-        schemaMock = jasmine.createSpyObj("schema", [
-            "validate"
+        tv4Mock = jasmine.createSpyObj("tv4", [
+            "validateResult"
         ]);
-        schemaMock.validate.andReturn(null);
-        middlewareFactory = require("../../../lib/middleware/validate-request-query-middleware")(chainMiddlewareMock, ErrorResponse, restifyPluginsMock, schemaMock);
+        tv4Mock.validateResult.andReturn({
+            error: null,
+            missing: [],
+            valid: "true"
+        });
+        middlewareFactory = require("../../../lib/middleware/validate-request-query-middleware")(chainMiddlewareMock, ErrorResponse, restifyPluginsMock, tv4Mock);
     });
     it("parses the query", () => {
         middlewareFactory("schema");
@@ -34,13 +38,13 @@ describe("validateRequestQueryMiddleware", () => {
             req = require("../../mock/request-mock")();
             res = require("../../mock/response-mock")();
         });
-        it("calls schema.validate()", () => {
+        it("calls tv4.validateResult()", () => {
             req.query = {
                 query: true
             };
 
             return middlewareAsync(req, res).then(() => {
-                expect(schemaMock.validate).toHaveBeenCalledWith({
+                expect(tv4Mock.validateResult).toHaveBeenCalledWith({
                     query: true
                 }, "schema");
                 expect(res.send).not.toHaveBeenCalled();
@@ -50,12 +54,12 @@ describe("validateRequestQueryMiddleware", () => {
             req.query = {
                 query: true
             };
-            schemaMock.validate.andReturn({
+            tv4Mock.validateResult.andReturn({
                 validation: "errors"
             });
 
             return middlewareAsync(req, res).then(jasmine.fail, () => {
-                expect(schemaMock.validate).toHaveBeenCalledWith({
+                expect(tv4Mock.validateResult).toHaveBeenCalledWith({
                     query: true
                 }, "schema");
                 expect(res.send).toHaveBeenCalledWith(400, jasmine.any(ErrorResponse));

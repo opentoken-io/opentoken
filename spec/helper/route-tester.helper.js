@@ -50,7 +50,7 @@ function addRouteMethods(routeTester) {
             // Wrap the middleware so it returns a promise.
             middleware = jasmine.middlewareToPromise(middleware);
             routeTester[methodName] = (body) => {
-                var schema;
+                var tv4;
 
                 if (body) {
                     if (!Buffer.isBuffer(body)) {
@@ -65,9 +65,9 @@ function addRouteMethods(routeTester) {
                     routeTester.req.internalContentLength = body.length;
                 }
 
-                schema = routeTester.container.resolve("schema");
+                tv4 = routeTester.container.resolve("tv4");
 
-                return schema.loadSchemaFolderAsync(path.resolve(__dirname, "../../schema")).then(() => {
+                return tv4.loadSchemaFolderAsync(path.resolve(__dirname, "../../schema")).then(() => {
                     return middleware(routeTester.req, routeTester.res);
                 });
             };

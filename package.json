@@ -1,6 +1,6 @@
 {
     "name": "opentoken",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Public and free software API to tokenize or encrypt data.",
     "main": "lib/opentoken.js",
     "scripts": {
@@ -64,6 +64,7 @@
         "restify-router-magic": "^1.1.0",
         "thirty-two": "^1.0.2",
         "tv4": "^1.2.7",
+        "tv4-file-loader": "^1.0.3",
         "urijs": "^1.18.2",
         "validator": "^6.2.0"
     }
