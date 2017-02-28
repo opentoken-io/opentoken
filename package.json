@@ -1,6 +1,6 @@
 {
     "name": "opentoken",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Public and free software API to tokenize or encrypt data.",
     "main": "lib/opentoken.js",
     "scripts": {
