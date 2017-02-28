@@ -1,12 +1,12 @@
 "use strict";
 
-var chalk, crypto, events, parseLinkHeader;
+var chalk, crypto, events, HttpLinkHeader;
 
 // Required for the class
 chalk = require("chalk");
 crypto = require("crypto");
 events = require("events");
-parseLinkHeader = require("parse-link-header");
+HttpLinkHeader = require("http-link-header");
 
 
 /**
@@ -227,7 +227,7 @@ class FunctionalTest {
     /**
      * Finds the link definition object in a list of formatted links.
      *
-     * @param {Object} links From parseLinkHeader
+     * @param {Object} links From HttpLinkHeader
      * @param {string} rel
      * @param {string} [title]
      * @return {(Object|Error)} Link definition or error message
@@ -235,14 +235,12 @@ class FunctionalTest {
     findLink(links, rel, title) {
         var linkArray, suffix;
 
-        linkArray = links[rel];
+        linkArray = links.rel(rel);
 
         if (!linkArray) {
             return new Error(`No links found for relation ${rel}`);
         }
 
-        // Standardize
-        linkArray = [].concat(linkArray);
         suffix = "";
 
         if (title) {
@@ -292,7 +290,7 @@ class FunctionalTest {
             return Promise.reject(linkDefinition);
         }
 
-        options.url = linkDefinition.url;
+        options.url = linkDefinition.uri;
 
         return this.requestAsync(options);
     }
@@ -469,11 +467,14 @@ class FunctionalTest {
             };
 
             res.on("end", () => {
+                var links;
+
                 /* eslint-disable no-underscore-dangle */
+                links = HttpLinkHeader.parse(res._getHeaders().Link || "");
                 resolve({
                     body: res._getData(),
                     headers: res._getHeaders(),
-                    links: parseLinkHeader(res._getHeaders().Link),
+                    links,
                     statusCode: res._getStatusCode(),
                     uri: options.url
                 });

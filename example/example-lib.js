@@ -5,7 +5,7 @@
 
 "use strict";
 
-var Bluebird, container, encoding, parseLinkHeader, requestLibAsync, tv4, twofa, Uri, util;
+var Bluebird, container, encoding, HttpLinkHeader, requestLibAsync, tv4, twofa, Uri, util;
 
 // ------------------ Dependencies for other functions ----------------
 
@@ -63,7 +63,7 @@ function requestAsync(method, uri, data) {
         }
 
         // Use a library to parse all link headers
-        links = parseLinkHeader(res.headers.link);
+        links = HttpLinkHeader.parse(res.headers.link);
         res.link = {};
 
         // Reformat the links so you can access them with
@@ -73,35 +73,33 @@ function requestAsync(method, uri, data) {
         // The OpenToken.io API will not emit multiple links with the
         // same link relation and title combination.  Thus, links should
         // never be overwritten with the following code.
-        Object.keys(links).forEach((rel) => {
-            var relCamel;
+        links.refs.forEach((linkDefinition) => {
+            var relCamel, titleCamel;
 
-            relCamel = toCamelCase(rel);
-            [].concat(links[rel]).forEach((linkDefinition) => {
-                var titleCamel;
+            relCamel = toCamelCase(linkDefinition.rel);
 
-                if (!res.link[relCamel]) {
-                    res.link[relCamel] = {};
-                }
+            if (!res.link[relCamel]) {
+                res.link[relCamel] = {};
+            }
 
-                // Resolve the href property.
-                // Note: the library does not use .href and instead uses
-                // .url.  So, we'll make .href be the absolute URI.
-                linkDefinition.href = resolveUri(uri, linkDefinition.url);
+            // Resolve the href property.
+            // Note: the library does not use .href and instead uses
+            // .uri.  So, we'll make .href be the absolute URI.
+            linkDefinition.href = resolveUri(uri, linkDefinition.uri);
+            console.log(linkDefinition);
 
-                // Also resolve the profile.
-                if (linkDefinition.profile) {
-                    linkDefinition.profile = resolveUri(uri, linkDefinition.profile);
-                }
+            // Also resolve the profile.
+            if (linkDefinition.profile) {
+                linkDefinition.profile = resolveUri(uri, linkDefinition.profile);
+            }
 
-                if (linkDefinition.title) {
-                    titleCamel = linkDefinition.title.replace(/-/g, "_");
-                } else {
-                    titleCamel = "default";
-                }
+            if (linkDefinition.title) {
+                titleCamel = linkDefinition.title.replace(/-/g, "_");
+            } else {
+                titleCamel = "default";
+            }
 
-                res.link[relCamel][titleCamel] = linkDefinition;
-            });
+            res.link[relCamel][titleCamel] = linkDefinition;
         });
 
         // Parse the response if it is valid JSON
@@ -268,7 +266,7 @@ function totpCode(keyBase32, offset) {
 Bluebird = require("bluebird");
 container = require("../lib/container");
 encoding = container.resolve("encoding");
-parseLinkHeader = require("parse-link-header");
+HttpLinkHeader = require("http-link-header");
 requestLibAsync = Bluebird.promisify(require("request"));
 tv4 = Bluebird.promisifyAll(require("tv4"));
 twofa = require("2fa");
