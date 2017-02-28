@@ -10,9 +10,9 @@ module.exports = () => {
     middleware = jasmine.createSpy("validateRequestBodyMiddlewareMockMiddleware").andCallFake((req, res, next) => {
         var result;
 
-        result = container.resolve("schema").validate(req.body, middleware.schemaPath);
+        result = container.resolve("tv4").validateResult(req.body, middleware.schemaPath);
 
-        if (result) {
+        if (!result.valid) {
             res.send(400, new Error(`Did not validate against schema: ${middleware.schemaPath}`));
 
             return next(false);

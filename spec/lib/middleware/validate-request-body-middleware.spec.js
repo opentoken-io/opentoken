@@ -1,7 +1,7 @@
 "use strict";
 
 describe("validateRequestBodyMiddleware", () => {
-    var chainMiddlewareMock, ErrorResponse, restifyPluginsMock, schemaMock, validateRequestBodyMiddleware;
+    var chainMiddlewareMock, ErrorResponse, restifyPluginsMock, tv4Mock, validateRequestBodyMiddleware;
 
     beforeEach(() => {
         var promiseMock;
@@ -12,11 +12,15 @@ describe("validateRequestBodyMiddleware", () => {
         restifyPluginsMock = jasmine.createSpyObj("restifyPlugins", [
             "bodyParser"
         ]);
-        schemaMock = jasmine.createSpyObj("schema", [
-            "validate"
+        tv4Mock = jasmine.createSpyObj("tv4", [
+            "validateResult"
         ]);
-        schemaMock.validate.andReturn(null);
-        validateRequestBodyMiddleware = require("../../../lib/middleware/validate-request-body-middleware")(chainMiddlewareMock, ErrorResponse, restifyPluginsMock, schemaMock);
+        tv4Mock.validateResult.andReturn({
+            error: null,
+            missing: [],
+            valid: "true"
+        });
+        validateRequestBodyMiddleware = require("../../../lib/middleware/validate-request-body-middleware")(chainMiddlewareMock, ErrorResponse, restifyPluginsMock, tv4Mock);
     });
     it("parses the body", () => {
         validateRequestBodyMiddleware("schema");
@@ -34,28 +38,28 @@ describe("validateRequestBodyMiddleware", () => {
             req = require("../../mock/request-mock")();
             res = require("../../mock/response-mock")();
         });
-        it("calls schema.validate()", () => {
+        it("calls tv4.validateResult()", () => {
             req.body = {
                 body: true
             };
 
             return middlewareAsync(req, res).then(() => {
-                expect(schemaMock.validate).toHaveBeenCalledWith({
+                expect(tv4Mock.validateResult).toHaveBeenCalledWith({
                     body: true
                 }, "schema");
                 expect(res.send).not.toHaveBeenCalled();
             });
         });
-        it("errors when the schema does not validate", () => {
+        it("errors when the schema does not validateResult", () => {
             req.body = {
                 body: true
             };
-            schemaMock.validate.andReturn({
+            tv4Mock.validateResult.andReturn({
                 validation: "errors"
             });
 
             return middlewareAsync(req, res).then(jasmine.fail, () => {
-                expect(schemaMock.validate).toHaveBeenCalledWith({
+                expect(tv4Mock.validateResult).toHaveBeenCalledWith({
                     body: true
                 }, "schema");
                 expect(res.send).toHaveBeenCalledWith(400, jasmine.any(ErrorResponse));
