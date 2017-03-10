@@ -30,15 +30,15 @@ describe("validateSessionMiddleware", () => {
         });
         describe("when sessionManager rejects the session", () => {
             beforeEach(() => {
-                sessionManagerMock.validateAsync.andCallFake(() => {
+                sessionManagerMock.validateAsync.and.callFake(() => {
                     return promiseMock.reject("x");
                 });
             });
             it("sends an error response", () => {
                 return middlewareAsync(req, res).then(jasmine.fail, () => {
                     expect(res.send).toHaveBeenCalledWith(403, jasmine.any(ErrorResponse));
-                    expect(res.send.mostRecentCall.args[1].code).toEqual("8gzh4j1A");
-                    expect(res.send.mostRecentCall.args[1].message).toEqual("Session is invalid.");
+                    expect(res.send.calls.mostRecent().args[1].code).toEqual("8gzh4j1A");
+                    expect(res.send.calls.mostRecent().args[1].message).toEqual("Session is invalid.");
                 });
             });
             it("passes a value to \"next\"", () => {
@@ -92,7 +92,7 @@ describe("validateSessionMiddleware", () => {
                 it("caches the self-discovery link for speed", () => {
                     return middlewareAsync(req, res).then(jasmine.fail, () => {
                         // This will prove that the route is not rendered again
-                        serverMock.router.render.andReturn("If this is returned the result was not cached");
+                        serverMock.router.render.and.returnValue("If this is returned the result was not cached");
 
                         // Replace the spy to remove the previous calls
                         res.header = jasmine.createSpy("response header");

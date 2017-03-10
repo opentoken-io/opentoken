@@ -12,13 +12,13 @@ module.exports = () => {
         "deleteAsync",
         "validateAsync"
     ]);
-    mock.createAsync.andCallFake(() => {
+    mock.createAsync.and.callFake(() => {
         return promiseMock.resolve("createdId");
     });
-    mock.deleteAsync.andCallFake(() => {
+    mock.deleteAsync.and.callFake(() => {
         return promiseMock.resolve();
     });
-    mock.validateAsync.andCallFake(() => {
+    mock.validateAsync.and.callFake(() => {
         return promiseMock.resolve();
     });
 

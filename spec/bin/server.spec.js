@@ -31,7 +31,7 @@ describe("bin/server.js", () => {
             config,
             logger: require("../mock/logger-mock")(),
             neodoc: {
-                run: jasmine.createSpy("neodoc").andReturn(neodocArgs)
+                run: jasmine.createSpy("neodoc").and.returnValue(neodocArgs)
             },
             path: require("path"),
             util: require("../../lib/util")()

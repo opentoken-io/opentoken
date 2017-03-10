@@ -29,11 +29,11 @@ describe("mfa/totp", () => {
             "generateUrl",
             "verifyTOTP"
         ]);
-        twofaAsyncMock.generateGoogleQRAsync.andCallFake(() => {
+        twofaAsyncMock.generateGoogleQRAsync.and.callFake(() => {
             return promiseMock.resolve(new Buffer("png data", "binary"));
         });
-        twofaAsyncMock.generateUrl.andReturn("twofaAsyncMock.generateUrl()");
-        twofaAsyncMock.verifyTOTP.andReturn(true);
+        twofaAsyncMock.generateUrl.and.returnValue("twofaAsyncMock.generateUrl()");
+        twofaAsyncMock.verifyTOTP.and.returnValue(true);
     });
     describe(".generateSecretAsync()", () => {
         it("returns a generated key", () => {
@@ -65,7 +65,7 @@ describe("mfa/totp", () => {
             expect(factory().verifyCurrent("secret", "current")).toBe(true);
         });
         it("returns false when invalid", () => {
-            twofaAsyncMock.verifyTOTP.andReturn(false);
+            twofaAsyncMock.verifyTOTP.and.returnValue(false);
             expect(factory().verifyCurrent("secret", "current")).toBe(false);
         });
     });
@@ -73,7 +73,7 @@ describe("mfa/totp", () => {
         var currentValid, previousValid;
 
         beforeEach(() => {
-            twofaAsyncMock.verifyTOTP.andCallFake((secret, code) => {
+            twofaAsyncMock.verifyTOTP.and.callFake((secret, code) => {
                 expect(secret).toBe("secret");
 
                 if (code === "current") {

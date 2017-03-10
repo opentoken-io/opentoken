@@ -1,12 +1,5 @@
 "use strict";
 
-/**
- * @typedef {Object} opentoken~functionalTestAsyncResponse
- * @property {*} body Can be anything, including objects
- * @property {Object} links The Link header reformatted for ease of use
- * @property {Object} headers
- * @property {number} statusCode
- */
 
 /**
  * @typedef {Object} opentoken~functionalTestAsyncTest
@@ -16,28 +9,9 @@
  * @property {Function} start Make a request to / and possibly follow a link
  */
 
-var events, mockRequire, originalEventEmitter;
+var mockRequire;
 
-
-/**
- * Create an object that extends EventEmitter so EventEmitter does
- * not have additional methods added due to Restify.
- *
- * Because everything uses `EventEmitter.call(this)`, this safety
- * layer can not be a typical class.  Instead, it is wired up this way.
- *
- * Also, this has to be the same safety layer that is used every time,
- * so don't go creating new safety layers continually.
- *
- * @return {*} Whatever EventEmitter returns
- */
-function EventEmitterSafetyLayer() {
-    var args;
-
-    args = [].slice.call(arguments);
-
-    return originalEventEmitter.call(this, args);
-}
+mockRequire = require("mock-require");
 
 
 /**
@@ -111,72 +85,6 @@ function getContainer(config) {
 
 
 /**
- * Mock the necessary bits of http.  This prevents tests from starting a
- * real server and listening on a real port.  It also reports back about
- * the request handler that is registered to handle HTTP requests.
- *
- * Properties will be assigned to test:
- *
- * test.requestHandler - The callback registered with .on("request", ...)
- *
- * @param {opentoken~FunctionalTest} test
- */
-function mockHttpAndEvents(test) {
-    var http, httpServerMock;
-
-    http = require("http");
-
-    // Preload modules so they get the real EventEmitter
-    try {
-        // bunyan is required by restify.  npm <= 3.x installs bunyan under
-        // restify and the next line can error.  That's ok.
-        // We should only require it here and if it fails we ignore the error.
-        require("bunyan");
-    } catch (e) {
-        // Ignore
-    }
-
-    // Mock the necessary bits to avoid making a server
-    // and still have access to the router.
-    httpServerMock = jasmine.createSpyObj("httpServerMock", [
-        "listen",
-        "on"
-    ]);
-    httpServerMock.listen.andCallFake((port, callback) => {
-        callback();
-    });
-    httpServerMock.on.andCallFake((event, callback) => {
-        if (event === "request") {
-            test.requestHandler = callback;
-        }
-    });
-    spyOn(http, "createServer").andReturn(httpServerMock);
-
-    // Restify modifies this directly when booting, so we modify it here.
-    // The end result is that this must inherit from whatever
-    // nodeMocksHttp uses.  Additional methods are added to this object's
-    // prototype.
-    jasmine.swapProperty(http, "IncomingMessage", EventEmitterSafetyLayer);
-
-    // nodeMocksHttp uses this directly when creating a response.  This
-    // must be the same object or a descendant of what Restify uses.
-    jasmine.swapProperty(events, "EventEmitter", EventEmitterSafetyLayer);
-
-    // Now rerequire nodeMocksHttp and provide it to the FunctionalTest object.
-    test.setNodeMocksHttp(mockRequire.reRequire("node-mocks-http"));
-}
-
-
-events = require("events");
-mockRequire = require("mock-require");
-
-// This finishes the setup of the safety layer and sets up the object
-// prototypes.
-originalEventEmitter = events.EventEmitter;
-EventEmitterSafetyLayer.prototype = Object.create(originalEventEmitter.prototype);
-EventEmitterSafetyLayer.prototype.constructor = originalEventEmitter;
-
-/**
  * Starts up the server and bootstraps.
  *
  * The resulting promise provides the request submitting function.
@@ -184,27 +92,25 @@ EventEmitterSafetyLayer.prototype.constructor = originalEventEmitter;
  * @return {Promise.<opentoken~FunctionalTest>}
  */
 jasmine.functionalTestAsync = () => {
-    var config, container, test;
+    var config, container, otTest;
 
     // Create the FunctionalTest object, which is what the promise will
     // provide.
-    test = new jasmine.FunctionalTest();
+    return jasmine.restifyFunctionalTestAsync(() => {
+        // Get a completely new and reset container, including mocks.
+        config = getConfig();
+        container = getContainer(config);
 
-    // Get a completely new and reset container, including mocks.
-    config = getConfig();
-    container = getContainer(config);
-    test.container = container;
+        // Bootstrap
+        return container.resolve("bootstrap")().then(() => {
+            return container.resolve("apiServer")();
+        });
+    }).then((test) => {
+        otTest = new jasmine.FunctionalTest(test);
+        otTest.container = container;
+        otTest.sendEmailSpy = container.resolve("email").sendAsync;
 
-    // Mock some required libraries.
-    mockHttpAndEvents(test);
-
-    // Bootstrap
-    return container.resolve("bootstrap")().then(() => {
-        return container.resolve("apiServer")();
-    }).then(() => {
-        test.sendEmailSpy = container.resolve("email").sendAsync;
-
-        return test;
+        return otTest;
     });
 };
 

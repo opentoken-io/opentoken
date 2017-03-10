@@ -14,10 +14,10 @@ module.exports = () => {
         "registerAsync",
         "secureAsync"
     ]);
-    mock.confirmEmailAsync.andCallFake(() => {
+    mock.confirmEmailAsync.and.callFake(() => {
         return promiseMock.resolve("account id");
     });
-    mock.getRecordAsync.andCallFake(() => {
+    mock.getRecordAsync.and.callFake(() => {
         return promiseMock.resolve({
             id: "id",
             record: {
@@ -25,10 +25,10 @@ module.exports = () => {
             }
         });
     });
-    mock.qrCodeImageAsync.andCallFake(() => {
+    mock.qrCodeImageAsync.and.callFake(() => {
         return promiseMock.resolve(new Buffer("png data", "binary"));
     });
-    mock.registerAsync.andCallFake(() => {
+    mock.registerAsync.and.callFake(() => {
         return promiseMock.resolve({
             id: "id",
             record: {
@@ -36,7 +36,7 @@ module.exports = () => {
             }
         });
     });
-    mock.secureAsync.andCallFake(() => {
+    mock.secureAsync.and.callFake(() => {
         return promiseMock.resolve({
             id: "id",
             record: {

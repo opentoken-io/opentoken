@@ -17,7 +17,7 @@ describe("email/log", () => {
             var loggedMessage;
 
             expect(loggerMock.info).toHaveBeenCalled();
-            loggedMessage = loggerMock.info.mostRecentCall.args[0];
+            loggedMessage = loggerMock.info.calls.mostRecent().args[0];
             expect(loggedMessage).toContain("TO");
             expect(loggedMessage).toContain("SUBJ");
             expect(loggedMessage).toContain("TEXT");

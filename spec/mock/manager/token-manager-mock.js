@@ -12,13 +12,13 @@ module.exports = () => {
         "deleteAsync",
         "getRecordAsync"
     ]);
-    mock.createAsync.andCallFake(() => {
+    mock.createAsync.and.callFake(() => {
         return promiseMock.resolve("tokenId");
     });
-    mock.deleteAsync.andCallFake(() => {
+    mock.deleteAsync.and.callFake(() => {
         return promiseMock.resolve();
     });
-    mock.getRecordAsync.andCallFake(() => {
+    mock.getRecordAsync.and.callFake(() => {
         return promiseMock.resolve();
     });
 

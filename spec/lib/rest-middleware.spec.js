@@ -44,7 +44,7 @@ describe("restMiddleware", () => {
 
         middleware = jasmine.createSpyObj(name, methods);
         methods.forEach((methodName) => {
-            middleware[methodName].andReturn(middleware[methodName]);
+            middleware[methodName].and.returnValue(middleware[methodName]);
         });
 
         return middleware;
@@ -67,9 +67,9 @@ describe("restMiddleware", () => {
         ]);
         serverMock = require("../mock/server-mock")();
         requestLoggerMiddlewareMock = jasmine.createSpy("requestLoggerMiddlewareMock");
-        requestLoggerMiddlewareMock.andReturn(requestLoggerMiddlewareMock);
+        requestLoggerMiddlewareMock.and.returnValue(requestLoggerMiddlewareMock);
         restifyLinks = jasmine.createSpy("restifyLinks");
-        restifyLinks.andReturn(restifyLinks);
+        restifyLinks.and.returnValue(restifyLinks);
         restifyPlugins = mockMiddleware("restifyPlugins", [
             "acceptParser",
             "gzipResponse",

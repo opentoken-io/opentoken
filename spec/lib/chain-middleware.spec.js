@@ -11,7 +11,7 @@ describe("chainMiddleware", () => {
      * @return {Function}
      */
     function fakeMiddleware(name, val) {
-        return jasmine.createSpy(name).andCallFake((req, res, next) => {
+        return jasmine.createSpy(name).and.callFake((req, res, next) => {
             fakeMiddlewareCalls.push(name);
             next(val);
         });

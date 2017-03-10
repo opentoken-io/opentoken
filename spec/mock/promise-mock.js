@@ -310,15 +310,15 @@ module.exports = () => {
     }
 
     return {
-        all: jasmine.createSpy("promise.all").andCallFake(all),
-        any: jasmine.createSpy("promise.any").andCallFake(any),
-        create: jasmine.createSpy("promise.create").andCallFake(create),
-        fromCallback: jasmine.createSpy("promise.fromCallback").andCallFake(fromCallback),
-        promisify: jasmine.createSpy("promise.promisify").andCallFake(promisify),
-        promisifyAll: jasmine.createSpy("promise.promisify").andCallFake(promisifyAll),
-        props: jasmine.createSpy("promise.props").andCallFake(props),
-        reject: jasmine.createSpy("promise.reject").andCallFake(reject),
-        resolve: jasmine.createSpy("promise.resolve").andCallFake(resolve),
-        try: jasmine.createSpy("promise.try").andCallFake(tryFn)
+        all: jasmine.createSpy("promise.all").and.callFake(all),
+        any: jasmine.createSpy("promise.any").and.callFake(any),
+        create: jasmine.createSpy("promise.create").and.callFake(create),
+        fromCallback: jasmine.createSpy("promise.fromCallback").and.callFake(fromCallback),
+        promisify: jasmine.createSpy("promise.promisify").and.callFake(promisify),
+        promisifyAll: jasmine.createSpy("promise.promisify").and.callFake(promisifyAll),
+        props: jasmine.createSpy("promise.props").and.callFake(props),
+        reject: jasmine.createSpy("promise.reject").and.callFake(reject),
+        resolve: jasmine.createSpy("promise.resolve").and.callFake(resolve),
+        try: jasmine.createSpy("promise.try").and.callFake(tryFn)
     };
 };

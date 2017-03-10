@@ -72,7 +72,7 @@ describe("linksMiddleware", () => {
                     res.linkObjects = [];
 
                     // Break server route rendering
-                    serverMock.router.render.andReturn("BROKEN");
+                    serverMock.router.render.and.returnValue("BROKEN");
                     req.method = "POST";
 
                     return middlewareAsync(req, res);

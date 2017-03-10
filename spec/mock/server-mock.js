@@ -8,7 +8,7 @@ module.exports = () => {
         use: jasmine.createSpy("server.use")
     };
     mock.router = {
-        render: jasmine.createSpy("server.router.render").andCallFake((name, obj) => {
+        render: jasmine.createSpy("server.router.render").and.callFake((name, obj) => {
             var route;
 
             route = `rendered route: ${name}`;

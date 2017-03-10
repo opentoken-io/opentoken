@@ -14,16 +14,16 @@ module.exports = () => {
         "getAsync",
         "putAsync"
     ]);
-    instance.deleteAsync.andCallFake(() => {
+    instance.deleteAsync.and.callFake(() => {
         return promise.resolve();
     });
-    instance.getAsync.andCallFake(() => {
+    instance.getAsync.and.callFake(() => {
         return promise.reject(new Error("Not configured to be successful"));
     });
-    instance.putAsync.andCallFake(() => {
+    instance.putAsync.and.callFake(() => {
         return promise.resolve();
     });
-    factory = jasmine.createSpy("storageServiceFactoryMock").andCallFake((idHash, lifetime, storagePrefix) => {
+    factory = jasmine.createSpy("storageServiceFactoryMock").and.callFake((idHash, lifetime, storagePrefix) => {
         expect(idHash).toEqual(jasmine.any(Object));
         expect(lifetime).toEqual(jasmine.any(Object));
         expect(typeof storagePrefix).toBe("string");

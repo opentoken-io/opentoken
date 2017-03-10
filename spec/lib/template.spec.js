@@ -37,7 +37,7 @@ describe("template", () => {
             });
         });
         it("processes a template", () => {
-            fsAsyncMock.readFileAsync.andCallFake(() => {
+            fsAsyncMock.readFileAsync.and.callFake(() => {
                 return promiseMock.resolve(new Buffer("testing {{x}} value"));
             });
 
@@ -51,7 +51,7 @@ describe("template", () => {
     });
     describe(".sendEmailAsync()", () => {
         it("builds the right templates", () => {
-            fsAsyncMock.readFileAsync.andCallFake((path) => {
+            fsAsyncMock.readFileAsync.and.callFake((path) => {
                 return promiseMock.resolve(`${path} - {{data.c}}\n`);
             });
 

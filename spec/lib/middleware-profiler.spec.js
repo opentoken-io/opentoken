@@ -19,10 +19,10 @@ describe("MiddlewareProfiler", () => {
             var args, callback;
 
             callback = jasmine.createSpy("callback");
-            expect(setIntervalFn.callCount).toBe(0);
+            expect(setIntervalFn.calls.count()).toBe(0);
             mp.displayAtInterval(callback, 1234);
-            expect(setIntervalFn.callCount).toBe(1);
-            args = setIntervalFn.mostRecentCall.args;
+            expect(setIntervalFn.calls.count()).toBe(1);
+            args = setIntervalFn.calls.mostRecent().args;
             expect(args.length).toBe(2);
             expect(args[1]).toBe(1234);
             expect(args[0]).toEqual(jasmine.any(Function));
@@ -101,7 +101,7 @@ describe("MiddlewareProfiler", () => {
                         delete spy.name;
                     }
 
-                    spy.andCallFake(fakeMiddleware);
+                    spy.and.callFake(fakeMiddleware);
 
                     return spy;
                 }
@@ -109,13 +109,13 @@ describe("MiddlewareProfiler", () => {
                 // No route
                 middle1 = createFakeMiddleware("middle1");
                 usePatched(middle1);
-                args1 = useSpy.mostRecentCall.args;
+                args1 = useSpy.calls.mostRecent().args;
                 wrap1 = args1[0];
 
                 // With a route
                 middle2 = createFakeMiddleware("middle2");
                 usePatched("/middle2", middle2);
-                args2 = useSpy.mostRecentCall.args;
+                args2 = useSpy.calls.mostRecent().args;
             });
             it("used no route for the first middleware", () => {
                 expect(args1.length).toEqual(1);
@@ -158,8 +158,8 @@ describe("MiddlewareProfiler", () => {
                 res = {};
                 next = () => {};
                 wrap1(req, res, next);
-                expect(middle1.callCount).toBe(1);
-                args = middle1.mostRecentCall.args;
+                expect(middle1.calls.count()).toBe(1);
+                args = middle1.calls.mostRecent().args;
                 expect(args[0]).toBe(req);
                 expect(args[1]).toBe(res);
                 expect(args[2]).toEqual(jasmine.any(Function));

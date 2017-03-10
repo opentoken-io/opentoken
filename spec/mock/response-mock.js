@@ -29,10 +29,10 @@ module.exports = () => {
         "setCookie"
     ]);
     response.contentType = "auto";
-    response.header.andCallFake(headerSetter);
+    response.header.and.callFake(headerSetter);
     response.headers = {};
     response.linkObjects = [];
-    response.links.andCallFake((linkObj) => {
+    response.links.and.callFake((linkObj) => {
         Object.keys(linkObj).sort().forEach((rel) => {
             var linkVals;
 
@@ -53,7 +53,7 @@ module.exports = () => {
             });
         });
     });
-    response.setHeader.andCallFake(headerSetter);
+    response.setHeader.and.callFake(headerSetter);
 
     return response;
 };

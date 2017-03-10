@@ -17,7 +17,7 @@ describe("storage/s3", () => {
                 awsSdkMock.lastInstance = this;
                 this.params = params;
                 this.getObjectAsync = jasmine.createSpy("getObjectAsync");
-                this.getObjectAsync.andCallFake(() => {
+                this.getObjectAsync.and.callFake(() => {
                     return promiseMock.resolve({
                         Body: new Buffer("this is a buffer", "binary")
                     });
@@ -28,7 +28,7 @@ describe("storage/s3", () => {
                     "putObjectAsync"
                 ].forEach((method) => {
                     this[method] = jasmine.createSpy(method);
-                    this[method].andCallFake((paramsInside) => {
+                    this[method].and.callFake((paramsInside) => {
                         return promiseMock.resolve(paramsInside);
                     });
                 });
@@ -153,6 +153,7 @@ describe("storage/s3", () => {
                 }).then((val) => {
                     expect(val).toEqual({
                         Body: jasmine.any(Buffer),
+                        ContentType: undefined, // eslint-disable-line no-undefined
                         Expires: "a date",
                         Key: "options"
                     });

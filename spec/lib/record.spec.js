@@ -12,8 +12,8 @@ describe("record", () => {
             "fromBuffer",
             "toBuffer"
         ]);
-        bufferSerializerMock.fromBuffer.andReturn("Original data");
-        bufferSerializerMock.toBuffer.andReturn(new Buffer("Serialized data", "binary"));
+        bufferSerializerMock.fromBuffer.and.returnValue("Original data");
+        bufferSerializerMock.toBuffer.and.returnValue(new Buffer("Serialized data", "binary"));
         config = {
             encryption: {
                 primary: {
@@ -36,16 +36,16 @@ describe("record", () => {
             "decryptAsync",
             "encryptAsync"
         ]);
-        encryptionMock.decryptAsync.andCallFake(() => {
+        encryptionMock.decryptAsync.and.callFake(() => {
             return promiseMock.resolve(new Buffer("decrypted", "binary"));
         });
-        encryptionMock.encryptAsync.andCallFake((buffer, key, hmac, cipher) => {
+        encryptionMock.encryptAsync.and.callFake((buffer, key, hmac, cipher) => {
             return promiseMock.resolve(new Buffer(`encrypted-${cipher}`, "binary"));
         });
         fsMock = jasmine.createSpyObj("fs", [
             "readFile"
         ]);
-        fsMock.readFile.andCallFake((filename, encoding, done) => {
+        fsMock.readFile.and.callFake((filename, encoding, done) => {
             done(null, new Buffer("encryption key"));
         });
         zlibAsyncMock = require("../mock/zlib-async-mock")();
@@ -75,13 +75,13 @@ describe("record", () => {
             expect(bufferSerializerMock.toBuffer).toHaveBeenCalledWith(data);
 
             // Compress
-            args = zlibAsyncMock.deflateRawAsync.mostRecentCall.args;
+            args = zlibAsyncMock.deflateRawAsync.calls.mostRecent().args;
             expect(args[0]).toEqual(jasmine.any(Buffer));
             expect(args[0].toString("binary")).toEqual("Serialized data");
             expect(args.length).toBe(1);
 
             // Inner encryption
-            args = encryptionMock.encryptAsync.calls[0].args;
+            args = encryptionMock.encryptAsync.calls.argsFor(0);
             expect(args[0]).toEqual(jasmine.any(Buffer));
             expect(args[0].toString("binary")).toEqual("compressed");
             expect(args[1]).toBe(innerKey);
@@ -91,11 +91,11 @@ describe("record", () => {
             // Serialize again.  I do not check the value of the expiration
             // date because it was not passed and I didn't go through the
             // effort of setting it correctly in this test.
-            args = bufferSerializerMock.toBuffer.mostRecentCall.args;
+            args = bufferSerializerMock.toBuffer.calls.mostRecent().args;
             expect(args[0].data.toString("binary")).toEqual("encrypted-secondary-cipher");
 
             // Outer encryption
-            args = encryptionMock.encryptAsync.calls[1].args;
+            args = encryptionMock.encryptAsync.calls.argsFor(1);
             expect(args[0]).toEqual(jasmine.any(Buffer));
             expect(args[0].toString("binary")).toEqual("Serialized data");
             expect(args[1].toString("binary")).toBe("encryption key");
@@ -111,7 +111,7 @@ describe("record", () => {
             return record.freezeAsync({}, "", {}, {
                 meta: "data"
             }).then(() => {
-                expect(bufferSerializerMock.toBuffer.calls[1].args[0].meta).toEqual({
+                expect(bufferSerializerMock.toBuffer.calls.argsFor(1)[0].meta).toEqual({
                     meta: "data"
                 });
             });
@@ -123,32 +123,32 @@ describe("record", () => {
         beforeEach(() => {
             // Set the "now" date to be our spy
             expiresMax = otDateMock.now();
-            otDateMock.now.andReturn(expiresMax);
+            otDateMock.now.and.returnValue(expiresMax);
             expiresOption = jasmine.createSpyObj("expiresOption", [
                 "isBefore"
             ]);
         });
         it("uses the passed expire date if it is before the max", () => {
-            expiresOption.isBefore.andReturn(true);
+            expiresOption.isBefore.and.returnValue(true);
 
             return record.freezeAsync({}, "", {
                 expires: expiresOption
             }).then(() => {
-                expect(bufferSerializerMock.toBuffer.calls[1].args[0].expires).toBe(expiresOption);
+                expect(bufferSerializerMock.toBuffer.calls.argsFor(1)[0].expires).toBe(expiresOption);
             });
         });
         it("uses the max if the passed expire date is after the max", () => {
-            expiresOption.isBefore.andReturn(false);
+            expiresOption.isBefore.and.returnValue(false);
 
             return record.freezeAsync({}, "", {
                 expires: expiresOption
             }).then(() => {
-                expect(bufferSerializerMock.toBuffer.calls[1].args[0].expires).toBe(expiresMax);
+                expect(bufferSerializerMock.toBuffer.calls.argsFor(1)[0].expires).toBe(expiresMax);
             });
         });
         it("uses the max without an expiration passed", () => {
             return record.freezeAsync({}, "").then(() => {
-                expect(bufferSerializerMock.toBuffer.calls[1].args[0].expires).toBe(expiresMax);
+                expect(bufferSerializerMock.toBuffer.calls.argsFor(1)[0].expires).toBe(expiresMax);
             });
         });
     });
@@ -159,7 +159,7 @@ describe("record", () => {
             date: new Date()
         };
         innerKey = new Buffer("This is the inner key", "binary");
-        bufferSerializerMock.fromBuffer.andReturn({
+        bufferSerializerMock.fromBuffer.and.returnValue({
             data: "deserialized data"
         });
         promise = record.thawAsync(data, innerKey);
@@ -169,24 +169,24 @@ describe("record", () => {
             var args;
 
             // Outer encryption
-            args = encryptionMock.decryptAsync.calls[0].args;
+            args = encryptionMock.decryptAsync.calls.argsFor(0);
             expect(args[0]).toBe(data);
             expect(args[1].toString("binary")).toBe("encryption key");
 
             // Deserialize
-            args = bufferSerializerMock.fromBuffer.calls[0].args;
+            args = bufferSerializerMock.fromBuffer.calls.argsFor(0);
             expect(args[0].toString("binary")).toBe("decrypted");
 
             // Inner encryption
-            args = encryptionMock.decryptAsync.calls[1].args;
+            args = encryptionMock.decryptAsync.calls.argsFor(1);
             expect(args[0].toString("binary")).toBe("deserialized data");
 
             // Compression
-            args = zlibAsyncMock.inflateRawAsync.mostRecentCall.args;
+            args = zlibAsyncMock.inflateRawAsync.calls.mostRecent().args;
             expect(args[0].toString("binary")).toBe("decrypted");
 
             // Deserialize again
-            args = bufferSerializerMock.fromBuffer.mostRecentCall.args;
+            args = bufferSerializerMock.fromBuffer.calls.mostRecent().args;
             expect(args[0].toString("binary")).toBe("decompressed");
 
             // Done
@@ -202,13 +202,13 @@ describe("record", () => {
             expires = jasmine.createSpyObj("expires", [
                 "isBefore"
             ]);
-            bufferSerializerMock.fromBuffer.andReturn({
+            bufferSerializerMock.fromBuffer.and.returnValue({
                 data: "deserialized data",
                 expires
             });
         });
         it("deserializes when expires is after today", () => {
-            expires.isBefore.andReturn(false);
+            expires.isBefore.and.returnValue(false);
 
             return record.thawAsync({}, "").then((result) => {
                 expect(result).toEqual({
@@ -218,7 +218,7 @@ describe("record", () => {
             });
         });
         it("errors when expires is before today", () => {
-            expires.isBefore.andReturn(true);
+            expires.isBefore.and.returnValue(true);
 
             return record.thawAsync({}, "").then(jasmine.fail, (err) => {
                 expect(err.toString()).toContain("Expired");

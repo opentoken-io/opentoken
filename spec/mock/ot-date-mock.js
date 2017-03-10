@@ -17,7 +17,7 @@ module.exports = () => {
          * @param {OtDateMock} other
          * @return {boolean}
          */
-        this.isBefore = jasmine.createSpy("isBefore").andCallFake((other) => {
+        this.isBefore = jasmine.createSpy("isBefore").and.callFake((other) => {
             return this.date < other.date;
         });
 
@@ -31,7 +31,7 @@ module.exports = () => {
          * @param {Object} spec
          * @return {OtDate}
          */
-        this.plus = jasmine.createSpy("plus").andCallFake(() => {
+        this.plus = jasmine.createSpy("plus").and.callFake(() => {
             return this;
         });
 
@@ -43,7 +43,7 @@ module.exports = () => {
          * @param {number} [offset] Starting position in the buffer
          * @return {Buffer}
          */
-        this.toBuffer = jasmine.createSpy("toBuffer").andCallFake((dest, offset) => {
+        this.toBuffer = jasmine.createSpy("toBuffer").and.callFake((dest, offset) => {
             if (!dest) {
                 dest = new Buffer(4);
                 offset = 0;
@@ -62,7 +62,7 @@ module.exports = () => {
          *
          * @return {string}
          */
-        this.toString = jasmine.createSpy("toString").andCallFake(() => {
+        this.toString = jasmine.createSpy("toString").and.callFake(() => {
             return this.date.toISOString();
         });
     }
@@ -74,7 +74,7 @@ module.exports = () => {
      * @param {number} [offset]
      * @return {OtDateMock}
      */
-    OtDateMock.fromBuffer = jasmine.createSpy("fromBuffer").andCallFake((buff, offset) => {
+    OtDateMock.fromBuffer = jasmine.createSpy("fromBuffer").and.callFake((buff, offset) => {
         var d, t;
 
         d = new Date();
@@ -90,7 +90,7 @@ module.exports = () => {
      * @param {string} str
      * @return {OtDateMock}
      */
-    OtDateMock.fromString = jasmine.createSpy("fromString").andCallFake((str) => {
+    OtDateMock.fromString = jasmine.createSpy("fromString").and.callFake((str) => {
         return new OtDateMock(new Date(str));
     });
 
@@ -99,7 +99,7 @@ module.exports = () => {
      *
      * @return {OtDateMock}
      */
-    OtDateMock.now = jasmine.createSpy("now").andCallFake(() => {
+    OtDateMock.now = jasmine.createSpy("now").and.callFake(() => {
         return new OtDateMock(new Date());
     });
 
@@ -113,7 +113,7 @@ module.exports = () => {
         var otDate;
 
         otDate = OtDateMock.now();
-        OtDateMock.now.andReturn(otDate);
+        OtDateMock.now.and.returnValue(otDate);
 
         return otDate;
     };

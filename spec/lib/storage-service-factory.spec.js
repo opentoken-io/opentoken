@@ -11,7 +11,7 @@ describe("storageServiceFactory", () => {
         recordMock = require("../mock/record-mock")();
         hashMock = require("../mock/hash-mock")();
         util = require("../../lib/util")();
-        hashMock.deriveAsync.andCallFake((input, hashConfig) => {
+        hashMock.deriveAsync.and.callFake((input, hashConfig) => {
             return promiseMock.resolve(`${hashConfig.name}(${input})`);
         });
         storageMock = require("../mock/storage-mock")();
@@ -51,7 +51,7 @@ describe("storageServiceFactory", () => {
                 var args;
 
                 expect(storageMock.getAsync).toHaveBeenCalledWith("prefix/hash(id)");
-                args = recordMock.thawAsync.mostRecentCall.args;
+                args = recordMock.thawAsync.calls.mostRecent().args;
                 expect(Buffer.isBuffer(args[0])).toBe(true);
                 expect(args[0].toString("binary")).toBe("record data");
                 expect(args[1]).toBe("id");
@@ -60,7 +60,7 @@ describe("storageServiceFactory", () => {
             });
         });
         it("puts without metadata", () => {
-            OtDateMock.stubNow().plus.andCallFake((lifetimeIn) => {
+            OtDateMock.stubNow().plus.and.callFake((lifetimeIn) => {
                 expect(lifetimeIn).toEqual({
                     lifetime: true
                 });
@@ -147,7 +147,7 @@ describe("storageServiceFactory", () => {
                 var args;
 
                 expect(storageMock.getAsync).toHaveBeenCalledWith("prefix/hash(id-one)/hash2(id-two)");
-                args = recordMock.thawAsync.mostRecentCall.args;
+                args = recordMock.thawAsync.calls.mostRecent().args;
                 expect(Buffer.isBuffer(args[0])).toBe(true);
                 expect(args[0].toString("binary")).toBe("record data");
                 expect(args[1]).toBe("id-two");

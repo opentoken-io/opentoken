@@ -15,7 +15,7 @@ describe("validateRequestBodyMiddleware", () => {
         tv4Mock = jasmine.createSpyObj("tv4", [
             "validateResult"
         ]);
-        tv4Mock.validateResult.andReturn({
+        tv4Mock.validateResult.and.returnValue({
             error: null,
             missing: [],
             valid: "true"
@@ -33,7 +33,7 @@ describe("validateRequestBodyMiddleware", () => {
             var middleware;
 
             validateRequestBodyMiddleware("schema");
-            middleware = chainMiddlewareMock.mostRecentCall.args[1];
+            middleware = chainMiddlewareMock.calls.mostRecent().args[1];
             middlewareAsync = jasmine.middlewareToPromise(middleware);
             req = require("../../mock/request-mock")();
             res = require("../../mock/response-mock")();
@@ -54,7 +54,7 @@ describe("validateRequestBodyMiddleware", () => {
             req.body = {
                 body: true
             };
-            tv4Mock.validateResult.andReturn({
+            tv4Mock.validateResult.and.returnValue({
                 validation: "errors"
             });
 

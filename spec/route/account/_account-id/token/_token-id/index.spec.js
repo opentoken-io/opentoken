@@ -39,7 +39,7 @@ jasmine.routeTester("/account/_account-id/token/_token-id/", (container) => {
         ].forEach((scenario) => {
             describe(`successful request ${scenario.name}`, () => {
                 beforeEach(() => {
-                    tokenManagerMock.getRecordAsync.andCallFake(() => {
+                    tokenManagerMock.getRecordAsync.and.callFake(() => {
                         return promiseMock.resolve({
                             contentType: "text/plain",
                             data: new Buffer("this is the data", "binary"),
@@ -54,7 +54,7 @@ jasmine.routeTester("/account/_account-id/token/_token-id/", (container) => {
                     var args;
 
                     expect(routeTester.res.send).toHaveBeenCalled();
-                    args = routeTester.res.send.mostRecentCall.args;
+                    args = routeTester.res.send.calls.mostRecent().args;
                     expect(args.length).toBe(2);
                     expect(args[0]).toBe(200);
                     expect(Buffer.isBuffer(args[1])).toBe(true);
@@ -106,7 +106,7 @@ jasmine.routeTester("/account/_account-id/token/_token-id/", (container) => {
             describe(`failed request ${scenario.name}`, () => {
                 beforeEach(() => {
                     routeTester.req.signed = scenario.signed;
-                    tokenManagerMock.getRecordAsync.andCallFake(scenario.record);
+                    tokenManagerMock.getRecordAsync.and.callFake(scenario.record);
 
                     return routeTester.get();
                 });

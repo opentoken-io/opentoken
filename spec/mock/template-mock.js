@@ -11,10 +11,10 @@ module.exports = () => {
         "processTemplateAsync",
         "sendEmailAsync"
     ]);
-    mock.processTemplateAsync.andCallFake(() => {
+    mock.processTemplateAsync.and.callFake(() => {
         return promiseMock.resolve("template rendered");
     });
-    mock.sendEmailAsync.andCallFake(() => {
+    mock.sendEmailAsync.and.callFake(() => {
         return promiseMock.resolve();
     });
 

@@ -11,7 +11,7 @@ module.exports = () => {
         "readFileAsync"
     ]);
 
-    mock.readFileAsync.andCallFake(() => {
+    mock.readFileAsync.and.callFake(() => {
         return promiseMock.reject(new Error("not configured"));
     });
 
