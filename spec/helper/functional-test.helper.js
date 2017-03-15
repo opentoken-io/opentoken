@@ -316,6 +316,10 @@ class FunctionalTest {
         }).then((response) => {
             var body;
 
+            if (response.statusCode !== 200) {
+                throw new Error(`Invalid status code from login. Status code: ${response.statusCode}`);
+            }
+
             body = JSON.parse(response.body);
             this.state.sessionId = body.sessionId;
 
