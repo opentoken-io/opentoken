@@ -7,7 +7,7 @@ container = require("../../../lib/container");
 module.exports = () => {
     var middleware, middlewareFactory;
 
-    middleware = jasmine.createSpy("validateRequestBodyMiddlewareMockMiddleware").andCallFake((req, res, next) => {
+    middleware = jasmine.createSpy("validateRequestBodyMiddlewareMockMiddleware").and.callFake((req, res, next) => {
         var result;
 
         result = container.resolve("tv4").validateResult(req.body, middleware.schemaPath);
@@ -22,7 +22,7 @@ module.exports = () => {
     });
 
     // This factory only returns the same middleware over and over.
-    middlewareFactory = jasmine.createSpy("validateRequestBodyMiddlewareMock").andCallFake((schemaPath) => {
+    middlewareFactory = jasmine.createSpy("validateRequestBodyMiddlewareMock").and.callFake((schemaPath) => {
         middleware.schemaPath = schemaPath;
 
         return middleware;

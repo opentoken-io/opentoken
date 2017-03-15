@@ -30,7 +30,7 @@ describe("middleware/validateSignatureMiddleware", () => {
 
         // Always return the same date for the date checks.
         // We can simulate errors in other ways, shown in tests below.
-        OtDateMock.now.andReturn(OtDateMock.now());
+        OtDateMock.now.and.returnValue(OtDateMock.now());
 
         middlewareFactory = require("../../../lib/middleware/validate-signature-middleware")(configMock, ErrorResponse, OtDateMock, promiseMock, signatureOt1Mock);
     });
@@ -62,8 +62,8 @@ describe("middleware/validateSignatureMiddleware", () => {
                     }
                 ], resMock.linkObjects);
                 expect(resMock.send).toHaveBeenCalledWith(401, jasmine.any(ErrorResponse));
-                expect(resMock.send.mostRecentCall.args[1].code).toBe(code);
-                expect(resMock.send.mostRecentCall.args[1].message).toBe(message);
+                expect(resMock.send.calls.mostRecent().args[1].code).toBe(code);
+                expect(resMock.send.calls.mostRecent().args[1].message).toBe(message);
             };
         }
 
@@ -176,7 +176,7 @@ describe("middleware/validateSignatureMiddleware", () => {
                 return runMiddlewareAsync("      OT1-hmac-SHA256-whatever    ").then(() => {
                     var args;
 
-                    args = signatureOt1Mock.authenticateAsync.mostRecentCall.args;
+                    args = signatureOt1Mock.authenticateAsync.calls.mostRecent().args;
 
                     // Testing individually because it makes the error
                     // messages far easier to read.
@@ -197,7 +197,7 @@ describe("middleware/validateSignatureMiddleware", () => {
 
                     // Only testing one parameter that is different from an
                     // earlier test in order to make any errors more readable.
-                    kvPairs = signatureOt1Mock.authenticateAsync.mostRecentCall.args[2];
+                    kvPairs = signatureOt1Mock.authenticateAsync.calls.mostRecent().args[2];
                     expect(kvPairs).toEqual({
                         aa: "AA",
                         b: "B;B=B;B",

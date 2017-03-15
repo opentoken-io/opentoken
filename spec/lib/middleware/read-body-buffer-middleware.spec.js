@@ -53,7 +53,7 @@ describe("middleware/readBodyBufferMiddleware", () => {
             var promise;
 
             // Does not set a content length
-            req.isChunked.andReturn(true);
+            req.isChunked.and.returnValue(true);
             promise = middlewareAsync(req, res).then(() => {
                 expect(Buffer.isBuffer(req.body)).toBe(true);
                 expect(req.body.toString()).toEqual("chunk1chunk2");

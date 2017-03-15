@@ -45,7 +45,7 @@ describe("requestLoggerMiddleware", () => {
             expect(loggerMock.info).not.toHaveBeenCalled();
             req.log("anything");
             expect(loggerMock.info).toHaveBeenCalled();
-            expect(loggerMock.info.mostRecentCall.args[0]).toMatch(/^BBBBBBBB [^ ]* anything$/);
+            expect(loggerMock.info.calls.mostRecent().args[0]).toMatch(/^BBBBBBBB [^ ]* anything$/);
         });
     });
 });

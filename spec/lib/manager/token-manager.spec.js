@@ -24,7 +24,7 @@ describe("tokenManager", () => {
         storageServiceFactoryMock = require("../../mock/storage-service-factory-mock")();
         manager = require("../../../lib/manager/token-manager")(configMock, promiseMock, randomMock, storageServiceFactoryMock);
         storageService = storageServiceFactoryMock.instance;
-        storageService.getAsync.andCallFake(() => {
+        storageService.getAsync.and.callFake(() => {
             return promiseMock.resolve("token record");
         });
     });

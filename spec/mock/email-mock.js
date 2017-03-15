@@ -10,7 +10,7 @@ module.exports = () => {
     mock = jasmine.createSpyObj("emailMock", [
         "sendAsync"
     ]);
-    mock.sendAsync.andCallFake(() => {
+    mock.sendAsync.and.callFake(() => {
         return promiseMock.resolve();
     });
 

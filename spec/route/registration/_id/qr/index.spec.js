@@ -29,7 +29,7 @@ jasmine.routeTester("/registration/_id/qr", (container) => {
                     }
                 ], routeTester.res.linkObjects);
                 expect(routeTester.res.send).toHaveBeenCalled();
-                args = routeTester.res.send.mostRecentCall.args;
+                args = routeTester.res.send.calls.mostRecent().args;
                 expect(Buffer.isBuffer(args[0])).toBe(true);
                 expect(args[0].toString("binary")).toEqual("png data");
                 expect(args.length).toBe(1);

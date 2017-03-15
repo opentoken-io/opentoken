@@ -1,4 +1,14 @@
 #!/usr/bin/env bash
 
+# Turn on strict mode.
+set -eEo pipefail
+
+# Move to repo root
+cd "${0%/*}/.."
+
+# Add node_modules/.bin to PATH
+PATH="$(pwd)/node_modules/.bin:$PATH"
+export PATH
+
 # Set up a watcher
-jasmine-node node_modules/jasmine-test-helpers/lib/ lib spec --autotest --watch
+nodemon --exec jasmine

@@ -9,10 +9,13 @@ describe("registration", () => {
         });
     });
     it("returns success", () => {
+        var body;
+
         return test.createAccountAsync().then((response) => {
+            body = JSON.parse(response.body);
             expect(response.statusCode).toBe(201);
-            expect(response.body).toEqual(jasmine.any(Object));
-            expect(response.links.rel("self")[0].uri).toBe(`/account/${response.body.accountId}`);
+            expect(body).toEqual(jasmine.any(Object));
+            expect(response.links.rel("self")[0].uri).toBe(`/account/${body.accountId}`);
         });
     });
 });

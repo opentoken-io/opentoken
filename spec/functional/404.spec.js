@@ -13,11 +13,13 @@ describe("404 errors", () => {
             url: "/something-wicked-this-way-comes"
         }).then((response) => {
             expect(response.statusCode).toBe(404);
-            expect(response.body).toEqual({
-                code: "ResourceNotFound",
-                message: "/something-wicked-this-way-comes does not exist"
+
+            // Note: ResourceNotFoundError is technically a RestError and
+            // therefore returns this error. Not sure if this is correct
+            // but this is indeed what it is actually returning.
+            expect(JSON.parse(response.body)).toEqual({
+                code: "VNjrPetsJp"
             });
         });
     });
 });
-

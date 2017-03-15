@@ -10,8 +10,8 @@ module.exports = () => {
         "freezeAsync",
         "thawAsync"
     ]);
-    mock.freezeAsync.andReturn(new Buffer("frozen", "binary"));
-    mock.thawAsync.andCallFake(() => {
+    mock.freezeAsync.and.returnValue(new Buffer("frozen", "binary"));
+    mock.thawAsync.and.callFake(() => {
         return promiseMock.resolve("thawed");
     });
 

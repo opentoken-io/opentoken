@@ -44,7 +44,7 @@ describe("accessCodeManager", () => {
     describe(".createAsync()", () => {
         describe("successful saving", () => {
             beforeEach(() => {
-                storageService.putAsync.andCallFake(() => {
+                storageService.putAsync.and.callFake(() => {
                     return promiseMock.resolve({
                         expires: "some expiration date"
                     });
@@ -87,7 +87,7 @@ describe("accessCodeManager", () => {
         });
         describe("failed saving", () => {
             it("rejects the promise", () => {
-                storageService.putAsync.andCallFake(() => {
+                storageService.putAsync.and.callFake(() => {
                     return promiseMock.reject("x");
                 });
 
@@ -109,7 +109,7 @@ describe("accessCodeManager", () => {
     });
     describe(".getAsync()", () => {
         it("gets from the storage service", () => {
-            storageService.getAsync.andCallFake(() => {
+            storageService.getAsync.and.callFake(() => {
                 return promiseMock.resolve("record data");
             });
 

@@ -1,12 +1,11 @@
 "use strict";
 
-var chalk, crypto, events, HttpLinkHeader;
+var chalk, crypto, querystring;
 
 // Required for the class
 chalk = require("chalk");
 crypto = require("crypto");
-events = require("events");
-HttpLinkHeader = require("http-link-header");
+querystring = require("querystring");
 
 
 /**
@@ -27,8 +26,11 @@ HttpLinkHeader = require("http-link-header");
 class FunctionalTest {
     /**
      * Initialization.
+     *
+     * @param {functionalRouteTester~functionalTest} test
      */
-    constructor() {
+    constructor(test) {
+        this.test = test;
         this.nodeMocksHttp = null;
         this.state = {};
 
@@ -43,26 +45,6 @@ class FunctionalTest {
 
 
     /**
-     * Converts a value into a buffer.  Used for generating the body of
-     * a request.
-     *
-     * @param {*} val
-     * @return {Buffer}
-     */
-    coerseToBuffer(val) {
-        if (Buffer.isBuffer(val)) {
-            return val;
-        }
-
-        if (typeof val !== "string") {
-            val = JSON.stringify(val);
-        }
-
-        return new Buffer(val, "binary");
-    }
-
-
-    /**
      * Create access codes
      *
      * @return {Promise.<functionalTestResponse>}
@@ -70,7 +52,7 @@ class FunctionalTest {
     createAccessCodesAsync() {
         return this.loginAsync().then((response) => {
             if (response.statusCode !== 200) {
-                throw new Error("Invalid status code from login");
+                throw new Error(`Invalid status code from login. Status code ${response.statusCode}`);
             }
 
             return this.followAsync(response, "up", "account", {
@@ -80,7 +62,7 @@ class FunctionalTest {
             });
         }).then((response) => {
             if (response.statusCode !== 200) {
-                throw new Error("Invalid status code from following 'up' link");
+                throw new Error(`Invalid status code from following 'up' link. Status code: ${response.statusCode}`);
             }
 
             return this.followAsync(response, "service", "account-accessCode", {
@@ -92,12 +74,15 @@ class FunctionalTest {
                 }
             });
         }).then((response) => {
+            var body;
+
             if (response.statusCode !== 201) {
                 throw new Error("Error requesting access codes");
             }
 
-            this.state.accessCode = response.body.code;
-            this.state.accessSecret = response.body.secret;
+            body = JSON.parse(response.body);
+            this.state.accessCode = body.code;
+            this.state.accessSecret = body.secret;
 
             return response;
         });
@@ -121,10 +106,10 @@ class FunctionalTest {
             }
         }).then((response) => {
             if (response.statusCode !== 200) {
-                throw new Error("Initial POST was not successful");
+                throw new Error(`Initial POST was not successful. Status code ${response.statusCode}`);
             }
 
-            this.state.registrationId = response.headers.Location.split("/")[2];
+            this.state.registrationId = response.getHeader("Location").split("/")[2];
 
             // MFA validation is mocked to always succeed.
             return this.followAsync(response, "edit", "registration-secure", {
@@ -139,8 +124,7 @@ class FunctionalTest {
                 },
                 headers: {
                     "Content-Type": "application/json"
-                },
-                method: "POST"
+                }
             });
         }).then((response) => {
             var email, match, uri;
@@ -149,11 +133,11 @@ class FunctionalTest {
                 throw new Error("Securing the registration failed");
             }
 
-            if (!this.sendEmailSpy.mostRecentCall) {
+            if (!this.sendEmailSpy.calls.mostRecent()) {
                 throw new Error("No email was sent");
             }
 
-            email = this.sendEmailSpy.mostRecentCall.args[2];
+            email = this.sendEmailSpy.calls.mostRecent().args[2];
             match = email.match(/\/registration\/[a-zA-Z0-9_-]+\/confirm\/([a-zA-Z0-9-_]+)/);
 
             if (!match) {
@@ -167,7 +151,14 @@ class FunctionalTest {
                 url: uri
             });
         }).then((response) => {
-            this.state.accountId = response.body.accountId;
+            var body;
+
+            if (response.statusCode !== 201) {
+                throw new Error(`Invalid status code from registration confirmation. Status code ${response.statusCode}`);
+            }
+
+            body = JSON.parse(response.body);
+            this.state.accountId = body.accountId;
 
             return response;
         });
@@ -297,31 +288,6 @@ class FunctionalTest {
 
 
     /**
-     * Find a header if it exists.  Because headers are case insensitive,
-     * this function needs to scan them all.
-     *
-     * @param {Object} headers
-     * @param {string} headerName
-     * @return {*} Header's value
-     */
-    getHeader(headers, headerName) {
-        var headerNameLowerCase, matches;
-
-        headerNameLowerCase = headerName.toLowerCase();
-
-        matches = Object.keys(headers).filter((key) => {
-            return key.toLowerCase() === headerNameLowerCase;
-        });
-
-        if (!matches.length) {
-            return null;
-        }
-
-        return headers[matches[0]];
-    }
-
-
-    /**
      * Shortcut to login after an account is created.
      *
      * @return {Promise.<opentoken~functionalTestResponse>}
@@ -348,10 +314,30 @@ class FunctionalTest {
                 }
             });
         }).then((response) => {
-            this.state.sessionId = response.body.sessionId;
+            var body;
+
+            if (response.statusCode !== 200) {
+                throw new Error(`Invalid status code from login. Status code: ${response.statusCode}`);
+            }
+
+            body = JSON.parse(response.body);
+            this.state.sessionId = body.sessionId;
 
             return response;
         });
+    }
+
+
+    /**
+     * This function formats the request options and makes requests.
+     *
+     * @param {nodeMocksHttp~mockRequestOptions} options
+     * @return {Promise.<functionalRouteTester~response>}
+     */
+    requestAsync(options) {
+        this.reformatRequestOptions(options);
+
+        return this.test.requestAsync(options.method, options.url, options);
     }
 
 
@@ -368,39 +354,17 @@ class FunctionalTest {
             options.headers = {};
         }
 
-        if (!this.getHeader(options.headers, "Host")) {
+        if (!this.test.getHeader(options.headers, "Host")) {
             options.headers.Host = "localhost";
-        }
-
-        // Munge the URI by replacing parameters.
-        if (options.parameters) {
-            Object.keys(options.parameters).forEach((key) => {
-                options.url = options.url.replace(`{${key}}`, options.parameters[key]);
-            });
-        }
-
-        // Add query string options to the URI.
-        if (options.query) {
-            Object.keys(options.query).forEach((key) => {
-                if (options.url.indexOf("?") === -1) {
-                    options.url += "?";
-                } else {
-                    options.url += "&";
-                }
-
-                options.url += `${key}=${options.query[key]}`;
-            });
         }
 
         // Set some default properties for posting data
         if (options.body) {
-            options.body = this.coerseToBuffer(options.body);
-
             if (!options.method) {
                 options.method = "POST";
             }
 
-            if (!this.getHeader(options.headers, "Content-Type")) {
+            if (!this.test.getHeader(options.headers, "Content-Type")) {
                 options.headers["Content-Type"] = "application/json";
             }
         }
@@ -412,98 +376,6 @@ class FunctionalTest {
         if (options.signed) {
             this.signRequest(options);
         }
-    }
-
-
-    /**
-     * This function makes requests, returns a promise, formats output
-     * and even creates a timer.  How wonderful!
-     *
-     * @param {nodeMocksHttp~mockRequestOptions} options
-     * @return {Promise.<opentoken~functionalTestAsyncResponse>}
-     */
-    requestAsync(options) {
-        var originalHeader, req, res;
-
-        this.reformatRequestOptions(options);
-        req = this.nodeMocksHttp.createRequest(options);
-        res = this.nodeMocksHttp.createResponse({
-            eventEmitter: events.EventEmitter,
-            req
-        });
-
-        // The res.header() function does not operate in a similar fashion to
-        // how Restify's version works.  Restify allows for a single string
-        // input and this returns the value.  We monkey patch the response
-        // object to behave similarly.
-        originalHeader = res.header;
-        res.header = (key, val) => {
-            if (!val && typeof key === "string") {
-                return res.getHeader(key);
-            }
-
-            return originalHeader.call(res, key, val);
-        };
-
-        return new Promise((resolve, reject) => {
-            var theTimeout;
-
-            // The mock request object overwrites .path(), but Restify
-            // wants to find its own function there.  Luckily we can fix this
-            // and the mock doesn't need the original path value for anything.
-            req.path = req.getPath;
-
-            // The mock does not have a resume() function.  Also, the body
-            // parser overwrites req.body, so this has to use the
-            // request options and convert it to a Buffer.
-            req.resume = () => {
-                setTimeout(() => {
-                    if (options.body) {
-                        req.emit("data", options.body);
-                    }
-
-                    req.emit("end");
-                });
-            };
-
-            res.on("end", () => {
-                var links;
-
-                /* eslint-disable no-underscore-dangle */
-                links = HttpLinkHeader.parse(res._getHeaders().Link || "");
-                resolve({
-                    body: res._getData(),
-                    headers: res._getHeaders(),
-                    links,
-                    statusCode: res._getStatusCode(),
-                    uri: options.url
-                });
-
-                if (theTimeout) {
-                    clearTimeout(theTimeout);
-                }
-            });
-
-            // Requests that do not finish quickly will reject the promise.
-            theTimeout = setTimeout(() => {
-                reject(new Error("Request timed out"));
-                theTimeout = null;
-            }, 2000);
-
-            // Issue the request to the router
-            this.requestHandler(req, res);
-        });
-    }
-
-
-    /**
-     * After the event emitters are mocked, the functional-test-async bit will
-     * set the mock HTTP object on here.
-     *
-     * @param {nodeMocksHttp} nodeMocksHttp
-     */
-    setNodeMocksHttp(nodeMocksHttp) {
-        this.nodeMocksHttp = nodeMocksHttp;
     }
 
 
@@ -522,7 +394,7 @@ class FunctionalTest {
             options.headers = {};
         }
 
-        if (!this.getHeader(options.headers, "Content-Type")) {
+        if (!this.test.getHeader(options.headers, "Content-Type")) {
             options.headers["Content-Type"] = "application/octet-stream";
         }
 
@@ -530,11 +402,7 @@ class FunctionalTest {
         options.headers["X-OpenToken-Date"] = dateString;
 
         if (options.body) {
-            options.body = this.coerseToBuffer(options.body);
-
-            if (!options.method) {
-                options.method = "POST";
-            }
+            options.body = this.test.coerseToBuffer(options.body);
         } else if (Buffer.alloc) {
             // node.js v5.10.0 and newer
             options.body = Buffer.alloc(0, 0, "binary");
@@ -543,17 +411,26 @@ class FunctionalTest {
             options.body = new Buffer(0);
         }
 
-        queryString = options.url.split("?");
-        path = queryString.shift();
-        queryString = queryString.join("?");
+        path = options.url;
+        queryString = querystring.stringify(options.query);
+
+        if (options.parameters) {
+            Object.keys(options.parameters).forEach((key) => {
+                path = path.replace(`{${key}}`, options.parameters[key]);
+            });
+        }
+
+        if (!this.test.getHeader(options.headers, "Host")) {
+            options.headers.Host = "localhost";
+        }
 
         // Build the signing content as a big buffer
         signingContent = [
             options.method.toUpperCase(),
             path,
             queryString,
-            `host:${this.getHeader(options.headers, "Host").toLowerCase()}`,
-            `content-type:${this.getHeader(options.headers, "Content-Type")}`,
+            `host:${this.test.getHeader(options.headers, "Host").toLowerCase()}`,
+            `content-type:${this.test.getHeader(options.headers, "Content-Type")}`,
             `x-opentoken-date:${dateString}`,
             "",
             options.body.toString("binary")

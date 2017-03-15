@@ -12,10 +12,10 @@ describe("bootstrap", () => {
         promise = require("../mock/promise-mock")();
         tv4 = require("tv4");
         tv4 = require("tv4-file-loader")(tv4);
-        spyOn(tv4, "addSchema").andCallThrough();
-        spyOn(tv4, "loadSchemaFolderAsync").andCallThrough();
-        spyOn(tv4, "validateResult").andCallThrough();
-        spyOn(tv4, "getMissingUris").andCallThrough();
+        spyOn(tv4, "addSchema").and.callThrough();
+        spyOn(tv4, "loadSchemaFolderAsync").and.callThrough();
+        spyOn(tv4, "validateResult").and.callThrough();
+        spyOn(tv4, "getMissingUris").and.callThrough();
         validator = require("validator");
         bootstrap = () => {
             var real;
@@ -52,7 +52,7 @@ describe("bootstrap", () => {
         });
     });
     it("errors when there are missing schemas", () => {
-        tv4.getMissingUris.andReturn([
+        tv4.getMissingUris.and.returnValue([
             "/schema"
         ]);
 
@@ -61,7 +61,7 @@ describe("bootstrap", () => {
         });
     });
     it("errors when the schema does not validate", () => {
-        tv4.validateResult.andReturn({
+        tv4.validateResult.and.returnValue({
             valid: false,
             error: {
                 dataPath: "x/y",

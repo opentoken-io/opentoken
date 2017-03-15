@@ -40,6 +40,6 @@ describe("email", () => {
                     engine: "notThere"
                 }
             });
-        }).toThrow("Could not find email engine: notThere");
+        }).toThrow(new Error("Could not find email engine: notThere"));
     });
 });

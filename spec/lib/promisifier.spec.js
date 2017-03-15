@@ -19,7 +19,7 @@ describe("promisifier", () => {
         result = {
             description: "result from promise.promisifyAll()"
         };
-        promiseMock.promisifyAll.andReturn(result);
+        promiseMock.promisifyAll.and.returnValue(result);
         expect(promisifier(obj)).toBe(result);
         expect(promiseMock.promisifyAll).toHaveBeenCalledWith(obj);
     });
@@ -28,8 +28,8 @@ describe("promisifier", () => {
 
         fn = () => {};
         result = () => {};
-        promiseMock.promisify.andReturn(result);
-        promiseMock.promisifyAll.andCallFake((x) => {
+        promiseMock.promisify.and.returnValue(result);
+        promiseMock.promisifyAll.and.callFake((x) => {
             return x;
         });
         expect(promisifier(fn)).toBe(result);

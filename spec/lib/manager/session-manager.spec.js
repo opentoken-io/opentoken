@@ -84,7 +84,7 @@ describe("sessionManager", () => {
     });
     describe(".validateAsync()", () => {
         beforeEach(() => {
-            storageService.getAsync.andCallFake(() => {
+            storageService.getAsync.and.callFake(() => {
                 return promiseMock.resolve({
                     accountId: "accountId"
                 });
@@ -98,7 +98,7 @@ describe("sessionManager", () => {
             });
         });
         it("confirms the account ID is as expected", () => {
-            storageService.getAsync.andCallFake(() => {
+            storageService.getAsync.and.callFake(() => {
                 return promiseMock.resolve({
                     accountId: "wrong"
                 });
@@ -111,7 +111,7 @@ describe("sessionManager", () => {
             });
         });
         it("does not wait for the sessions to be refreshed", () => {
-            storageService.putAsync.andCallFake(() => {
+            storageService.putAsync.and.callFake(() => {
                 // Purposely do not resolve this promise.  If we depend on this
                 // unresolved promise, then the test will time out and fail.
                 return new Promise(() => {});

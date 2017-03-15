@@ -17,21 +17,21 @@ module.exports = () => {
         "log"
     ]);
     request.body = null;
-    request.contentType.andReturn(null);
-    request.getContentLength.andCallFake(() => {
+    request.contentType.and.returnValue(null);
+    request.getContentLength.and.callFake(() => {
         return request.internalContentLength;
     });
-    request.getPath.andCallFake(() => {
+    request.getPath.and.callFake(() => {
         return request.internalPath;
     });
-    request.getQuery.andCallFake(() => {
+    request.getQuery.and.callFake(() => {
         return request.internalQuery;
     });
     request.headers = [];
-    request.href.andCallFake(() => {
+    request.href.and.callFake(() => {
         return request.internalPath;
     });
-    request.isChunked.andCallFake(() => {
+    request.isChunked.and.callFake(() => {
         return false;
     });
     request.logId = "random log id";
@@ -54,7 +54,7 @@ module.exports = () => {
         "once"
     ].forEach((methodName) => {
         request[methodName] = eventEmitter[methodName].bind(eventEmitter);
-        spyOn(request, methodName).andCallThrough();
+        spyOn(request, methodName).and.callThrough();
     });
     request.resume = jasmine.createSpy("request.resume");
 

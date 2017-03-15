@@ -11,12 +11,12 @@ module.exports = () => {
         "createAsync",
         "validateAsync"
     ]);
-    mock.createAsync.andCallFake(() => {
+    mock.createAsync.and.callFake(() => {
         return promiseMock.resolve({
             challengeConfig: "config for the challenge"
         });
     });
-    mock.validateAsync.andCallFake(() => {
+    mock.validateAsync.and.callFake(() => {
         return promiseMock.resolve();
     });
 

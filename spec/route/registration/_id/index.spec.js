@@ -78,7 +78,7 @@ jasmine.routeTester("/registration/_id", (container) => {
         it("reports failure", () => {
             var body;
 
-            registrationManagerMock.secureAsync.andCallFake(() => {
+            registrationManagerMock.secureAsync.and.callFake(() => {
                 return Promise.reject(new Error());
             });
             body = {

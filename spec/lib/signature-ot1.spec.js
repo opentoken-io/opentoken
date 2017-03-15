@@ -30,7 +30,7 @@ describe("signatureOt1", () => {
         util = require("../../lib/util")();
         ErrorResponse = require("../../lib/error-response")(promiseMock);
 
-        hashMock.hmac.andReturn("FakeSignature");
+        hashMock.hmac.and.returnValue("FakeSignature");
         requestMock.headers.host = "example.com";
         requestMock.headers["x-opentoken-date"] = "2010-01-01T01:23:45Z";
         requestMock.headers["content-type"] = "text/plain";
@@ -103,7 +103,7 @@ describe("signatureOt1", () => {
     });
     describe("private key", () => {
         it("fails when the access code + account is invalid", () => {
-            accessCodeManagerMock.getAsync.andCallFake(() => {
+            accessCodeManagerMock.getAsync.and.callFake(() => {
                 return promiseMock.reject();
             });
 
@@ -144,7 +144,7 @@ describe("signatureOt1", () => {
             });
         });
         it("fails when hashes don't match", () => {
-            hashMock.compare.andReturn(false);
+            hashMock.compare.and.returnValue(false);
 
             return verifySignature().then(jasmine.fail, assertError("Signature verification mismatch.", "k6JoBvzV"));
         });

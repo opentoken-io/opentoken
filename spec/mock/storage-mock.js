@@ -12,13 +12,13 @@ module.exports = () => {
         "getAsync",
         "putAsync"
     ]);
-    mock.deleteAsync.andCallFake(() => {
+    mock.deleteAsync.and.callFake(() => {
         return promiseMock.resolve(true);
     });
-    mock.getAsync.andCallFake(() => {
+    mock.getAsync.and.callFake(() => {
         return promiseMock.resolve(new Buffer("record data"));
     });
-    mock.putAsync.andCallFake(() => {
+    mock.putAsync.and.callFake(() => {
         return promiseMock.resolve(true);
     });
 

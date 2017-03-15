@@ -40,6 +40,6 @@ describe("storage", () => {
                     engine: "notThere"
                 }
             });
-        }).toThrow("Could not find storage engine: notThere");
+        }).toThrow(new Error("Could not find storage engine: notThere"));
     });
 });

@@ -1,0 +1,13 @@
+{
+    "spec_dir": "spec",
+    "spec_files": [
+        "**/*[sS]pec.js"
+    ],
+    "helpers": [
+        "../node_modules/functional-route-tester/helper/**/*.js",
+        "helper/**/*.js",
+        "../node_modules/jasmine-test-helpers/lib/*.js"
+    ],
+    "stopSpecOnExpectationFailure": false,
+    "random": false
+}

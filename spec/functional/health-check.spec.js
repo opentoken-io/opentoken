@@ -10,7 +10,7 @@ describe("health-check", () => {
     });
     it("returns success", () => {
         return test.startAsync("service", "health-check").then((response) => {
-            expect(response.body).toEqual({
+            expect(JSON.parse(response.body)).toEqual({
                 status: "healthy"
             });
             expect(response.statusCode).toBe(200);

@@ -15,24 +15,24 @@ module.exports = () => {
         "passwordHashConfigAsync",
         "recordAsync"
     ]);
-    mock.createAsync.andCallFake(() => {
+    mock.createAsync.and.callFake(() => {
         return promiseMock.resolve("createdId");
     });
-    mock.loginAsync.andCallFake(() => {
+    mock.loginAsync.and.callFake(() => {
         return promiseMock.resolve({
             sessionId: "login-session-id"
         });
     });
-    mock.loginHashConfigAsync.andCallFake(() => {
+    mock.loginHashConfigAsync.and.callFake(() => {
         return promiseMock.resolve("loginHashConfig");
     });
-    mock.logoutAsync.andCallFake(() => {
+    mock.logoutAsync.and.callFake(() => {
         return promiseMock.resolve();
     });
-    mock.passwordHashConfigAsync.andCallFake(() => {
+    mock.passwordHashConfigAsync.and.callFake(() => {
         return promiseMock.resolve("accountManager.passwordHashConfig");
     });
-    mock.recordAsync.andCallFake(() => {
+    mock.recordAsync.and.callFake(() => {
         return promiseMock.resolve({
             id: "record-id",
             login: "new-login-cookie",

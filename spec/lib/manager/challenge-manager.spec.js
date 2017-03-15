@@ -53,10 +53,10 @@ describe("challengeManager", () => {
     });
     describe(".createAsync()", () => {
         it("creates a new challenge when none existed", () => {
-            storageService.getAsync.andCallFake(() => {
+            storageService.getAsync.and.callFake(() => {
                 return promiseMock.resolve([]);
             });
-            OtDateMock.stubNow().plus.andReturn(OtDateMock.stubNow());
+            OtDateMock.stubNow().plus.and.returnValue(OtDateMock.stubNow());
 
             return factory().createAsync("accountId").then((result) => {
                 expect(result).toEqual({
@@ -67,10 +67,10 @@ describe("challengeManager", () => {
             });
         });
         it("creates a new challenge", () => {
-            storageService.getAsync.andCallFake(() => {
+            storageService.getAsync.and.callFake(() => {
                 return promiseMock.resolve([]);
             });
-            OtDateMock.stubNow().plus.andReturn(OtDateMock.stubNow());
+            OtDateMock.stubNow().plus.and.returnValue(OtDateMock.stubNow());
 
             return factory().createAsync("accountId").then((result) => {
                 expect(result).toEqual({
@@ -87,7 +87,7 @@ describe("challengeManager", () => {
 
             date = OtDateMock.now();
             date.date.setTime(date.date.getTime() + 5000);
-            storageService.getAsync.andCallFake(() => {
+            storageService.getAsync.and.callFake(() => {
                 return promiseMock.resolve([
                     {
                         expires: date,
@@ -102,7 +102,7 @@ describe("challengeManager", () => {
             });
         });
         it("fails when the password hash doesn't match", () => {
-            hashMock.hash.andReturn("will-not-match");
+            hashMock.hash.and.returnValue("will-not-match");
 
             return factory().validateAsync("accountId", "does-not-matter", "---hash---").then(jasmine.fail, (err) => {
                 expect(err.toString()).toContain("Did not match any known challenge result");
@@ -119,10 +119,10 @@ describe("challengeManager", () => {
     });
     describe("loading lists", () => {
         it("returns an empty array when there was no data", () => {
-            storageService.getAsync.andCallFake(() => {
+            storageService.getAsync.and.callFake(() => {
                 return promiseMock.reject();
             });
-            OtDateMock.stubNow().plus.andReturn(OtDateMock.stubNow());
+            OtDateMock.stubNow().plus.and.returnValue(OtDateMock.stubNow());
 
             return factory().createAsync("accountId").then(() => {
                 expect(OtDateMock.stubNow().plus).toHaveBeenCalledWith({
@@ -141,7 +141,7 @@ describe("challengeManager", () => {
 
             nowPlus5Seconds = OtDateMock.now();
             nowPlus5Seconds.date.setTime(nowPlus5Seconds.date.getTime() + 5000);
-            storageService.getAsync.andCallFake(() => {
+            storageService.getAsync.and.callFake(() => {
                 return promiseMock.resolve([
                     // These get filtered out
                     "not an object",
@@ -159,7 +159,7 @@ describe("challengeManager", () => {
                     }
                 ]);
             });
-            OtDateMock.stubNow().plus.andReturn(OtDateMock.stubNow());
+            OtDateMock.stubNow().plus.and.returnValue(OtDateMock.stubNow());
 
             return factory().createAsync("accountId").then(() => {
                 expect(storageService.putAsync).toHaveBeenCalledWith("accountId", [

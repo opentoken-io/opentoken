@@ -42,14 +42,14 @@ describe("WebServer", () => {
             "on",
             "use"
         ]);
-        restifyServer.listen.andCallFake((port, callback) => {
+        restifyServer.listen.and.callFake((port, callback) => {
             callback();
         });
         restify = jasmine.createSpyObj("restify", [
             "createServer"
         ]);
-        restify.createServer.andReturn(restifyServer);
-        restifyRouterMagicMock = jasmine.createSpy("restifyRouterMagicAsync").andCallFake(() => {
+        restify.createServer.and.returnValue(restifyServer);
+        restifyRouterMagicMock = jasmine.createSpy("restifyRouterMagicAsync").and.callFake(() => {
             return promiseMock.resolve();
         });
         restMiddleware = jasmine.createSpy("restMiddleware");
@@ -120,7 +120,7 @@ describe("WebServer", () => {
 
             return webServer.startServerAsync().then(() => {
                 expect(restifyRouterMagicMock).toHaveBeenCalled();
-                expect(restifyRouterMagicMock.mostRecentCall.args[1]).toEqual({
+                expect(restifyRouterMagicMock.calls.mostRecent().args[1]).toEqual({
                     indexWithSlash: "never",
                     options: {
                         container: containerMock
@@ -156,9 +156,9 @@ describe("WebServer", () => {
 
             return webServer.startServerAsync().then(() => {
                 // test the config passed to restifyServer
-                expect(restify.createServer.callCount).toBe(1);
-                expect(restify.createServer.mostRecentCall.args.length).toBe(1);
-                actual = restify.createServer.mostRecentCall.args[0];
+                expect(restify.createServer.calls.count()).toBe(1);
+                expect(restify.createServer.calls.mostRecent().args.length).toBe(1);
+                actual = restify.createServer.calls.mostRecent().args[0];
                 expect(actual).toEqual(expected);
             });
         }
@@ -192,7 +192,7 @@ describe("WebServer", () => {
             }, {});
         });
         it("reads certificate and key files", () => {
-            fsAsyncMock.readFileAsync.andCallFake((fn) => {
+            fsAsyncMock.readFileAsync.and.callFake((fn) => {
                 if (fn === "keyfile") {
                     return promiseMock.resolve("keyfile ok");
                 }
@@ -241,7 +241,7 @@ describe("WebServer", () => {
             return webServer.startServerAsync().then(() => {
                 // Skipping most checks here because they were done
                 // in the previous test.
-                expect(restMiddleware.mostRecentCall.args[0].baseUrl).toBe("/bunnies");
+                expect(restMiddleware.calls.mostRecent().args[0].baseUrl).toBe("/bunnies");
             });
         });
         it("passes profileMiddleware", () => {
@@ -255,10 +255,10 @@ describe("WebServer", () => {
             return webServer.startServerAsync().then(() => {
                 expect(middlewareProfiler.profileServer).toHaveBeenCalled();
                 expect(middlewareProfiler.displayAtInterval).toHaveBeenCalled();
-                args = middlewareProfiler.profileServer.mostRecentCall.args;
+                args = middlewareProfiler.profileServer.calls.mostRecent().args;
                 expect(args.length).toBe(1);
                 expect(args[0]).toBe(restifyServer);
-                args = middlewareProfiler.displayAtInterval.mostRecentCall.args;
+                args = middlewareProfiler.displayAtInterval.calls.mostRecent().args;
                 expect(args.length).toBe(2);
                 expect(args[0]).toEqual(jasmine.any(Function));
                 expect(args[1]).toEqual(jasmine.any(Number));
@@ -276,8 +276,8 @@ describe("WebServer", () => {
 
             return webServer.startServerAsync().then(() => {
                 expect(restifyServer.listen).toHaveBeenCalled();
-                expect(restifyServer.listen.callCount).toBe(1);
-                args = restifyServer.listen.mostRecentCall.args;
+                expect(restifyServer.listen.calls.count()).toBe(1);
+                args = restifyServer.listen.calls.mostRecent().args;
 
                 // default port
                 expect(args[0]).toBe(8080);
@@ -287,7 +287,7 @@ describe("WebServer", () => {
         });
         it("has a working callback", () => {
             return webServer.startServerAsync().then(() => {
-                restifyServer.listen.mostRecentCall.args[1]();
+                restifyServer.listen.calls.mostRecent().args[1]();
             });
         });
         it("executes the uncaughtException callback", () => {
@@ -297,12 +297,12 @@ describe("WebServer", () => {
             res = require("../mock/response-mock")();
 
             return webServer.startServerAsync().then(() => {
-                callback = restifyServer.listen.mostRecentCall.args[1];
+                callback = restifyServer.listen.calls.mostRecent().args[1];
                 expect(() => {
                     callback();
                 }).not.toThrow();
                 expect(restifyServer.on).toHaveBeenCalled();
-                args = restifyServer.on.calls[0].args;
+                args = restifyServer.on.calls.argsFor(0);
                 expect(args.length).toBe(2);
                 expect(args[0]).toBe("uncaughtException");
                 expect(args[1]).toEqual(jasmine.any(Function));
@@ -326,12 +326,12 @@ describe("WebServer", () => {
             return webServer.startServerAsync().then(() => {
                 var error;
 
-                callback = restifyServer.listen.mostRecentCall.args[1];
+                callback = restifyServer.listen.calls.mostRecent().args[1];
                 expect(() => {
                     callback();
                 });
                 expect(restifyServer.on).toHaveBeenCalled();
-                args = restifyServer.on.calls[1].args;
+                args = restifyServer.on.calls.argsFor(1);
                 expect(args.length).toBe(2);
                 expect(args[0]).toBe("restifyError");
                 expect(args[1]).toEqual(jasmine.any(Function));

@@ -13,12 +13,12 @@ module.exports = () => {
         "hmac"
     ]);
 
-    mock.compare.andReturn(true);
-    mock.deriveAsync.andCallFake(() => {
+    mock.compare.and.returnValue(true);
+    mock.deriveAsync.and.callFake(() => {
         return promiseMock.resolve("---derived---");
     });
-    mock.hash.andReturn("---hash---");
-    mock.hmac.andReturn("---hmac---");
+    mock.hash.and.returnValue("---hash---");
+    mock.hmac.and.returnValue("---hmac---");
 
     return mock;
 };

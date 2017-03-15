@@ -90,7 +90,7 @@ jasmine.routeTester("/account/_account-id/login/", (container) => {
         });
         describe("with failed login", () => {
             beforeEach(() => {
-                accountManagerMock.loginAsync.andCallFake(() => {
+                accountManagerMock.loginAsync.and.callFake(() => {
                     return promiseMock.reject("login-err");
                 });
             });

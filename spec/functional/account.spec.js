@@ -46,8 +46,8 @@ describe("account", () => {
             });
         }).then((response) => {
             expect(response.statusCode).toBe(200);
-            expect(response.headers["Content-Type"]).toBe("text/plain");
-            expect(response.body.toString("binary")).toBe("This is a test token");
+            expect(response.getHeader("Content-Type")).toBe("text/plain");
+            expect(response.body.toString()).toBe("This is a test token\n");
         });
     });
     it("tokenizes public data", () => {
@@ -80,8 +80,8 @@ describe("account", () => {
             return test.followAsync(response, "self");
         }).then((response) => {
             expect(response.statusCode).toBe(200);
-            expect(response.headers["Content-Type"]).toBe("text/plain");
-            expect(response.body.toString("binary")).toBe("This is a test token");
+            expect(response.getHeader("Content-Type")).toBe("text/plain");
+            expect(response.body.toString()).toBe("This is a test token\n");
         });
     });
 });

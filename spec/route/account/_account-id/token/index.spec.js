@@ -64,7 +64,7 @@ jasmine.routeTester("/account/_account-id/token/", (container) => {
                 var args;
 
                 expect(tokenManagerMock.createAsync).toHaveBeenCalled();
-                args = tokenManagerMock.createAsync.mostRecentCall.args;
+                args = tokenManagerMock.createAsync.calls.mostRecent().args;
                 expect(args.length).toBe(3);
                 expect(args[0]).toBe("accountId");
                 expect(Buffer.isBuffer(args[1])).toBe(true);
@@ -80,7 +80,7 @@ jasmine.routeTester("/account/_account-id/token/", (container) => {
                 var args;
 
                 expect(tokenManagerMock.createAsync).toHaveBeenCalled();
-                args = tokenManagerMock.createAsync.mostRecentCall.args;
+                args = tokenManagerMock.createAsync.calls.mostRecent().args;
                 expect(args.length).toBe(3);
                 expect(args[0]).toBe("accountId");
                 expect(Buffer.isBuffer(args[1])).toBe(true);

@@ -64,7 +64,7 @@ jasmine.routeTester("/account/_account-id/", (container) => {
             // Really, this shouldn't happen.  If the session exists,
             // the account should exist as well.
             beforeEach(() => {
-                accountManagerMock.recordAsync.andCallFake(() => {
+                accountManagerMock.recordAsync.and.callFake(() => {
                     return promiseMock.reject(new Error("something is wrong"));
                 });
             });

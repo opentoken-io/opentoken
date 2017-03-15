@@ -23,7 +23,7 @@ module.exports = () => {
     }
 
     return {
-        decode: jasmine.createSpy("encoding.decode").andCallFake(decodeFake),
-        encode: jasmine.createSpy("encoding.encode").andCallFake(encodeFake)
+        decode: jasmine.createSpy("encoding.decode").and.callFake(decodeFake),
+        encode: jasmine.createSpy("encoding.encode").and.callFake(encodeFake)
     };
 };

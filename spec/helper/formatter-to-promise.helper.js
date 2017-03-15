@@ -38,7 +38,7 @@ jasmine.formatterToPromise = (formatterName, reqMock, resMock) => {
     // necessary code and then we reach into our genericFormatterMock to
     // get the unwrapped formatter.
     container.resolve(formatterName);
-    formatter = genericFormatterMock.formatWithFallback.mostRecentCall.args[0];
+    formatter = genericFormatterMock.formatWithFallback.calls.mostRecent().args[0];
 
     // Because the container was corrupt, we now erase the corrupted
     // container from the require cache.

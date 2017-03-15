@@ -7,7 +7,7 @@ describe("random", () => {
         var cryptoAsyncMock;
 
         base64 = require("../../lib/base64")();
-        spyOn(base64, "encode").andReturn(new Buffer("abcdwxyzABCDWXYZ0189+/testing++//"));
+        spyOn(base64, "encode").and.returnValue(new Buffer("abcdwxyzABCDWXYZ0189+/testing++//"));
         cryptoAsyncMock = require("../mock/crypto-async-mock")();
         random = require("../../lib/random")(base64, cryptoAsyncMock);
     });
@@ -51,7 +51,7 @@ describe("random", () => {
         ].forEach((scenario) => {
             it(`sends the right amount of binary data to base64: length ${scenario.desiredLength}`, () => {
                 return random.idAsync(scenario.desiredLength).then(() => {
-                    expect(base64.encode.mostRecentCall.args[0].length).toBe(scenario.binLength);
+                    expect(base64.encode.calls.mostRecent().args[0].length).toBe(scenario.binLength);
                 });
             });
             it(`replaced + and /: length ${scenario.desiredLength}`, () => {

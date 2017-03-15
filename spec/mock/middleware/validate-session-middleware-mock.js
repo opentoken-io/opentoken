@@ -3,12 +3,12 @@
 module.exports = () => {
     var middleware, middlewareFactory;
 
-    middleware = jasmine.createSpy("validateSessionMiddlewareMockMiddleware").andCallFake((req, res, next) => {
+    middleware = jasmine.createSpy("validateSessionMiddlewareMockMiddleware").and.callFake((req, res, next) => {
         next();
     });
 
     // This factory only returns the same middleware over and over.
-    middlewareFactory = jasmine.createSpy("validateSessionMiddlewareMock").andReturn(middleware);
+    middlewareFactory = jasmine.createSpy("validateSessionMiddlewareMock").and.returnValue(middleware);
 
     return middlewareFactory;
 };

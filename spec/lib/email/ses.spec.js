@@ -17,7 +17,7 @@ describe("email/ses", () => {
              */
             constructor(params) {
                 this.params = params;
-                this.sendEmail = jasmine.createSpy("sendEmail").andCallFake((emailConfig, callback) => {
+                this.sendEmail = jasmine.createSpy("sendEmail").and.callFake((emailConfig, callback) => {
                     this.emailConfig = emailConfig;
                     callback();
                 });

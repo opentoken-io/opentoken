@@ -13,16 +13,16 @@ module.exports = () => {
         "inflateRaw",
         "inflateRawAsync"
     ]);
-    zlibAsyncMock.deflateRaw.andCallFake((data, callback) => {
+    zlibAsyncMock.deflateRaw.and.callFake((data, callback) => {
         callback(null, new Buffer("compressed", "binary"));
     });
-    zlibAsyncMock.deflateRawAsync.andCallFake(() => {
+    zlibAsyncMock.deflateRawAsync.and.callFake(() => {
         return promiseMock.resolve(new Buffer("compressed", "binary"));
     });
-    zlibAsyncMock.inflateRaw.andCallFake((data, callback) => {
+    zlibAsyncMock.inflateRaw.and.callFake((data, callback) => {
         callback(null, new Buffer("decompressed", "binary"));
     });
-    zlibAsyncMock.inflateRawAsync.andCallFake(() => {
+    zlibAsyncMock.inflateRawAsync.and.callFake(() => {
         return promiseMock.resolve(new Buffer("decompressed", "binary"));
     });
 

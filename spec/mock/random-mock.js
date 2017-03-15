@@ -12,7 +12,7 @@ module.exports = () => {
         "idAsync"
     ]);
 
-    random.bufferAsync.andCallFake((size) => {
+    random.bufferAsync.and.callFake((size) => {
         var buff;
 
         buff = new Buffer(size);
@@ -21,7 +21,7 @@ module.exports = () => {
         return promiseMock.resolve(buff);
     });
 
-    random.idAsync.andCallFake((size) => {
+    random.idAsync.and.callFake((size) => {
         var buff;
 
         buff = new Buffer(size);

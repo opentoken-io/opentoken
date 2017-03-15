@@ -81,7 +81,7 @@ describe("accountManager", () => {
     });
     describe(".loginAsync()", () => {
         beforeEach(() => {
-            storageService.getAsync.andCallFake(() => {
+            storageService.getAsync.and.callFake(() => {
                 return promiseMock.resolve({
                     mfa: {
                         totp: {
@@ -91,12 +91,12 @@ describe("accountManager", () => {
                     passwordHash: "passwordHash"
                 });
             });
-            challengeManagerMock.validateAsync.andCallFake(() => {
+            challengeManagerMock.validateAsync.and.callFake(() => {
                 return promiseMock.resolve();
             });
         });
         it("fails if TOTP does not validate", () => {
-            totpMock.verifyCurrent.andReturn(false);
+            totpMock.verifyCurrent.and.returnValue(false);
 
             return factory().loginAsync("id", {
                 challengeHash: "challengeHash",
@@ -145,7 +145,7 @@ describe("accountManager", () => {
     });
     describe(".loginHashConfigAsync()", () => {
         it("returns a configuration with a new challenge", () => {
-            storageService.getAsync.andCallFake(() => {
+            storageService.getAsync.and.callFake(() => {
                 return promiseMock.resolve({
                     passwordHashConfig: "passwordHashConfig"
                 });
@@ -185,7 +185,7 @@ describe("accountManager", () => {
     });
     describe(".recordAsync()", () => {
         it("filters the record to only return select values", () => {
-            storageService.getAsync.andCallFake(() => {
+            storageService.getAsync.and.callFake(() => {
                 return promiseMock.resolve({
                     email: "emailAddress",
                     mfa: {
