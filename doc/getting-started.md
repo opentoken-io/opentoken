@@ -42,7 +42,7 @@ Tokenization, Detokenization
 
 Signing a request to OpenToken.io is easier than AWS but based on the same principles. There's a great request to do this for you as well. Let's tokenize the file `tokenize-me.txt`.
 
-    cd examples   # In case you were not there before
+    cd example    # In case you were not there before
     unset HISTFILE  # Turn off shell history so your password isn't stored
     export OPENTOKEN_CODE=YOUR_API_CODE
     export OPENTOKEN_SECRET=YOUR_API_SECRET
