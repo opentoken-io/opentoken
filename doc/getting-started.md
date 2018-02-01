@@ -23,14 +23,14 @@ This initiates the account setup. You will get the MFA seed and you will need th
 This retrieves the account ID. Save it. This is pretty important, just like your password and the MFA seed.
 
 
-Creating API Keys
------------------
+Creating Code Pair
+------------------
 
-API keys are necessary in order to tokenize information.
+Code pairs are necessary in order to tokenize information.
 
-    cd examples   # In case you were not there before
+    cd example   # In case you were not there before
     unset HISTFILE  # Turn off shell history so your password isn't stored
-    ./create-api-keys.js --account=ACCOUNT_ID \
+    ./create-code-pair.js --account=ACCOUNT_ID \
         --description="Your description for these keys" \
         --mfa=THE_MFA_SEED --password=REALLY_GOOD_PASSWORD
 
