@@ -58,7 +58,7 @@
             "oneOf": [
                 {
                     "required": [
-                        "certificatFile",
+                        "certificateFile",
                         "keyFile"
                     ]
                 },
