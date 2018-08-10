@@ -28,6 +28,8 @@ module.exports = (server, path, options) => {
                     });
                     res.send(201, {
                         accountId
+                    }, (err) => {
+                        console.error(err);
                     });
                 }).then(next, next);
             },

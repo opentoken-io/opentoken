@@ -34,7 +34,9 @@ module.exports = (server, path, options) => {
                                 }
                             ]
                         });
-                        res.send(200, account.record);
+                        res.send(200, account.record, (err) => {
+                            console.error(err);
+                        });
                     }).then(next, next);
                 }
             ],

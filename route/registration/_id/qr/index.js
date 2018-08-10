@@ -14,7 +14,9 @@ module.exports = (server, path, options) => {
                             title: "registration-secure"
                         }
                     });
-                    res.send(pngData);
+                    res.send(pngData, (err) => {
+                        console.error(err);
+                    });
                 }).then(next, next);
             },
             name: "registration-secure-qr"

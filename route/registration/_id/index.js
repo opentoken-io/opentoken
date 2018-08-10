@@ -28,10 +28,14 @@ module.exports = (server, path, options) => {
                                 id: secureInfoGroup.id
                             })
                         });
-                        res.send(204);
-                    }).then(next, (err) => {
-                        req.log(err.toString);
-                        res.send(400, new ErrorResponse("Invalid information", "6a6BwJexiW"));
+                        res.send(204, "", (err) => {
+                            console.error(err);
+                        });
+                    }).then(next, (badRegistration) => {
+                        req.log(badRegistration.toString);
+                        res.send(400, new ErrorResponse("Invalid information", "6a6BwJexiW"), (err) => {
+                            console.error(err);
+                        });
                         next();
                     });
                 }
