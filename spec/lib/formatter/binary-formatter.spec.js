@@ -20,6 +20,11 @@ describe("formatter/binaryFormatter", () => {
         expect(result.toString("binary")).toBe("abc");
     });
     it("essentially breaks with objects", () => {
-        expect(formatter({})).toEqual(null);
+        try {
+            formatter({});
+            jasmine.fail("should have thrown an error");
+        } catch (result) {
+            expect(result).toEqual(jasmine.any(Error));
+        }
     });
 });
