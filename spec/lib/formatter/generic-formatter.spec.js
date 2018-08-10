@@ -83,8 +83,8 @@ describe("formatter/genericFormatter", () => {
         genericFormatter = require("../../../lib/formatter/generic-formatter")(ErrorResponse, restifyErrorsMock);
         reqMock = require("../../mock/request-mock")();
         resMock = require("../../mock/response-mock")();
-        defaultTransform = (req, res, body, done) => {
-            done(null, new Buffer("{\"DEFAULT TRANSFORM\":true}\n", "binary"));
+        defaultTransform = () => {
+            return new Buffer("{\"DEFAULT TRANSFORM\":true}\n", "binary");
         };
         genericFormatterAsync = (body) => {
             return new Promise((resolve, reject) => {
@@ -155,8 +155,8 @@ describe("formatter/genericFormatter", () => {
     });
     describe("default transform errors", () => {
         beforeEach(() => {
-            defaultTransform = (req, res, body, done) => {
-                done(new Error("whoops"));
+            defaultTransform = () => {
+                return new Error("whoops");
             };
         });
         it("propogates the error out of the formatter", () => {

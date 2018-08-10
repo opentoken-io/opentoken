@@ -166,7 +166,6 @@ describe("WebServer", () => {
         beforeEach(() => {
             defaultConfig = {
                 formatters: jasmine.any(Object),
-                handleUncaughtExceptions: true,
                 handleUpgrades: false,
                 httpsServerOptions: null,
                 name: "OpenToken API",

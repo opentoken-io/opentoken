@@ -39,9 +39,7 @@ module.exports = (server, pathUrl, options) => {
                         }
                     ]
                 });
-                res.send(204, "", (err) => {
-                    console.error(err);
-                });
+                res.send(204);
                 next();
             },
             name: "self-discovery"

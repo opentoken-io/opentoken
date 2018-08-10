@@ -21,9 +21,7 @@ module.exports = (server, path, options) => {
                             title: "account"
                         }
                     });
-                    res.send(204, "", (err) => {
-                        console.error(err);
-                    });
+                    res.send(204);
                     next();
                 }
             ],
@@ -55,9 +53,7 @@ module.exports = (server, path, options) => {
                                 title: "account"
                             }
                         });
-                        res.send(201, codeInfo, (err) => {
-                            console.error(err);
-                        });
+                        res.send(201, codeInfo);
                     }).then(next, next);
                 }
             ]

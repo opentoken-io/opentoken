@@ -1,11 +1,11 @@
 "use strict";
 
 describe("formatter/jsonpFormatter", () => {
-    var formatterAsync, reqMock;
+    var formatter, reqMock;
 
     beforeEach(() => {
         reqMock = require("../../mock/request-mock")();
-        formatterAsync = jasmine.formatterToPromise("jsonpFormatter", reqMock);
+        formatter = jasmine.formatter("jsonpFormatter", reqMock);
     });
     [
         {
@@ -47,25 +47,23 @@ describe("formatter/jsonpFormatter", () => {
         }
     ].forEach((scenario) => {
         describe(scenario.name, () => {
+            var result;
+
             beforeEach(() => {
                 if (scenario.query) {
                     reqMock.query = scenario.query;
                 }
+
+                result = formatter(scenario.body);
             });
             it("provides a buffer", () => {
-                return formatterAsync(scenario.body).then((result) => {
-                    expect(Buffer.isBuffer(result)).toBe(true);
-                });
+                expect(Buffer.isBuffer(result)).toBe(true);
             });
             it("has a trailing newline", () => {
-                return formatterAsync(scenario.body).then((result) => {
-                    expect(result.toString("binary").substr(-1)).toBe("\n");
-                });
+                expect(result.toString("binary").substr(-1)).toBe("\n");
             });
             it("made the right result", () => {
-                return formatterAsync(scenario.body).then((result) => {
-                    expect(result.toString("binary")).toBe(scenario.result);
-                });
+                expect(result.toString("binary")).toBe(scenario.result);
             });
         });
     });

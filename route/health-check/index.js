@@ -6,8 +6,6 @@ module.exports = (server, pathUrl, options) => {
             get(req, res, next) {
                 res.send(200, {
                     status: "healthy"
-                }, (err) => {
-                    console.error(err);
                 });
                 next();
             },

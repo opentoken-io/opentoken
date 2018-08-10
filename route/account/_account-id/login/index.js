@@ -30,9 +30,7 @@ module.exports = (server, path, options) => {
                             title: "account"
                         }
                     });
-                    res.send(200, passwordHashConfig, (err) => {
-                        console.error(err);
-                    });
+                    res.send(200, passwordHashConfig);
                 }).then(next, next);
             },
             name: "account-login",
@@ -55,17 +53,13 @@ module.exports = (server, path, options) => {
                         res.header("Location", accountRoute);
                         res.send(200, {
                             sessionId: login.sessionId
-                        }, (err) => {
-                            console.error(err);
                         });
 
                         next();
                     }, (badLogin) => {
                         loginCookie.clear(req, res);
                         req.log(`Login failure: ${badLogin.toString()}`);
-                        res.send(403, new ErrorResponse("Unable to login", "gxt9zbR0AK"), (err) => {
-                            console.error(err);
-                        });
+                        res.send(403, new ErrorResponse("Unable to login", "gxt9zbR0AK"));
                         next(badLogin);
                     });
                 }

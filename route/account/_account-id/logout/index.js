@@ -12,9 +12,7 @@ module.exports = (server, path, options) => {
         function logout(req, res, next) {
             loginCookie.clear(req, res);
             res.header("Location", config.server.baseUrl);
-            res.send(204, "", (err) => {
-                console.error(err);
-            });
+            res.send(204);
             accountManager.logoutAsync(req.params.accountId, loginCookie.get(req)).then(next, next);
         }
 

@@ -58,9 +58,7 @@ module.exports = (server, path, options) => {
                                 title: "account"
                             }
                         });
-                        res.send(201, "", (err) => {
-                            console.error(err);
-                        });
+                        res.send(201);
                     }).then(next, next);
                 }
             ]

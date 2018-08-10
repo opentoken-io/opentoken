@@ -22,25 +22,17 @@ module.exports = (server, path, options) => {
 
                             res.header("Content-Type", tokenRecord.contentType);
                             res.header("Content-Length", tokenRecord.data.length);
-                            res.send(200, tokenRecord.data, (err) => {
-                                console.error(err);
-                            });
+                            res.send(200, tokenRecord.data);
                         } else {
-                            res.send(403, "", (err) => {
-                                console.error(err);
-                            });
+                            res.send(403);
                         }
                     }, (notFound) => {
                         // Only give a 404 if the user is allowed to see that
                         // the token did not exist.
                         if (req.signed) {
-                            res.send(404, "", (err) => {
-                                console.error(err);
-                            });
+                            res.send(404);
                         } else {
-                            res.send(403, "", (err) => {
-                                console.error(err);
-                            });
+                            res.send(403);
                         }
 
                         // Continue the problem state

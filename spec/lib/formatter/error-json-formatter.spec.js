@@ -1,23 +1,22 @@
 "use strict";
 
 describe("formatter/errorJsonFormatter", () => {
-    var formatterAsync;
+    var formatter;
 
     beforeEach(() => {
-        formatterAsync = jasmine.formatterToPromise("errorJsonFormatter");
+        formatter = jasmine.formatter("errorJsonFormatter");
     });
     it("creates an error object", () => {
-        return formatterAsync("something").then((result) => {
-            var parsed;
+        var parsed, result;
 
-            expect(Buffer.isBuffer(result)).toBe(true);
-            expect(result.toString("binary").substr(-1)).toBe("\n");
-            parsed = JSON.parse(result.toString("binary"));
-            expect(parsed).toEqual({
-                code: "4qsTYJa3",
-                logref: "random log id",
-                message: "Unknown error"
-            });
+        result = formatter("something");
+        expect(Buffer.isBuffer(result)).toBe(true);
+        expect(result.toString("binary").substr(-1)).toBe("\n");
+        parsed = JSON.parse(result.toString("binary"));
+        expect(parsed).toEqual({
+            code: "4qsTYJa3",
+            logref: "random log id",
+            message: "Unknown error"
         });
     });
 });

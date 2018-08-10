@@ -15,7 +15,7 @@ mockRequire = require("mock-require");
  * @param {Object} [resMock] Response mock (one is generated if not specified)
  * @return {Promise.<Function>} A Promised middleware accepting (req,res)
  */
-jasmine.formatterToPromise = (formatterName, reqMock, resMock) => {
+jasmine.formatter = (formatterName, reqMock, resMock) => {
     var container, formatter, genericFormatterMock;
 
     if (!reqMock) {
@@ -45,14 +45,6 @@ jasmine.formatterToPromise = (formatterName, reqMock, resMock) => {
     mockRequire.reRequire("../../lib/container");
 
     return (body) => {
-        return new Promise((resolve, reject) => {
-            formatter(reqMock, resMock, body, (err, result) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(result);
-                }
-            });
-        });
+        return formatter(reqMock, resMock, body);
     };
 };

@@ -1,29 +1,25 @@
 "use strict";
 
 describe("formatter/binaryFormatter", () => {
-    var formatterAsync;
+    var formatter;
 
     beforeEach(() => {
-        formatterAsync = jasmine.formatterToPromise("binaryFormatter");
+        formatter = jasmine.formatter("binaryFormatter");
     });
     it("leaves a Buffer intact", () => {
         var buff;
 
         buff = new Buffer("abc", "binary");
-
-        return formatterAsync(buff).then((result) => {
-            expect(result).toBe(buff);
-        });
+        expect(formatter(buff)).toBe(buff);
     });
     it("transforms a string into a buffer", () => {
-        return formatterAsync("abc").then((result) => {
-            expect(Buffer.isBuffer(result)).toBe(true);
-            expect(result.toString("binary")).toBe("abc");
-        });
+        var result;
+
+        result = formatter("abc");
+        expect(Buffer.isBuffer(result)).toBe(true);
+        expect(result.toString("binary")).toBe("abc");
     });
     it("essentially breaks with objects", () => {
-        return formatterAsync({}).then(jasmine.fail, (err) => {
-            expect(err).toBeDefined();
-        });
+        expect(formatter({})).toEqual(null);
     });
 });
