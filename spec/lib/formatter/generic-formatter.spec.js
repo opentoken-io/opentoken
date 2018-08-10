@@ -1,7 +1,7 @@
 "use strict";
 
 describe("formatter/genericFormatter", () => {
-    var defaultTransform, ErrorResponse, genericFormatterAsync, resMock;
+    var defaultTransform, ErrorResponse, formatter, resMock;
 
 
     /**
@@ -41,33 +41,26 @@ describe("formatter/genericFormatter", () => {
      * @param {number} length Length of buffer
      */
     function standardErrorChecks(inputFn, expected, length) {
-        var input;
+        var input, result;
 
         beforeEach(() => {
             input = inputFn();
+            result = formatter(input);
         });
         it("returns a buffer", () => {
-            return genericFormatterAsync(input).then((result) => {
-                expect(Buffer.isBuffer(result)).toBe(true);
-            });
+            expect(Buffer.isBuffer(result)).toBe(true);
         });
         it("has a trailing newline", () => {
-            return genericFormatterAsync(input).then((result) => {
-                expect(result.toString("binary").substr(-1)).toBe("\n");
-            });
+            expect(result.toString("binary").substr(-1)).toBe("\n");
         });
         it("is valid JSON and is what we expect", () => {
-            return genericFormatterAsync(input).then((result) => {
-                var parsed;
+            var parsed;
 
-                parsed = JSON.parse(result.toString("binary"));
-                expect(parsed).toEqual(expected);
-            });
+            parsed = JSON.parse(result.toString("binary"));
+            expect(parsed).toEqual(expected);
         });
         it("sets the right Content-Length header", () => {
-            return genericFormatterAsync(input).then(() => {
-                expect(resMock.setHeader).toHaveBeenCalledWith("Content-Length", length);
-            });
+            expect(resMock.setHeader).toHaveBeenCalledWith("Content-Length", length);
         });
     }
 
@@ -86,19 +79,12 @@ describe("formatter/genericFormatter", () => {
         defaultTransform = () => {
             return new Buffer("{\"DEFAULT TRANSFORM\":true}\n", "binary");
         };
-        genericFormatterAsync = (body) => {
-            return new Promise((resolve, reject) => {
-                var formatter;
+        formatter = (body) => {
+            var formatterFn;
 
-                formatter = genericFormatter.formatWithFallback(defaultTransform);
-                formatter(reqMock, resMock, body, (err, result) => {
-                    if (err) {
-                        reject(err);
-                    } else {
-                        resolve(result);
-                    }
-                });
-            });
+            formatterFn = genericFormatter.formatWithFallback(defaultTransform);
+
+            return formatterFn(reqMock, resMock, body);
         };
     });
     describe("Error objects", () => {
@@ -160,10 +146,11 @@ describe("formatter/genericFormatter", () => {
             };
         });
         it("propogates the error out of the formatter", () => {
-            return genericFormatterAsync("abcd").then(jasmine.fail, (err) => {
-                expect(err instanceof Error).toBe(true);
-                expect(err.toString()).toBe("Error: whoops");
-            });
+            var result;
+
+            result = formatter("abcd");
+            expect(result instanceof Error).toBe(true);
+            expect(result.toString()).toBe("Error: whoops");
         });
     });
 });

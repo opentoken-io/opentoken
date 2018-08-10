@@ -134,9 +134,12 @@ describe("OtDate", () => {
             expect(result).toEqual("2016-04-16T08:00:00.000Z");
         });
         it("gets the UTC date/time when no timezone is set", () => {
-            var result;
+            var d, result, time;
 
-            result = OtDate.fromDate(new Date("2016-04-16T03:00:00.000")).toString();
+            time = Date.UTC(2016, 3, 16, 3, 0, 0);
+            d = new Date();
+            d.setTime(time);
+            result = OtDate.fromDate(d).toString();
             expect(result).toEqual("2016-04-16T03:00:00.000Z");
         });
     });
