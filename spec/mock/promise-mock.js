@@ -1,6 +1,5 @@
 "use strict";
 
-/* global Promise */
 module.exports = () => {
     /**
      * Resolves when all promises are resolved.
@@ -232,9 +231,9 @@ module.exports = () => {
             result = {};
             Object.keys(obj).forEach((key) => {
                 needed += 1;
-                (new Promise((childResolve) => {
+                new Promise((childResolve) => {
                     childResolve(obj[key]);
-                })).then((resolvedValue) => {
+                }).then((resolvedValue) => {
                     result[key] = resolvedValue;
                     doneWithOne();
                 }, (rejectedValue) => {
