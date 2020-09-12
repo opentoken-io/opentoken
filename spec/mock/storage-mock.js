@@ -16,7 +16,7 @@ module.exports = () => {
         return promiseMock.resolve(true);
     });
     mock.getAsync.and.callFake(() => {
-        return promiseMock.resolve(new Buffer("record data"));
+        return promiseMock.resolve(Buffer.from("record data", "utf8"));
     });
     mock.putAsync.and.callFake(() => {
         return promiseMock.resolve(true);

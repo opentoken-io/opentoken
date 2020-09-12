@@ -180,7 +180,7 @@ describe("signatureOt1", () => {
             ];
 
             // The buffer is "ñ\n" encoded as UTF-8
-            requestMock.body = new Buffer("c3b10a", "hex");
+            requestMock.body = Buffer.from("c3b10a", "hex");
 
             return verifySignature().then(() => {
                 expect(hashMock.hmac).toHaveBeenCalledWith(content.join("\n"), jasmine.any(Object));

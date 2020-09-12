@@ -7,7 +7,7 @@ describe("random", () => {
         var cryptoAsyncMock;
 
         base64 = require("../../lib/base64")();
-        spyOn(base64, "encode").and.returnValue(new Buffer("abcdwxyzABCDWXYZ0189+/testing++//"));
+        spyOn(base64, "encode").and.returnValue(Buffer.from("abcdwxyzABCDWXYZ0189+/testing++//", "utf8"));
         cryptoAsyncMock = require("../mock/crypto-async-mock")();
         random = require("../../lib/random")(base64, cryptoAsyncMock);
     });

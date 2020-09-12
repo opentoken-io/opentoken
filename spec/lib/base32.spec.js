@@ -40,7 +40,7 @@ describe("base32", () => {
         it(`encodes a buffer to a string: ${scenario.name}`, () => {
             var result;
 
-            result = base32.encode(new Buffer(scenario.decoded, "binary"));
+            result = base32.encode(Buffer.from(scenario.decoded, "binary"));
             expect(result).toEqual(scenario.encoded);
         });
         it(`encodes a string to a string: ${scenario.name}`, () => {
@@ -52,7 +52,7 @@ describe("base32", () => {
         it(`decodes a buffer from a buffer: ${scenario.name}`, () => {
             var result;
 
-            result = base32.decode(new Buffer(scenario.encoded, "binary"));
+            result = base32.decode(Buffer.from(scenario.encoded, "binary"));
             expect(Buffer.isBuffer(result)).toBe(true);
             expect(result.toString("binary")).toEqual(scenario.decoded);
         });
@@ -67,7 +67,7 @@ describe("base32", () => {
     it("encodes a buffer for use in a URI", () => {
         var result;
 
-        result = base32.encodeForUri(new Buffer("x", "binary"));
+        result = base32.encodeForUri(Buffer.from("x", "binary"));
         expect(result).toBe("PA");
     });
     it("encodes a string for use in a URI", () => {

@@ -45,7 +45,7 @@ module.exports = () => {
          */
         this.toBuffer = jasmine.createSpy("toBuffer").and.callFake((dest, offset) => {
             if (!dest) {
-                dest = new Buffer(4);
+                dest = Buffer.alloc(4);
                 offset = 0;
             }
 

@@ -19,7 +19,7 @@ describe("storage/s3", () => {
                 this.getObjectAsync = jasmine.createSpy("getObjectAsync");
                 this.getObjectAsync.and.callFake(() => {
                     return promiseMock.resolve({
-                        Body: new Buffer("this is a buffer", "binary")
+                        Body: Buffer.from("this is a buffer", "binary")
                     });
                 });
                 [
@@ -115,7 +115,7 @@ describe("storage/s3", () => {
                 });
             });
             it("puts to s3 with contents as a buffer", () => {
-                return s3.putAsync("buffer", new Buffer("this is a buffer", "binary")).then((val) => {
+                return s3.putAsync("buffer", Buffer.from("this is a buffer", "binary")).then((val) => {
                     expect(val).toEqual({
                         Body: jasmine.any(Buffer),
                         Key: "buffer"

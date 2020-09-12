@@ -43,8 +43,8 @@ describe("middleware/readBodyBufferMiddleware", () => {
                 expect(req.body.toString()).toEqual("chunk1chunk2");
             });
             expect(req.resume).toHaveBeenCalled();
-            req.emit("data", new Buffer("chunk1", "binary"));
-            req.emit("data", new Buffer("chunk2", "binary"));
+            req.emit("data", Buffer.from("chunk1", "binary"));
+            req.emit("data", Buffer.from("chunk2", "binary"));
             req.emit("end");
 
             return promise;
@@ -59,8 +59,8 @@ describe("middleware/readBodyBufferMiddleware", () => {
                 expect(req.body.toString()).toEqual("chunk1chunk2");
             });
             expect(req.resume).toHaveBeenCalled();
-            req.emit("data", new Buffer("chunk1", "binary"));
-            req.emit("data", new Buffer("chunk2", "binary"));
+            req.emit("data", Buffer.from("chunk1", "binary"));
+            req.emit("data", Buffer.from("chunk2", "binary"));
             req.emit("end");
 
             return promise;
@@ -75,8 +75,8 @@ describe("middleware/readBodyBufferMiddleware", () => {
                 expect(req.body.toString()).toEqual("hello");
             });
             expect(req.resume).toHaveBeenCalled();
-            req.emit("data", new Buffer("1f8b0800000000000003", "hex"));
-            req.emit("data", new Buffer("cb48cdc9c9070086a6103605000000", "hex"));
+            req.emit("data", Buffer.from("1f8b0800000000000003", "hex"));
+            req.emit("data", Buffer.from("cb48cdc9c9070086a6103605000000", "hex"));
             req.emit("end");
 
             return promise;
@@ -91,8 +91,8 @@ describe("middleware/readBodyBufferMiddleware", () => {
                 expect(req.body.toString()).toEqual("hello");
             });
             expect(req.resume).toHaveBeenCalled();
-            req.emit("data", new Buffer("1f8b0800000000000003", "hex"));
-            req.emit("data", new Buffer("cb48cdc9c9070086a6103605000000", "hex"));
+            req.emit("data", Buffer.from("1f8b0800000000000003", "hex"));
+            req.emit("data", Buffer.from("cb48cdc9c9070086a6103605000000", "hex"));
             req.emit("end");
 
             return promise;
@@ -111,7 +111,7 @@ describe("middleware/readBodyBufferMiddleware", () => {
                 expect(Buffer.isBuffer(req.body)).toBe(true);
                 expect(req.body.toString()).toEqual("chunk1chunk2");
             });
-            req.emit("data", new Buffer("012345678901234567890123456789", "binary"));
+            req.emit("data", Buffer.from("012345678901234567890123456789", "binary"));
             req.emit("end");
 
             return promise.then(jasmine.fail, (err) => {
@@ -126,9 +126,9 @@ describe("middleware/readBodyBufferMiddleware", () => {
                 expect(Buffer.isBuffer(req.body)).toBe(true);
                 expect(req.body.toString()).toEqual("chunk1chunk2");
             });
-            req.emit("data", new Buffer("0123456789", "binary"));
-            req.emit("data", new Buffer("0123456789", "binary"));
-            req.emit("data", new Buffer("0123456789", "binary"));
+            req.emit("data", Buffer.from("0123456789", "binary"));
+            req.emit("data", Buffer.from("0123456789", "binary"));
+            req.emit("data", Buffer.from("0123456789", "binary"));
             req.emit("end");
 
             return promise.then(jasmine.fail, (err) => {

@@ -36,7 +36,7 @@ describe("hex", () => {
         it(`encodes a buffer to a string: ${scenario.name}`, () => {
             var result;
 
-            result = hex.encode(new Buffer(scenario.decoded, "binary"));
+            result = hex.encode(Buffer.from(scenario.decoded, "binary"));
             expect(result).toEqual(scenario.encoded);
         });
         it(`encodes a string to a string: ${scenario.name}`, () => {
@@ -55,7 +55,7 @@ describe("hex", () => {
         it(`decodes a buffer from a buffer: ${scenario.name}`, () => {
             var result;
 
-            result = hex.decode(new Buffer(scenario.encoded, "binary"));
+            result = hex.decode(Buffer.from(scenario.encoded, "binary"));
             expect(Buffer.isBuffer(result)).toBe(true);
             expect(result.toString("binary")).toEqual(scenario.decoded);
         });

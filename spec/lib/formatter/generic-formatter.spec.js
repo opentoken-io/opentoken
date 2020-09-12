@@ -77,7 +77,7 @@ describe("formatter/genericFormatter", () => {
         reqMock = require("../../mock/request-mock")();
         resMock = require("../../mock/response-mock")();
         defaultTransform = () => {
-            return new Buffer("{\"DEFAULT TRANSFORM\":true}\n", "binary");
+            return Buffer.from("{\"DEFAULT TRANSFORM\":true}\n", "binary");
         };
         formatter = (body) => {
             var formatterFn;

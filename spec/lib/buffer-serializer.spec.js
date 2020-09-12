@@ -41,7 +41,7 @@ describe("bufferSerializer", () => {
     it("deserializes OtDate", () => {
         var date;
 
-        date = bufferSerializer.fromBuffer(new Buffer("005A064F7444617465544F00F380", "hex"));
+        date = bufferSerializer.fromBuffer(Buffer.from("005A064F7444617465544F00F380", "hex"));
         expect(date).toEqual(jasmine.any(OtDate));
         expect(date.toString()).toEqual("2012-01-02T00:00:00.000Z");
     });

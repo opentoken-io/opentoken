@@ -55,9 +55,9 @@ function addRouteMethods(routeTester) {
                 if (body) {
                     if (!Buffer.isBuffer(body)) {
                         if (typeof body === "string") {
-                            body = new Buffer(body, "binary");
+                            body = Buffer.from(body, "binary");
                         } else {
-                            routeTester.req.body = new Buffer(JSON.stringify(body), "binary");
+                            routeTester.req.body = Buffer.from(JSON.stringify(body), "binary");
                         }
                     }
 

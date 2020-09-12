@@ -46,7 +46,7 @@ describe("hash", () => {
             });
         });
         it("hashes a passed in buffer", () => {
-            return hash.deriveAsync(new Buffer("rRTcBER_EiFUsRa34Hj5Zpok", "binary"), {
+            return hash.deriveAsync(Buffer.from("rRTcBER_EiFUsRa34Hj5Zpok", "binary"), {
                 algorithm: "sha256",
                 derivedLength: 24,
                 encoding: "base64",
@@ -58,7 +58,7 @@ describe("hash", () => {
             });
         });
         it("rejects when there is no data", () => {
-            return hash.deriveAsync(new Buffer("", "binary"), {
+            return hash.deriveAsync(Buffer.alloc(0), {
                 algorithm: "sha256",
                 derivedLength: 24,
                 encoding: "base64",
@@ -102,7 +102,7 @@ describe("hash", () => {
             })).toEqual("WsdJ++7JNgf8KNZmvoXnOg==");
         });
         it("hashes a buffer with a salt", () => {
-            expect(hash.hash(new Buffer("buffer goes here", "binary"), {
+            expect(hash.hash(Buffer.from("buffer goes here", "binary"), {
                 algorithm: "md5",
                 encoding: "disregard",
                 salt: "extra data"
@@ -118,7 +118,7 @@ describe("hash", () => {
             })).toEqual("dssLj28qkxcaS3zIlf2G/w==");
         });
         it("hashes a buffer", () => {
-            expect(hash.hmac(new Buffer("buffer", "binary"), {
+            expect(hash.hmac(Buffer.from("buffer", "binary"), {
                 algorithm: "sha256",
                 encoding: "disregard",
                 secret: "tuvwxyz"

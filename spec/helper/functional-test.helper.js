@@ -403,12 +403,9 @@ class FunctionalTest {
 
         if (options.body) {
             options.body = this.test.coerseToBuffer(options.body);
-        } else if (Buffer.alloc) {
+        } else {
             // node.js v5.10.0 and newer
             options.body = Buffer.alloc(0, 0, "binary");
-        } else {
-            // Deprecated as of node.js 6.0.0
-            options.body = new Buffer(0);
         }
 
         path = options.url;
@@ -436,7 +433,7 @@ class FunctionalTest {
             options.body.toString("binary")
         ];
         signingContent = signingContent.join("\n");
-        signingContent = new Buffer(signingContent, "binary");
+        signingContent = Buffer.from(signingContent, "binary");
 
         // Calculate the HMAC
         hmac = crypto.createHmac("sha256", this.state.accessSecret);

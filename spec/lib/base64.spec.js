@@ -37,7 +37,7 @@ describe("base64", () => {
         it(`encodes a buffer to a string: ${scenario.name}`, () => {
             var result;
 
-            result = base64.encode(new Buffer(scenario.decoded, "binary"));
+            result = base64.encode(Buffer.from(scenario.decoded, "binary"));
             expect(result).toEqual(scenario.encoded);
         });
         it(`encodes a string to a string: ${scenario.name}`, () => {
@@ -49,7 +49,7 @@ describe("base64", () => {
         it(`decodes a buffer from a buffer: ${scenario.name}`, () => {
             var result;
 
-            result = base64.decode(new Buffer(scenario.encoded, "binary"));
+            result = base64.decode(Buffer.from(scenario.encoded, "binary"));
             expect(Buffer.isBuffer(result)).toBe(true);
             expect(result.toString("binary")).toEqual(scenario.decoded);
         });
@@ -64,7 +64,7 @@ describe("base64", () => {
     it("encodes a buffer for use in a URI", () => {
         var result;
 
-        result = base64.encodeForUri(new Buffer("p5>T44d3?12Ui", "binary"));
+        result = base64.encodeForUri(Buffer.from("p5>T44d3?12Ui", "binary"));
         expect(result).toBe("cDU-VDQ0ZDM_MTJVaQ");
     });
     it("encodes a string for use in a URI", () => {

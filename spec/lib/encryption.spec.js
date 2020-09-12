@@ -16,7 +16,7 @@ describe("encryption", () => {
     });
     it("encrypts from a buffer with a key as a buffer", () => {
         // The rest of the tests use Buffers because it is WAY easier
-        return encryption.encryptAsync(new Buffer("as a string", "binary"), new Buffer("key", "binary"), {
+        return encryption.encryptAsync(Buffer.from("as a string", "binary"), Buffer.from("key", "binary"), {
             algorithm: "md5",
             digest: "sha1",
             iterations: 50
@@ -32,9 +32,9 @@ describe("encryption", () => {
         // The rest of the tests use Buffers because it is WAY easier
         var asString;
 
-        asString = (new Buffer("0001053200000040031d0000000b00000053f8a825e3b1c5e9537c20800324153042424242424242424242424242424242e94cea7494417116671128", "hex")).toString("binary");
+        asString = Buffer.from("0001053200000040031d0000000b00000053f8a825e3b1c5e9537c20800324153042424242424242424242424242424242e94cea7494417116671128", "hex").toString("binary");
 
-        return encryption.decryptAsync(asString, new Buffer("key")).then((result) => {
+        return encryption.decryptAsync(asString, Buffer.from("key", "utf8")).then((result) => {
             expect(result.toString("binary")).toEqual("as a string");
         });
     });
@@ -45,7 +45,7 @@ describe("encryption", () => {
             // These are identical to the result from the "decrypts from
             // string and key from buffer" test, immediately above, but
             // all of the config is here so you can generate this again.
-            buff = new Buffer("0001053200000040031d0000000b00000053f8a825e3b1c5e9537c20800324153042424242424242424242424242424242e94cea7494417116671128", "hex");
+            buff = Buffer.from("0001053200000040031d0000000b00000053f8a825e3b1c5e9537c20800324153042424242424242424242424242424242e94cea7494417116671128", "hex");
             keySource = "key";
             hmacConfig = {
                 algorithm: "md5",
@@ -138,7 +138,7 @@ describe("encryption", () => {
             });
         });
         it(`decrypts the latest version: ${scenario.name}`, () => {
-            return encryption.decryptAsync(new Buffer(scenario.encryptedHex, "hex"), scenario.keySource).then((result) => {
+            return encryption.decryptAsync(Buffer.from(scenario.encryptedHex, "hex"), scenario.keySource).then((result) => {
                 expect(result.toString("binary")).toEqual(scenario.plain);
             });
         });
@@ -156,7 +156,7 @@ describe("encryption", () => {
         it("decrypts version 0", () => {
             var buff;
 
-            buff = new Buffer("0001053200000040031d0000000b00000053f8a825e3b1c5e9537c20800324153042424242424242424242424242424242e94cea7494417116671128", "hex");
+            buff = Buffer.from("0001053200000040031d0000000b00000053f8a825e3b1c5e9537c20800324153042424242424242424242424242424242e94cea7494417116671128", "hex");
 
             return encryption.decryptAsync(buff, "key").then((result) => {
                 expect(result.toString()).toEqual("as a string");

@@ -13,7 +13,7 @@ describe("record", () => {
             "toBuffer"
         ]);
         bufferSerializerMock.fromBuffer.and.returnValue("Original data");
-        bufferSerializerMock.toBuffer.and.returnValue(new Buffer("Serialized data", "binary"));
+        bufferSerializerMock.toBuffer.and.returnValue(Buffer.from("Serialized data", "binary"));
         config = {
             encryption: {
                 primary: {
@@ -37,16 +37,16 @@ describe("record", () => {
             "encryptAsync"
         ]);
         encryptionMock.decryptAsync.and.callFake(() => {
-            return promiseMock.resolve(new Buffer("decrypted", "binary"));
+            return promiseMock.resolve(Buffer.from("decrypted", "binary"));
         });
         encryptionMock.encryptAsync.and.callFake((buffer, key, hmac, cipher) => {
-            return promiseMock.resolve(new Buffer(`encrypted-${cipher}`, "binary"));
+            return promiseMock.resolve(Buffer.from(`encrypted-${cipher}`, "binary"));
         });
         fsMock = jasmine.createSpyObj("fs", [
             "readFile"
         ]);
         fsMock.readFile.and.callFake((filename, encoding, done) => {
-            done(null, new Buffer("encryption key"));
+            done(null, Buffer.from("encryption key", "utf8"));
         });
         zlibAsyncMock = require("../mock/zlib-async-mock")();
         record = require("../../lib/record")(bufferSerializerMock, config, encryptionMock, promiseMock.promisifyAll(fsMock), otDateMock, promiseMock, zlibAsyncMock);
@@ -64,7 +64,7 @@ describe("record", () => {
         data = {
             date: new Date()
         };
-        innerKey = new Buffer("This is the inner key", "binary");
+        innerKey = Buffer.from("This is the inner key", "binary");
         promise = record.freezeAsync(data, innerKey);
         expect(promise.then).toEqual(jasmine.any(Function));
 
@@ -158,7 +158,7 @@ describe("record", () => {
         data = {
             date: new Date()
         };
-        innerKey = new Buffer("This is the inner key", "binary");
+        innerKey = Buffer.from("This is the inner key", "binary");
         bufferSerializerMock.fromBuffer.and.returnValue({
             data: "deserialized data"
         });

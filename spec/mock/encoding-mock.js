@@ -8,7 +8,7 @@ module.exports = () => {
      * @return {string}
      */
     function decodeFake(input) {
-        return new Buffer(input.toString("binary"), "base64");
+        return Buffer.from(input.toString("binary"), "base64");
     }
 
 
@@ -19,7 +19,7 @@ module.exports = () => {
      * @return {string} base64 of input
      */
     function encodeFake(input) {
-        return new Buffer(input.toString("binary"), "binary").toString("base64");
+        return Buffer.from(input.toString("binary"), "binary").toString("base64");
     }
 
     return {

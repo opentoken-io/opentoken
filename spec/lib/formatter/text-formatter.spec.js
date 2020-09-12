@@ -9,7 +9,7 @@ describe("formatter/textFormatter", () => {
     it("encodes a Buffer as a string", () => {
         var buff, result;
 
-        buff = new Buffer("abc", "binary");
+        buff = Buffer.from("abc", "binary");
         result = formatter(buff);
         expect(Buffer.isBuffer(result)).toBe(true);
         expect(result.toString("binary")).toBe("abc\n");

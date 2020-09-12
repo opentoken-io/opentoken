@@ -42,7 +42,7 @@ jasmine.routeTester("/account/_account-id/token/_token-id/", (container) => {
                     tokenManagerMock.getRecordAsync.and.callFake(() => {
                         return promiseMock.resolve({
                             contentType: "text/plain",
-                            data: new Buffer("this is the data", "binary"),
+                            data: Buffer.from("this is the data", "binary"),
                             public: scenario.public
                         });
                     });

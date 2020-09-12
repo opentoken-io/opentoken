@@ -30,7 +30,7 @@ describe("mfa/totp", () => {
             "verifyTOTP"
         ]);
         twofaAsyncMock.generateGoogleQRAsync.and.callFake(() => {
-            return promiseMock.resolve(new Buffer("png data", "binary"));
+            return promiseMock.resolve(Buffer.from("png data", "binary"));
         });
         twofaAsyncMock.generateUrl.and.returnValue("twofaAsyncMock.generateUrl()");
         twofaAsyncMock.verifyTOTP.and.returnValue(true);

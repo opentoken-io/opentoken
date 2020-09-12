@@ -9,7 +9,7 @@ describe("formatter/jsonFormatter", () => {
     it("encodes a Buffer as base64", () => {
         var buff, result;
 
-        buff = new Buffer("abc", "binary");
+        buff = Buffer.from("abc", "binary");
         result = formatter(buff);
         expect(Buffer.isBuffer(result)).toBe(true);
         expect(result.toString("binary")).toBe("YWJj\n");

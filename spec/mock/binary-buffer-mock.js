@@ -9,7 +9,7 @@ module.exports = () => {
     ]);
 
     mock.toBuffer.and.callFake((params) => {
-        return new Buffer(params, "binary");
+        return Buffer.from(params, "binary");
     });
 
     mock.toString.and.callFake((params) => {

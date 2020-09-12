@@ -9,7 +9,7 @@ describe("formatter/jsonpFormatter", () => {
     });
     [
         {
-            body: new Buffer("abc", "binary"),
+            body: Buffer.from("abc", "binary"),
             name: "with a Buffer",
             result: "\"YWJj\"\n"
         },

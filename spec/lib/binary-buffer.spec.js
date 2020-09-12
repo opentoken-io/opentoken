@@ -9,14 +9,14 @@ describe("binaryBuffer", () => {
     [
         "some string",
         "",
-        new Buffer("some buffer")
+        Buffer.from("some buffer", "utf8")
     ].forEach((scenario) => {
         describe(".toBuffer()", () => {
             it("makes a buffer", () => {
                 expect(binaryBuffer.toBuffer(scenario)).toEqual(jasmine.any(Buffer));
             });
             it("has the right content", () => {
-                expect(binaryBuffer.toBuffer(new Buffer(scenario, "binary"))).toEqual(jasmine.any(Buffer));
+                expect(binaryBuffer.toBuffer(Buffer.from(scenario, "binary"))).toEqual(jasmine.any(Buffer));
             });
         });
         describe(".toString()", () => {

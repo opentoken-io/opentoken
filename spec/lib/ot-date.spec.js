@@ -59,7 +59,7 @@ describe("OtDate", () => {
         it("gets an OtDate object back from a buffer at 1", () => {
             var b;
 
-            b = new Buffer(5);
+            b = Buffer.alloc(5);
             OtDate.fromDate(new Date("2016-04-16")).toBuffer(b, 1);
             testOtDate(OtDate.fromBuffer(b, 1), "2016-04-16T00:00:00.000Z");
         });

@@ -26,7 +26,7 @@ module.exports = () => {
         });
     });
     mock.qrCodeImageAsync.and.callFake(() => {
-        return promiseMock.resolve(new Buffer("png data", "binary"));
+        return promiseMock.resolve(Buffer.from("png data", "binary"));
     });
     mock.registerAsync.and.callFake(() => {
         return promiseMock.resolve({

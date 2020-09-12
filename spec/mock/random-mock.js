@@ -15,8 +15,7 @@ module.exports = () => {
     random.bufferAsync.and.callFake((size) => {
         var buff;
 
-        buff = new Buffer(size);
-        buff.fill(0x42);
+        buff = Buffer.alloc(size, 0x42);
 
         return promiseMock.resolve(buff);
     });
@@ -24,10 +23,8 @@ module.exports = () => {
     random.idAsync.and.callFake((size) => {
         var buff;
 
-        buff = new Buffer(size);
-
         // Fill with the letter B, BBBBBBBBBBBBB... etc
-        buff.fill(0x42);
+        buff = Buffer.alloc(size, 0x42);
 
         return promiseMock.resolve(buff.toString());
     });
