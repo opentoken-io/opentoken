@@ -1,7 +1,7 @@
 "use strict";
 
 describe("validateRequestBodyMiddleware", () => {
-    var chainMiddlewareMock, ErrorResponse, restifyPluginsMock, tv4Mock, validateRequestBodyMiddleware;
+    var chainMiddlewareMock, ErrorResponse, restifyMock, tv4Mock, validateRequestBodyMiddleware;
 
     beforeEach(() => {
         var promiseMock;
@@ -9,9 +9,11 @@ describe("validateRequestBodyMiddleware", () => {
         promiseMock = require("../../mock/promise-mock")();
         ErrorResponse = require("../../../lib/error-response")(promiseMock);
         chainMiddlewareMock = jasmine.createSpy("chainMiddlewareMock");
-        restifyPluginsMock = jasmine.createSpyObj("restifyPlugins", [
-            "bodyParser"
-        ]);
+        restifyMock = {
+            plugins: jasmine.createSpyObj("restify.plugins", [
+                "bodyParser"
+            ])
+        };
         tv4Mock = jasmine.createSpyObj("tv4", [
             "validateResult"
         ]);
@@ -20,11 +22,11 @@ describe("validateRequestBodyMiddleware", () => {
             missing: [],
             valid: "true"
         });
-        validateRequestBodyMiddleware = require("../../../lib/middleware/validate-request-body-middleware")(chainMiddlewareMock, ErrorResponse, restifyPluginsMock, tv4Mock);
+        validateRequestBodyMiddleware = require("../../../lib/middleware/validate-request-body-middleware")(chainMiddlewareMock, ErrorResponse, restifyMock, tv4Mock);
     });
     it("parses the body", () => {
         validateRequestBodyMiddleware("schema");
-        expect(restifyPluginsMock.bodyParser).toHaveBeenCalled();
+        expect(restifyMock.plugins.bodyParser).toHaveBeenCalled();
     });
     describe("validation against schema", () => {
         var middlewareAsync, req, res;

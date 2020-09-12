@@ -1,6 +1,6 @@
 "use strict";
 
-describe("registration", () => {
+xdescribe("registration", () => {
     var test;
 
     beforeEach(() => {

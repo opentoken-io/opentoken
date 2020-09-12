@@ -69,9 +69,9 @@
         "engine": "ses",
         "from": "opentoken@opentoken.io",
         "ses": {
-            "accessKeyId": "",
+            "accessKeyId": "x",
             "region": "us-east-1",
-            "secretAccessKey": ""
+            "secretAccessKey": "x"
         }
     },
     "encryption": {
@@ -165,10 +165,10 @@
     "storage": {
         "engine": "s3",
         "s3": {
-            "accessKeyId": "",
+            "accessKeyId": "x",
             "bucket": "opentoken-io-api",
             "region": "us-east-1",
-            "secretAccessKey": ""
+            "secretAccessKey": "x"
         }
     },
     "template": {

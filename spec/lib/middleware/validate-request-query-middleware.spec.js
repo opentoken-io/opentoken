@@ -1,7 +1,7 @@
 "use strict";
 
 describe("validateRequestQueryMiddleware", () => {
-    var chainMiddlewareMock, ErrorResponse, middlewareFactory, restifyPluginsMock, tv4Mock;
+    var chainMiddlewareMock, ErrorResponse, middlewareFactory, restifyMock, tv4Mock;
 
     beforeEach(() => {
         var promiseMock;
@@ -9,9 +9,11 @@ describe("validateRequestQueryMiddleware", () => {
         promiseMock = require("../../mock/promise-mock")();
         ErrorResponse = require("../../../lib/error-response")(promiseMock);
         chainMiddlewareMock = jasmine.createSpy("chainMiddlewareMock");
-        restifyPluginsMock = jasmine.createSpyObj("restifyPlugins", [
-            "queryParser"
-        ]);
+        restifyMock = {
+            plugins: jasmine.createSpyObj("restify.plugins", [
+                "queryParser"
+            ])
+        };
         tv4Mock = jasmine.createSpyObj("tv4", [
             "validateResult"
         ]);
@@ -20,11 +22,11 @@ describe("validateRequestQueryMiddleware", () => {
             missing: [],
             valid: "true"
         });
-        middlewareFactory = require("../../../lib/middleware/validate-request-query-middleware")(chainMiddlewareMock, ErrorResponse, restifyPluginsMock, tv4Mock);
+        middlewareFactory = require("../../../lib/middleware/validate-request-query-middleware")(chainMiddlewareMock, ErrorResponse, restifyMock, tv4Mock);
     });
     it("parses the query", () => {
         middlewareFactory("schema");
-        expect(restifyPluginsMock.queryParser).toHaveBeenCalled();
+        expect(restifyMock.plugins.queryParser).toHaveBeenCalled();
     });
     describe("validation against schema", () => {
         var middlewareAsync, req, res;

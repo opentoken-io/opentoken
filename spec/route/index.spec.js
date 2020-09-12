@@ -46,7 +46,7 @@ jasmine.routeTester("/", null, (routeTester) => {
         });
         it("calls server.get to serve static assets", () => {
             return routeTester.get().then(() => {
-                expect(routeTester.server.get).toHaveBeenCalledWith(jasmine.any(RegExp), jasmine.any(Function));
+                expect(routeTester.server.get).toHaveBeenCalledWith(jasmine.any(String), jasmine.any(Function));
             });
         });
     });

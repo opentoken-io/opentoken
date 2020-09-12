@@ -1,8 +1,8 @@
 "use strict";
 
 module.exports = (server, pathUrl, options) => {
-    return options.container.call((config, path, restifyPlugins) => {
-        server.get(/\/schema\/.*/, restifyPlugins.serveStatic({
+    return options.container.call((config, path, restify) => {
+        server.get("/schema/*", restify.plugins.serveStatic({
             charSet: "utf-8",
             directory: path.resolve(config.baseDir),
             match: /\.json$/

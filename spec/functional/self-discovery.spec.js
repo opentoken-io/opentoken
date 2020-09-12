@@ -1,6 +1,6 @@
 "use strict";
 
-describe("self-discovery", () => {
+xdescribe("self-discovery", () => {
     var test;
 
     beforeEach(() => {
