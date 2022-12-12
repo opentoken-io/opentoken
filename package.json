@@ -42,7 +42,7 @@
         "jasmine": "~3.6.1",
         "jasmine-test-helpers": "^1.2.3",
         "mock-require": "^3.0.3",
-        "nodemon": "~2.0.4"
+        "nodemon": "~2.0.20"
     },
     "dependencies": {
         "2fa": "^0.1.2",
