@@ -46,7 +46,7 @@
     },
     "dependencies": {
         "2fa": "^0.1.2",
-        "aws-sdk": "^2.814.0",
+        "aws-sdk": "^2.1354.0",
         "bluebird": "^3.7.2",
         "buffer-serializer": "^1.1.0",
         "dizzy": "^2.3.0",
