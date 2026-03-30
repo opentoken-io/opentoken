@@ -35,7 +35,7 @@
     "devDependencies": {
         "chalk": "^4.1.0",
         "codecov": "^3.7.2",
-        "eslint": "^7.8.1",
+        "eslint": "^7.32.0",
         "functional-route-tester": "^1.0.5",
         "http-link-header": "^1.0.2",
         "istanbul": "^0.4.5",
